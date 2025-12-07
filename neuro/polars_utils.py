@@ -38,6 +38,15 @@ def stack_or(flag_list: list[str]) -> pl.Expr:
         pl.lit(False),
     )
 
+def stack_and(flag_list: list[str]) ->pl.Expr:
+    """matches any songs with all listed flags"""
+    return reduce(
+        lambda acc, val: acc & flag_expr(val),
+        flag_list,
+        pl.lit(True),
+    )
+    """start with True and AND with truth of each flag being present"""
+
 
 def load_db(as_db: bool = True, root: Path = ROOT_DIR) -> pl.DataFrame:
     """Wrapper to loader the songs DB regardless of the backend format.
@@ -107,7 +116,6 @@ class Preset:
         """
         self.name = preset_dict["name"]
         self.dict = preset_dict
-
         self.include = self.get_list_assert("include-flags")
         self.exclude = self.get_list_assert("exclude-flags")
 
@@ -119,8 +127,14 @@ class Preset:
                 if preset_dict.get("mp3gain", False) is True:
                     self.mp3gain = mp3gain_config[1]
 
+        self.include_type = preset_dict.get("include-type", "or")
+        self.exclude_type = preset_dict.get("exclude-type", "or")
+
+
         path = preset_dict["path"]
         assert type(path) is str
+
+        path.replace(" ", "\\ ")
 
         if root is None:
             self.path = Path(path)
@@ -135,8 +149,19 @@ class Preset:
         """
         songs_df = load_db()
 
-        includes = stack_or(self.include)  # include#1 | include#2 ...
-        excludes = stack_or(self.exclude)  # exclude#1 | exclude#2 ...
+        assert (self.include_type == "and") | (self.include_type == "or")
+
+        if self.include_type == "and":
+            includes = stack_and(self.include)  # include#1 & include#2 ...
+        elif self.include_type == "or":
+            includes = stack_or(self.include)  # include#1 | include#2 ...
+            
+        assert (self.exclude_type == "and") | (self.exclude_type == "or")
+
+        if self.exclude_type == "and":
+            excludes = stack_and(self.exclude)  # exclude#1 & exclude#2 ...
+        elif self.exclude_type == "or":
+            excludes = stack_or(self.exclude)  # exclude#1 | exclude#2 ...
 
         # Has one of the include flags and none of the exclude
         return songs_df.filter(includes & excludes.not_())

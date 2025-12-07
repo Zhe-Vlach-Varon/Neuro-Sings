@@ -134,8 +134,6 @@ class Preset:
         path = preset_dict["path"]
         assert type(path) is str
 
-        path.replace(" ", "\\ ")
-
         if root is None:
             self.path = Path(path)
         else:

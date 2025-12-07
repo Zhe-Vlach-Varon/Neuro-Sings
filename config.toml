@@ -94,15 +94,15 @@ mp3gain = true
 name = "v1 voice"
 include-flags = ["v1"]
 exclude-flags = ["duplicate", "collab"]
-path = "zvv_sort/v1 voice"
-mp3gain = true
+path = "zvv_sort/v1_voice"
+mp3gain = false
 
 [[Presets]]
 name = "v2 voice"
 include-flags = ["v2"]
 exclude-flags = ["duplicate", "collab"]
-path = "zvv_sort/v2 voice"
-mp3gain = true
+path = "zvv_sort/v2_voice"
+mp3gain = false
 
 [[Presets]]
 #v3 neuro only
@@ -123,7 +123,7 @@ mp3gain = true
 name = "Duets Neuro Lead"
 include-flags = ["duet", "neuro"]
 exclude-flags = ["duplicate", "collab", "christmas", "halloween", "original", "official"]
-path = "zvv_sort/Duets Neuro Lead"
+path = "zvv_sort/Duets_Neuro_Lead"
 mp3gain = true
 include-type = "and"
 
@@ -131,21 +131,21 @@ include-type = "and"
 name = "Duets Neuro Lead"
 include-flags = ["duet", "evil"]
 exclude-flags = ["duplicate", "collab", "christmas", "halloween", "original", "official"]
-path = "zvv_sort/Duets Evil Lead"
+path = "zvv_sort/Duets_Evil_Lead"
 mp3gain = true
 include-type = "and"
 
 [[Presets]]
 name = "Twin Duet Streams"
 include-flags = ["duet"]
-exclude-flags = ["neuro", "evil", "duplicates", "christmas", "halloween", "original", "official"]
-path = "zvv_sort/Twin Duets"
+exclude-flags = ["neuro", "evil", "duplicate", "christmas", "halloween", "original", "official"]
+path = "zvv_sort/Twin_Duets"
 mp3gain = true
 
 [[Presets]]
 name = "Originals"
 include-flags = ["original"]
-exclude-flags = []
+exclude-flags = ["duplicate"]
 path = "zvv_sort/Originals"
 mp3gain = true
 
@@ -153,37 +153,37 @@ mp3gain = true
 name = "Collab Covers"
 include-flags = ["collab"]
 exclude-flags = ["official"]
-path = "zvv_sort/Collab Covers"
+path = "zvv_sort/Collab_Covers"
 mp3gain = true
 
 [[Presets]]
 name = "Official Covers"
 include-flags = ["official"]
 exclude-flags = []
-path = "zvv_sort/Official Covers"
+path = "zvv_sort/Official_Covers"
 mp3gain = true
 
 [[Presets]]
 name = "ZVV Duplicates v3 Neuro"
 include-flags = ["duplicate", "neuro", "v3"]
-exclude-flags = ["arg", "v1", "v2", "duet", "evil", "christmas", "halloween", "original"]
-path = "zvv_sort/Duplicates v3 Neuro"
+exclude-flags = ["arg", "v1", "v2", "duet", "evil", "christmas", "halloween"]
+path = "zvv_sort/Duplicates_v3_Neuro"
 mp3gain = true
 include-type = "and"
 
 [[Presets]]
 name = "ZVV Duplicates v3 Evil"
 include-flags = ["duplicate", "evil", "v3"]
-exclude-flags = ["arg", "v1", "v2", "duet", "neuro", "christmas", "halloween", "original"]
-path = "zvv_sort/Duplicates v3 Evil"
+exclude-flags = ["arg", "v1", "v2", "duet", "neuro", "christmas", "halloween"]
+path = "zvv_sort/Duplicates_v3_Evil"
 mp3gain = true
 include-type = "and"
 
 [[Presets]]
 name = "ZVV Duplicates v3 Duets"
 include-flags = ["duplicate", "duet", "v3"]
-exclude-flags = ["arg", "v1", "v2", "christmas", "halloween", "original"]
-path = "zvv_sort/Duplicates v3 Duets"
+exclude-flags = ["arg", "v1", "v2", "christmas", "halloween"]
+path = "zvv_sort/Duplicates_v3_Duets"
 mp3gain = true
 include-type = "and"
 
@@ -192,7 +192,7 @@ include-type = "and"
 #name = "ZVV Duplicates v2"
 #include-flags = ["v2", "duplicate"]
 #exclude-flags = ["arg", "v3", "v1", "christmas", "halloween"]
-#path = "zvv_sort/Duplicates v2"
+#path = "zvv_sort/Duplicates_v2"
 #mp3gain = false
 #include-type = "and"
 
@@ -201,7 +201,7 @@ name = "ZVV Duplicates v1"
 include-flags = ["v1", "duplicate"]
 exclude-flags = ["arg", "v3", "v2", "christmas", "halloween"]
 # From root
-path = "zvv_sort/Duplicates v1"
+path = "zvv_sort/Duplicates_v1"
 mp3gain = false
 include-type = "and"
 

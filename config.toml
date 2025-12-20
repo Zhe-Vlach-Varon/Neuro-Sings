@@ -23,36 +23,40 @@ mode = "per-preset"
 # Tag just writes a tag giving the gain information, doesn't modify the file's audio
 type = "gain"
 
+# include-type | exclude-type
+# modes are "and" | "or" defaults to "or"
+# what mode to use for include/exclude flags
+
 [[Presets]]
 name = "Main"
 include-flags = ["duet", "evil", "neuro"]
-exclude-flags = ["arg", "duplicate", "v1", "v2"]
+exclude-flags = ["arg", "duplicate", "v1", "v2", "encore"]
 # From root
-path = "main"
+path = "original_sort/main"
 mp3gain = true
 
 [[Presets]]
 name = "Old"
 include-flags = ["v1", "v2"]
-exclude-flags = ["arg", "duplicate"]
+exclude-flags = ["arg", "duplicate", "encore"]
 # From root
-path = "v1v2"
+path = "original_sort/v1v2"
 mp3gain = false
 
 [[Presets]]
 name = "Duplicates v3"
 include-flags = ["duplicate"]
-exclude-flags = ["arg", "v1", "v2"]
+exclude-flags = ["arg", "v1", "v2", "encore"]
 # From root
-path = "duplicates/v3"
+path = "original_sort/duplicates/v3"
 mp3gain = true
 
 [[Presets]]
 name = "Duplicates v1-v2"
 include-flags = ["duplicate"]
-exclude-flags = ["arg", "v3"]
+exclude-flags = ["arg", "v3", "encore"]
 # From root
-path = "duplicates"
+path = "original_sort/duplicates"
 mp3gain = false
 
 [[Presets]]
@@ -60,36 +64,182 @@ name = "ARG"
 include-flags = ["arg"]
 exclude-flags = []
 #from root
-path = "arg"
+path = "original_sort/arg"
 mp3gain = false
+
+[[Presets]]
+name = "ENCORE"
+include-flags = ["encore"]
+exclude-flags = []
+path = "original_sort/encore"
+mp3gain = true
 
 
 # Other examples of presets
-# [[Presets]]
-# name = "All" # Excluding ARG
-# include-flags = ["evil", "neuro"]
-# exclude-flags = []
-# path = "all"
-# mp3gain = false
+#[[Presets]]
+#name = "All" # Excluding ARG
+#include-flags = ["evil", "neuro"]
+#exclude-flags = ["encore"]
+#path = "all"
+#mp3gain = true
 
-# [[Presets]]
-# #v3 neuro only
-# name = "Neuro"
-# include-flags = ["neuro"]
-# exclude-flags = ["duet", "evil", "v1", "v2", "duplicate"]
-# # From root
-# path = "neuro"
+#[[Presets]]
+#name = "All_encore" # Excluding ARG
+#include-flags = ["encore"]
+#exclude-flags = []
+#path = "all_encore"
+#mp3gain = true
 
-# [[Presets]]
-# name = "Evil"
-# include-flags = ["evil"]
-# exclude-flags = ["duet", "neuro", "v1", "v2", "duplicate"]
-# # From root
-# path = "evil"
+[[Presets]]
+name = "v1 voice"
+include-flags = ["v1"]
+exclude-flags = ["duplicate", "collab"]
+path = "zvv_sort/v1_voice"
+mp3gain = false
 
-# [[Presets]]
-# name = "Duets"
-# include-flags = ["duet"]
-# exclude-flags = ["v1", "v2", "duplicate"]
-# # From root
-# path = "duets"
+[[Presets]]
+name = "v2 voice"
+include-flags = ["v2"]
+exclude-flags = ["duplicate", "collab"]
+path = "zvv_sort/v2_voice"
+mp3gain = false
+
+[[Presets]]
+#v3 neuro only
+name = "Neuro"
+include-flags = ["neuro"]
+exclude-flags = ["duet", "evil", "v1", "v2", "duplicate", "collab", "christmas", "halloween", "original", "official"]
+path = "zvv_sort/Neuro"
+mp3gain = true
+
+[[Presets]]
+name = "Evil"
+include-flags = ["evil"]
+exclude-flags = ["duet", "neuro", "v1", "v2", "duplicate", "collab", "christmas", "halloween", "original", "official"]
+path = "zvv_sort/Evil"
+mp3gain = true
+
+[[Presets]]
+name = "Duets Neuro Lead"
+include-flags = ["duet", "neuro"]
+exclude-flags = ["duplicate", "collab", "christmas", "halloween", "original", "official"]
+path = "zvv_sort/Duets_Neuro_Lead"
+mp3gain = true
+include-type = "and"
+
+[[Presets]]
+name = "Duets Neuro Lead"
+include-flags = ["duet", "evil"]
+exclude-flags = ["duplicate", "collab", "christmas", "halloween", "original", "official"]
+path = "zvv_sort/Duets_Evil_Lead"
+mp3gain = true
+include-type = "and"
+
+[[Presets]]
+name = "Twin Duet Streams"
+include-flags = ["duet"]
+exclude-flags = ["neuro", "evil", "duplicate", "christmas", "halloween", "original", "official"]
+path = "zvv_sort/Twin_Duets"
+mp3gain = true
+
+[[Presets]]
+name = "Neuro Originals"
+include-flags = ["original", "neuro"]
+exclude-flags = ["duplicate"]
+path = "zvv_sort/Neuro_Originals"
+mp3gain = true
+include-type = "and"
+
+[[Presets]]
+name = "Evil Originals"
+include-flags = ["original", "evil"]
+exclude-flags = ["duplicate"]
+path = "zvv_sort/Evil_Originals"
+mp3gain = true
+include-type = "and"
+
+[[Presets]]
+name = "Duet Originals"
+include-flags = ["original", "duet"]
+exclude-flags = ["duplicate"]
+path = "zvv_sort/Duet_Originals"
+mp3gain = true
+include-type = "and"
+
+[[Presets]]
+name = "Collab Covers"
+include-flags = ["collab"]
+exclude-flags = ["official"]
+path = "zvv_sort/Collab_Covers"
+mp3gain = true
+
+[[Presets]]
+name = "Official Covers"
+include-flags = ["official"]
+exclude-flags = []
+path = "zvv_sort/Official_Covers"
+mp3gain = true
+
+[[Presets]]
+name = "ZVV Duplicates v3 Neuro"
+include-flags = ["duplicate", "neuro", "v3"]
+exclude-flags = ["arg", "v1", "v2", "duet", "evil", "christmas", "halloween"]
+path = "zvv_sort/Duplicates_v3_Neuro"
+mp3gain = true
+include-type = "and"
+
+[[Presets]]
+name = "ZVV Duplicates v3 Evil"
+include-flags = ["duplicate", "evil", "v3"]
+exclude-flags = ["arg", "v1", "v2", "duet", "neuro", "christmas", "halloween"]
+path = "zvv_sort/Duplicates_v3_Evil"
+mp3gain = true
+include-type = "and"
+
+[[Presets]]
+name = "ZVV Duplicates v3 Duets"
+include-flags = ["duplicate", "duet", "v3"]
+exclude-flags = ["arg", "v1", "v2", "christmas", "halloween"]
+path = "zvv_sort/Duplicates_v3_Duets"
+mp3gain = true
+include-type = "and"
+
+# there are no duplicates in v2
+#[[Presets]]
+#name = "ZVV Duplicates v2"
+#include-flags = ["v2", "duplicate"]
+#exclude-flags = ["arg", "v3", "v1", "christmas", "halloween"]
+#path = "zvv_sort/Duplicates_v2"
+#mp3gain = false
+#include-type = "and"
+
+[[Presets]]
+name = "ZVV Duplicates v1"
+include-flags = ["v1", "duplicate"]
+exclude-flags = ["arg", "v3", "v2", "christmas", "halloween"]
+# From root
+path = "zvv_sort/Duplicates_v1"
+mp3gain = false
+include-type = "and"
+
+[[Presets]]
+name = "ZVV ARG"
+include-flags = ["arg"]
+exclude-flags = []
+path = "zvv_sort/arg"
+mp3gain = false
+
+[[Presets]]
+name = "ZVV Christmas"
+include-flags = ["christmas"]
+exclude-flags = []
+path = "zvv_sort/Christmas"
+mp3gain = true
+
+[[Presets]]
+name = "ZVV Halloween"
+include-flags = ["halloween"]
+exclude-flags = []
+path = "zvv_sort/Halloween"
+mp3gain = true
+

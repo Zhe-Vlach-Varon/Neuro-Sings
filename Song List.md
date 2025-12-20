@@ -1711,6 +1711,7 @@ Special album: Subathon covers
 1. LIFE (Neuro)
 2. BOOM (Evil)
 3. NEVER (Duet)
+4. Colorful Array (Neuro)
 
 ## ARG Songs
 1. Numbers.mp3 | 2023-04-27

@@ -143,11 +143,28 @@ path = "zvv_sort/Twin_Duets"
 mp3gain = true
 
 [[Presets]]
-name = "Originals"
-include-flags = ["original"]
+name = "Neuro Originals"
+include-flags = ["original", "neuro"]
 exclude-flags = ["duplicate"]
-path = "zvv_sort/Originals"
+path = "zvv_sort/Neuro_Originals"
 mp3gain = true
+include-type = "and"
+
+[[Presets]]
+name = "Evil Originals"
+include-flags = ["original", "evil"]
+exclude-flags = ["duplicate"]
+path = "zvv_sort/Evil_Originals"
+mp3gain = true
+include-type = "and"
+
+[[Presets]]
+name = "Duet Originals"
+include-flags = ["original", "duet"]
+exclude-flags = ["duplicate"]
+path = "zvv_sort/Duet_Originals"
+mp3gain = true
+include-type = "and"
 
 [[Presets]]
 name = "Collab Covers"

@@ -1647,6 +1647,19 @@ Only duplicates
 17. Flawed Mangoes - Surreal: 01:56:44
 18. (Duet) Casey Edwards - Bury the Light:  02:04:22
 
+### 21-12-2025 (Evil) Link and timestamps to be added when vod is uploaded
+
+1. I am Gonna Claw (Out Your Eyes Then Drown you to Death) - Darren Korb - New
+2. Sk8ter Boi - Avril Lavigne - Duplicate
+3. RuLe - Ado - Duplicate
+4. Dial Tone - Catch Your Breath - New
+5. Vice Versa - Nano - Duplicate
+6. Q & A - Pinata - New
+7. Seven Nation Army - The White Stripes - Duplicate
+8. Every Breath You Take - The Police - New
+9. Intergalactia - Kira - Duplicate
+10. She Used To Be Mine - Sara Bareilles - New
+
 ## Collabs
 ### "Official" (not on stream, separate release)
 Put as special album: Collabs, list in order
@@ -1660,7 +1673,7 @@ Put as special album: Collabs, list in order
 - [x] 6. Bottom 2 ft Numi & other people 18-04-2025
 - [x] 7. Mesmerizer ft Bao 19-08-2025
 - [x] 8. Crazy Fuckin' Robot Body 03-12-2025
-- [x] 7. Chinatown Blues ft Vedal 06-12-2025
+- [x] 9. Chinatown Blues ft Vedal 06-12-2025
 
 ### Stream Covers
 [I see the light](https://youtu.be/dIyByMwOaD8)
@@ -1706,6 +1719,9 @@ Special album: Subathon covers
 ### Year 2
 5. Subathon Mashup 2
 6. Viva la vida fallen Kingdom
+
+### Year 3
+7. Subathon Mashup 3
 
 ## Originals
 1. LIFE (Neuro)

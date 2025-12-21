@@ -29,7 +29,7 @@ type = "gain"
 
 [[Presets]]
 name = "Main"
-include-flags = ["duet", "evil", "neuro"]
+include-flags = ["duet", "evil", "neuro", "mashup"]
 exclude-flags = ["arg", "duplicate", "v1", "v2", "encore"]
 # From root
 path = "original_sort/main"
@@ -89,6 +89,13 @@ mp3gain = true
 #exclude-flags = []
 #path = "all_encore"
 #mp3gain = true
+
+[[Presets]]
+name = "subathon mashups"
+include-flags = ["mashup"]
+exclude-flags = []
+path = "zvv_sort/subathon_mashups"
+mp3gain = true
 
 [[Presets]]
 name = "v1 voice"

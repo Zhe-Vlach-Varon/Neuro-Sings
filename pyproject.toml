@@ -20,6 +20,7 @@ license-files = ["LICENSE-APACHE", "LICENSE-MIT"]
 
 [project.scripts] # Shortcuts, have a command for main run so that it emulates a "real" run
 songs-generate = "neuro.run:generate_songs"
+albums-generate = "neuro.run:generate_albums"
 update-json = "neuro.run:new_batch_detection"
 thumbnails-generate = "neuro.thumbnails:generate_main"
 # thumbnails-old = "neuro.thumbnails:generate_oldge"

@@ -9,7 +9,7 @@ from neuro import DRIVE_DIR, LOG_DIR
 from neuro.checks import check_are_dbs_identical
 from neuro.detection import export_json, extract_all
 from neuro.file_tags import CustomSong, DriveSong
-from neuro.polars_utils import Preset, load_dates
+from neuro.polars_utils import Preset, load_dates, load_db
 from neuro.utils import MP3GainMode, MP3ModeTuple, format_logger, time_format
 
 DateDict = dict[str, dict[str, str]]
@@ -101,6 +101,71 @@ def generate_songs() -> None:
 
     logger.success(f"[GEN] Generated all presets in {time_format(time() - t)} !")
 
+def generate_albums() -> None:
+    """generates all songs sorted by album"""
+
+    format_logger(log_file=LOG_DIR / "generation.log")
+    logger.info("[GEN] Starting generation batch")
+
+    # Avoids wrong generations due to inconsistent databases
+    try:
+        check_are_dbs_identical()
+    except ValueError as e:
+        logger.error("[GEN] Error while comparing Databases")
+        raise e
+    
+    # Loading config file
+    with open("config.toml", "rb") as file:
+        config = toml.load(file)
+    
+    cfg_out = config["output"]
+    if cfg_out["use-root"]:
+        OUT_ROOT = Path(cfg_out["out-root"])
+    else:
+        OUT_ROOT = None
+
+    mp3gain = parse_mp3gain(config)
+
+    # Start time
+    t = time()
+
+    songDB = load_db()
+
+    albums = songDB.get_column("Album").unique()
+
+    album_names = []
+    album_paths = []
+
+    dates_dict: DateDict = {k["Date"]: k for k in load_dates().iter_rows(named=True)}
+
+    for album in albums:
+        if not album_names.__contains__(album):
+            album_names.append(album)
+            out_dir = OUT_ROOT.__str__() + "/albums/" + album
+            os.makedirs(out_dir, exist_ok=True)
+            album_paths.append(out_dir)
+    
+    for i, song_dict in enumerate(songDB.iter_rows(named=True)):
+        N_SONGS = len(songDB)
+
+        if Path(song_dict["File_IN"]).is_relative_to(DRIVE_DIR):
+            date_dict = dates_dict.get(song_dict["Date"], {})
+            s = DriveSong(song_dict, date_dict)
+        else:
+            s = CustomSong(song_dict)
+
+        album = song_dict["Album"]
+        
+        created = s.create_out_file(create=False, out_dir=OUT_ROOT.__str__() + "/albums/" + album)
+        if created:
+            s.apply_tags()
+        logger.debug(
+            f"[GEN] [{i+1:4d}/{N_SONGS}] [{album}] {'Generated' if created else 'Skipped'} {song_dict['Song']}"
+        )
+    mp3gain_albums(album_paths)
+
+    
+
 
 def parse_mp3gain(config: dict) -> MP3ModeTuple:
     """Gets the mp3gain global config from the config file.
@@ -179,6 +244,14 @@ def mp3gain_standalone() -> None:
         preset_obj = Preset(preset, mp3gain, OUT_ROOT)
         run_mp3gain(preset_obj)
 
+def mp3gain_albums(album_paths: list) -> None:
+    """Runs mp3gain on Albums"""
+    options = "-r -k"
+    OUT_LOG = Path(LOG_DIR / "mpgain.log")
+    for path in album_paths:
+        escaped_path = path.__str__().replace(' ', '\ ').replace('[', '\[').replace(']', '\]')
+        logger.info(f"[GEN] Running mp3gain for album {os.path.basename(path)}")
+        os.system(f"mp3gain {options} {escaped_path}/*.mp3 > {OUT_LOG}")
 
 if __name__ == "__main__":
     generate_songs()

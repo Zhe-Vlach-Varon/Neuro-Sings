@@ -13,6 +13,7 @@ dependencies = [
     "pyarrow>=20.0.0",
     "sqlalchemy>=2.0.41",
     "tqdm>=4.67.1",
+    "tinytag>=2.2.0",
 ]
 requires-python = ">=3.11, <3.13"
 readme = "README.md"

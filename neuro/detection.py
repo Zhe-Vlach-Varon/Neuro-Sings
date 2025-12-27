@@ -5,11 +5,12 @@ import re
 from datetime import datetime
 from pathlib import Path
 from typing import Optional
+import tinytag
 
 import polars as pl
 from loguru import logger
 
-from neuro import CUSTOM_DIR, DRIVE_DIR, ROOT_DIR, SONGS_JSON
+from neuro import CUSTOM_DIR, DRIVE_DIR, ROOT_DIR, SONGS_JSON, UNOFFICIALV3_DIR, UNOFFV3_DISC1, UNOFFV3_DISC2, UNOFFV3_DISC3, UNOFFV3_DISC4, UNOFFV3_DISC5, UNOFFV3_DISC6, UNOFFV3_DISC7, UNOFFV3_DISC8, UNOFFV3_DISC66
 from neuro.polars_utils import load_db
 
 SongEntry = dict[str, Optional[str]]
@@ -42,6 +43,7 @@ def get_files(songs: pl.DataFrame) -> dict[str, list[Path]]:
     v1_dir = DRIVE_DIR / "v1 voice"
     v2_dir = DRIVE_DIR / "v2 voice"
     custom_dir = CUSTOM_DIR
+    unofficialV3_dir = [UNOFFICIALV3_DIR / UNOFFV3_DISC1, UNOFFICIALV3_DIR / UNOFFV3_DISC2, UNOFFICIALV3_DIR / UNOFFV3_DISC3, UNOFFICIALV3_DIR / UNOFFV3_DISC4, UNOFFICIALV3_DIR / UNOFFV3_DISC5, UNOFFICIALV3_DIR / UNOFFV3_DISC6, UNOFFICIALV3_DIR / UNOFFV3_DISC7, UNOFFICIALV3_DIR / UNOFFV3_DISC8, UNOFFICIALV3_DIR / UNOFFV3_DISC66]
 
     return {
         "Neuro": get_audios(neuro_dir),
@@ -50,6 +52,7 @@ def get_files(songs: pl.DataFrame) -> dict[str, list[Path]]:
         "V1": get_audios(v1_dir),
         "V2": get_audios(v2_dir),
         "Custom": get_audios(custom_dir) + get_audios(custom_dir, filetype="flac"),
+        "UnofficialV3": get_audios(unofficialV3_dir[0]) + get_audios(unofficialV3_dir[1]) + get_audios(unofficialV3_dir[2]) + get_audios(unofficialV3_dir[3]) + get_audios(unofficialV3_dir[4]) + get_audios(unofficialV3_dir[5]) + get_audios(unofficialV3_dir[6]) + get_audios(unofficialV3_dir[7]) + get_audios(unofficialV3_dir[8]),
     }
 
 
@@ -237,6 +240,69 @@ def extract_custom(files: list[Path], out: SongJSON = {}) -> SongJSON:
     out["custom"] = outputs
     return out
 
+def extract_unofficialV3(files: list[Path], out: SongJSON = {}) -> SongJSON:
+    """extract files from the Unofficial Neuro Karaoke Archvie v3
+    
+    Args:
+        files (list[Path]): List of files.
+        out (SongJSON, optional): Same as for `extract_list`. Dictionary created or completed\
+            with files' data. Defaults to {}.
+            
+    Returns:
+        SongJSON: Dictionary with at least these files' information.
+    """
+
+    id = 1
+    for file in files:
+        data = {}
+        date = ""
+        artist = ""
+        title = ""
+        trackInfo = tinytag.TinyTag.get(file)
+        if trackInfo.other.keys().__contains__('comment'):
+            trackJSon = json.loads(trackInfo.other['comment'][0])
+            date = trackJSon['Date']
+            artist = trackJSon['Artist']
+            title = trackJSon['Title']
+        elif file.__str__().__contains__('Mashup'):
+            year = trackInfo.year.__str__()
+            date = year + '-12-19'
+            title = 'Anniversary Mashup (' + year + ')'
+            artist = 'Duet (Neuro & Evil) - Mixed by QueenPb'
+        elif file.__str__().__contains__('ARG'):
+            date = 'ARG'
+            artist = trackInfo.artist
+            title = trackInfo.title
+        data = {
+            'CoverArtist': trackJSon['CoverArtist'],
+            'Artist':artist,
+            'Song':title,
+            'file':file.__str__(),
+            'id': id,
+        }
+        if date.__contains__("2023-01"):
+            date = "Neuro [v1] January Stream Songs"
+        if date.__contains__("2023-02"):
+            date = "Neuro [v1] Feburary Stream Songs"
+        if date.__contains__("2023-03") and date < "2023-03-22":
+            date = "Neuro [v1] March Stream Songs"
+        # unused song from PBs drive, was inserted into Disc 3 of Unofficial Archive, not including in Neuro-Sings
+        if (date == "2023" and title == "It's Been So Long") or (date == ""):
+            date = "outlier"
+            data['id'] = None
+        else:
+            id += 1
+        # date = "unofficial V3 extract"
+        if date in out:
+            out[date].append(data)
+        else:
+            out[date] = [data]
+
+    return out
+
+ # TODO make date a sub-element of the song object, and make the top-level objects Album
+ # TODO auto-detect what karaoke stream a song is from, and group songs by date and singer
+
 
 def extract_all() -> SongJSON:
     """Runs all the extraction functions on all defined patterns.
@@ -264,6 +330,9 @@ def extract_all() -> SongJSON:
 
     # Custom
     extract_custom(files["Custom"], out)
+
+    # unofficial v3
+    extract_unofficialV3(files["UnofficialV3"], out)
     return out
 
 

@@ -5,7 +5,7 @@ from time import time
 
 from loguru import logger
 
-from neuro import DRIVE_DIR, LOG_DIR
+from neuro import DRIVE_DIR, CUSTOM_DIR, UNOFFICIALV3_DIR, LOG_DIR
 from neuro.checks import check_are_dbs_identical
 from neuro.detection import export_json, extract_all
 from neuro.file_tags import CustomSong, DriveSong
@@ -21,7 +21,7 @@ def new_batch_detection() -> None:
     """
     format_logger(verbosity=5, log_file=LOG_DIR / "batches.log")
     # These 3 lines could be ine call, but it would just make the code less clear
-    out = extract_all()  # Exctacts data
+    out = extract_all()  # Exctracts data
     export_json(out)  # Writing into JSON
 
 
@@ -248,10 +248,16 @@ def mp3gain_albums(album_paths: list) -> None:
     """Runs mp3gain on Albums"""
     options = "-r -k"
     OUT_LOG = Path(LOG_DIR / "mpgain.log")
-    for path in album_paths:
-        escaped_path = path.__str__().replace(' ', '\ ').replace('[', '\[').replace(']', '\]')
-        logger.info(f"[GEN] Running mp3gain for album {os.path.basename(path)}")
-        os.system(f"mp3gain {options} {escaped_path}/*.mp3 > {OUT_LOG}")
+    with open("config.toml", "rb") as file:
+        config = toml.load(file)
+
+    cfg_out = config["output"]
+    OUT_ROOT = Path(cfg_out["out-root"])
+    # for path in album_paths:
+        # if not path.__str__() == "":
+            # escaped_path = path.__str__().replace(' ', '\\ ')
+    logger.info(f"[GEN] Running mp3gain for albums") # {os.path.basename(path)}")
+    os.system(f"mp3gain {options} {OUT_ROOT.__str__() + "/albums"}/*/*.mp3 > {OUT_LOG}")
 
 if __name__ == "__main__":
     generate_songs()

@@ -8,7 +8,7 @@ from loguru import logger
 from neuro import DRIVE_DIR, CUSTOM_DIR, UNOFFICIALV3_DIR, LOG_DIR
 from neuro.checks import check_are_dbs_identical
 from neuro.detection import export_json, extract_all
-from neuro.file_tags import CustomSong, DriveSong
+from neuro.file_tags import CustomSong, DriveSong, UnofficialV3Song
 from neuro.polars_utils import Preset, load_dates, load_db
 from neuro.utils import MP3GainMode, MP3ModeTuple, format_logger, time_format
 
@@ -21,7 +21,7 @@ def new_batch_detection() -> None:
     """
     format_logger(verbosity=5, log_file=LOG_DIR / "batches.log")
     # These 3 lines could be ine call, but it would just make the code less clear
-    out = extract_all()  # Exctracts data
+    out = extract_all()  # Extracts data
     export_json(out)  # Writing into JSON
 
 
@@ -46,6 +46,8 @@ def generate_from_preset(preset: Preset, dates_dict: DateDict) -> None:
         if Path(song_dict["File_IN"]).is_relative_to(DRIVE_DIR):
             date_dict = dates_dict.get(song_dict["Date"], {})
             s = DriveSong(song_dict, date_dict)
+        elif Path(song_dict["File_IN"]).is_relative_to(UNOFFICIALV3_DIR):
+            s = UnofficialV3Song(song_dict, date_dict)
         else:
             s = CustomSong(song_dict)
 

@@ -39,6 +39,8 @@ def check_hash() -> None:
     logger.debug("Checking files' hashes")
     for song in tqdm(songs.iter_rows(named=True), total=len(songs)):
         file = ROOT_DIR / Path(song["File_IN"])
+        # TODO add debug mode toggles
+        print(file)
         assert file.exists()
         hash = song["Hash_IN"]
         assert get_sha256(file) == hash, f"{file}"

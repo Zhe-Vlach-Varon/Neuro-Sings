@@ -92,6 +92,8 @@ class Song:
         self.image: Optional[str] = song_dict["Image"]
         self.outfile: Optional[Path] = None
 
+        self.who: str = ""
+
         self.d: SongEntry = song_dict
         self.k: SongEntry = karaoke_dict
 
@@ -271,15 +273,28 @@ class DriveSong(Song):
         id3.add(TPE2(encoding=3, text=self.album_artist))
         id3.add(TSO2(encoding=3, text=self.album_artist))
 
+        if self.flags.evil:
+            self.who = "evil"
+        elif self.flags.neuro:
+            self.who = "neuro"
+        else:
+            self.who = "twins"
+
         # Cover Image
         if self.image is None:
             if self.flags.duet:
-                cover = IMAGES_COVERS_DIR / Path(f"duet-{self.date}.jpg")
-            else:
+                cover = IMAGES_COVERS_DIR / Path(f"{self.date}-{self.who}-duet.jpg")
+            elif self.flags.v1 or self.flags.v2:
                 cover = IMAGES_COVERS_DIR / Path(f"{self.date}.jpg")
+            else:
+                cover = IMAGES_COVERS_DIR / Path(f"{self.date}-{self.who}.jpg")
         else:
             cover = IMAGES_CUSTOM_DIR / f"{self.image}.jpg"
+        
+        print(self.who)
 
+        print(self.file)
+        print(self.flags)
         file_check(cover)
         id3.delall("APIC")
         id3.add(self.id3_pic(cover))
@@ -322,10 +337,37 @@ class CustomSong(Song):
             ValueError: If the file isn't a .mp3 or .flac file.
         """
         ext = self.file.suffix
-        if self.image is None:
+        print(self.file)
+        print(self.flags)
+        if self.image is None and not self.flags.as_drive:
             logger.error(f"Image can't be None for custom song {self.file}")
 
-        self.cover = IMAGES_CUSTOM_DIR / f"{self.image}.jpg"
+        if self.flags.evil:
+            self.who = "evil"
+        elif self.flags.neuro:
+            self.who = "neuro"
+        else:
+            self.who = "twins"
+
+        # Cover Image
+        if self.image is None:
+            if self.flags.duet:
+                print("duet")
+                self.cover = IMAGES_COVERS_DIR / Path(f"{self.date}-{self.who}-duet.jpg")
+            elif self.flags.v1 or self.flags.v2:
+                print("v1 or v2")
+                self.cover = IMAGES_COVERS_DIR / Path(f"{self.date}.jpg")
+            else:
+                print("v3")
+                self.cover = IMAGES_COVERS_DIR / Path(f"{self.date}-{self.who}.jpg")
+        else:
+            print("Custom image")
+            self.cover = IMAGES_CUSTOM_DIR / f"{self.image}.jpg"
+        
+        print(self.who)
+
+        print(self.file)
+        print(self.flags)
         file_check(self.cover)
 
         match ext:
@@ -410,6 +452,62 @@ class CustomSong(Song):
         file.clear_pictures()
         file.add_picture(image)
         file.save()
+
+# TODO figure out if this is actually needed and if so finish
+class UnofficialV3Song(Song):
+    """Metadata for a song from the Unofficial Archive."""
+
+    def __init__(self, song_dict: dict, karaoke_dict) -> None:
+        super().__init__(song_dict, karaoke_dict)
+
+    def create_out_file(self, *, out_dir: Path = Path("out"), create: bool = True) -> bool:
+        file = self.file
+        ext = file.suffix
+
+        name = self.file_name(not self.flags.as_drive)
+        self.outfile = ROOT_DIR / out_dir / f"{name}{ext}"
+
+        if create or (not self.outfile.exists()):
+            shutil.copy2(file, self.outfile)
+            return True
+        return False
+
+    def apply_tags(self) -> None:
+        """Applies ID3 tags on the file. First uses EasyID3 for text tags. Then ID3 to write the cover
+        picture to the file.
+        """
+        # Text tags
+        id3 = ID3(self.outfile)
+
+        common_props = self.get_id3_frames()
+        for frame in common_props:
+            id3.add(frame)
+
+        id3.add(TPE2(encoding=3, text=self.album_artist))
+        id3.add(TSO2(encoding=3, text=self.album_artist))
+
+        if self.flags.evil:
+            self.who = "evil"
+        elif self.flags.neuro:
+            self.who = "neuro"
+
+        # Cover Image
+        if self.image is None:
+            if self.flags.duet:
+                cover = IMAGES_COVERS_DIR / Path(f"{self.date}-{self.who}-duet.jpg")
+            else:
+                cover = IMAGES_COVERS_DIR / Path(f"{self.date}-{self.who}.jpg")
+        else:
+            cover = IMAGES_CUSTOM_DIR / f"{self.image}.jpg"
+
+        print(self.file)
+        print(self.flags)
+        file_check(cover)
+        id3.delall("APIC")
+        id3.add(self.id3_pic(cover))
+        id3.save()
+
+    # def apply_id3(self) -> None:
 
 
 if __name__ == "__main__":

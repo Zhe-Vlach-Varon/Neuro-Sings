@@ -34,6 +34,6 @@ UNOFFV3_DISC5 = "DISC 5 - Non-Stop Innovation (2024-07-10 - 2024-11-17)"
 UNOFFV3_DISC6 = "DISC 6 - Second Anniversary (2024-11-17 - 2025-05-15)"
 UNOFFV3_DISC7 = "DISC 7 - Background Running Process (2025-05-28 - 2025-11-26)"
 UNOFFV3_DISC8 = "DISC 8 - Third Anniversary (2025-12-19 - Present)"
-UNOFFV3_DISC66 = "DISC 66 - ARG"
+UNOFFV3_DISC66 = "EXTRA CONTENT/DISC 66 - ARG"
 
 LOG_DIR = ROOT_DIR / Path("logs")

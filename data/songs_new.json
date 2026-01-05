@@ -6,5 +6,13 @@
       "file": "songs/drive/Evil/Darude - Sandstorm (evil) (29 05 24).mp3",
       "id": null
     }
+  ],
+  "outlier": [
+    {
+      "Artist": "",
+      "Song": "fnaf",
+      "file": "songs/drive/fnaf.mp3",
+      "id": null
+    }
   ]
 }

@@ -21,6 +21,141 @@ from neuro import (
 from neuro.polars_utils import load_dates
 from neuro.utils import format_logger, time_format
 
+# 01 19 296 
+# 02 06 310
+# 03 03 312
+# 04 02 313
+# 05 06 309
+# 06 01 314
+# 07 07 308
+# 08 02 313
+# 09 03 312
+# 10 19 296
+# 11 39 276
+# 12 25 290
+
+
+DATES_MONTH_BOUND_BOX_SIZES = [
+    [19, 296],
+    [6, 310],
+    [3, 312],
+    [2, 313],
+    [6, 309],
+    [1, 314],
+    [7, 308],
+    [2, 313],
+    [3, 312],
+    [19, 296],
+    [39, 276],
+    [25, 290]
+]
+
+# DATES_DAY_BOUND_BOX_SIZES = []
+
+# TODO figure out why the day numbers don't line up properly vertically (seriously, what is going on, why don't they match the spacing of the year and month)
+# TODO make a lookup table for day bounding box dimensions
+# TODO figure out how to space characters to mimic proper kerning
+# TODO move this function and related changes to a seperate branch, merge that branch into main, then merge main back into unofficialV3_extract
+def apply_text_from_date_atlases(image: Image.Image,
+                                 year: int,
+                                 month: int,
+                                 day: int,
+                                 MAX_SIZE: int = 500
+) -> Image.Image:
+    """Writes a date from new Year, Month, and Day text atlas images on an image. Resizes the\
+       image to fit in a MAX_SIZExMAX_SIZE (default 500) Square. Returns the modified image.
+       
+    Args:
+        image (ImageFile): Background Image
+        year (int): the year part of the date - 2023 - 2026
+        month (int): the month part of the date - 1 - 12
+        day (int): the day part of the date - 1 - 31
+            does not check if date is valid
+            
+    Returns:
+            Image.Image: Image with the date text pasted on it."""
+    years = Image.open(IMAGES_DATES_DIR / "text_atlas_year.png").convert("RGBA")
+    months = Image.open(IMAGES_DATES_DIR / "text_atlas_month.png").convert("RGBA")
+    days = Image.open(IMAGES_DATES_DIR / "text_atlas_day.png").convert("RGBA")
+
+    year_w = years.width
+    month_w = DATES_MONTH_BOUND_BOX_SIZES[month-1][1] - DATES_MONTH_BOUND_BOX_SIZES[month-1][0]
+    day_w = days.width
+
+    date_w = year_w + month_w + day_w
+    date_h = 170
+
+    year_idx = year - 2023
+    month_idx = month - 1
+    day_idx = day - 1
+    
+    w,h = image.size
+    new_image = image.copy()
+
+    # Force cover to be at most MAX_SIZExMAX_SIZE (default 500x500)
+    if w > MAX_SIZE or h > MAX_SIZE:
+        if w == h:  # Case to avoid rounding errors
+            new_dims = (MAX_SIZE, MAX_SIZE)
+        elif w > h:
+            new_dims = (MAX_SIZE, int(MAX_SIZE / w * h))
+        else:  # w < h
+            new_dims = (int(MAX_SIZE / h * w), MAX_SIZE)
+        new_image = new_image.resize(new_dims)
+    w, h = new_image.size
+
+    # Cropping the Date zone in the dates atlas
+    year_box_up = date_h * year_idx
+    year_box_down = year_box_up + date_h
+
+    month_box_up = date_h * month_idx
+    month_box_down = month_box_up + date_h
+
+    day_box_up = date_h * day_idx
+    day_box_down = day_box_up + date_h
+
+    year_zone = (0,year_box_up, year_w, year_box_down)
+    year_crop = years.crop(year_zone)
+
+    month_zone = (DATES_MONTH_BOUND_BOX_SIZES[month-1][0], month_box_up, DATES_MONTH_BOUND_BOX_SIZES[month-1][1], month_box_down)
+    month_crop = months.crop(month_zone)
+
+    day_zone = (0, day_box_up, day_w, day_box_down)
+    day_crop = days.crop(day_zone)
+
+    # Scaling text to image
+    TEXT_RATIO = 0.6
+    text_w = TEXT_RATIO * w
+    text_h = text_w * date_h / date_w # Keeps the text aspect ratio
+    # th = tw * dh / dw
+    # th * dw = tw * dh
+    # th * dw / dh = tw
+    year_resize_w = text_h * year_w / date_h
+    month_resize_w = text_h * month_w / date_h
+    day_resize_w = text_h * day_w / date_h
+    
+    year_text = year_crop.resize([int(year_resize_w), int(text_h)])
+    month_text = month_crop.resize([int(month_resize_w), int(text_h)])
+    day_text = day_crop.resize([int(day_resize_w), int(text_h)])
+
+    # Pastes the date onto the original image
+    text_x = int((w - text_w) / 2)
+    text_y = int(0.8 * h)
+
+    year_x = int(text_x)
+    month_x = int(year_x + year_resize_w)
+    day_x = int(month_x + month_resize_w)
+
+    year_paste_zone = (year_x, text_y)
+    month_paste_zone = (month_x, text_y)
+    day_paste_zone = (day_x, text_y)
+
+    # Pastes the date onto the original image
+    new_image.paste(year_text, year_paste_zone, year_text)
+    new_image.paste(month_text, month_paste_zone, month_text)
+    new_image.paste(day_text, day_paste_zone, day_text)
+
+    return new_image
+
 
 def apply_text(
     image: Image.Image,
@@ -127,9 +262,13 @@ def generate_oldge() -> None:
         else:
             base = SOLO_BG[1]
 
+
         if date[5] in digits:  # It's a month digit and not a month written in letters
-            date_img = DATES_KARAOKES
-            apply_text(base, date_img, i_k).convert("RGB").save(IMAGES_COVERS_DIR / f"{date}.jpg")
+            date_img = DATES_KARAOKES        
+            year = 2023
+            month = digits.find(date[5]) * 10 + digits.find(date[6])
+            day = digits.find(date[8]) * 10 + digits.find(date[9])
+            apply_text_from_date_atlases(base, year, month, day).convert("RGB").save(IMAGES_COVERS_DIR / f"{date}.jpg")
             i_k += 1
         else:
             date_img = DATES_MONTHS
@@ -162,7 +301,7 @@ def check_stream(stream: dict[str, str]) -> None:
         - Duet format isn't v1, v2v1 or v2
     """
     year = stream["Date"][:4]
-    if year not in ["2023", "2024", "2025"]:
+    if year not in ["2023", "2024", "2025", "2026"]:
         raise ValueError(f"Wrong year {year}")
 
     if stream["Singer"] not in ["Neuro", "Evil", "Twins"]:
@@ -212,7 +351,6 @@ def singer_match(singer: Singer, version: DuetVersion) -> tuple[int, int]:
 
     return solo, duet
 
-
 def generate_main() -> None:
     """Generates all thumbnails at once. It automatically re-generate all of them."""
     format_logger(log_file=LOG_DIR / "thumbnails.log")
@@ -232,7 +370,7 @@ def generate_main() -> None:
 
     DATES_IMAGES = {
         y: open_image(IMAGES_DATES_DIR, f"{y}-dates.png", rgba=True)
-        for y in range(2023, 2026)
+        for y in range(2023, 7)
     }
     # fmt: on
 
@@ -244,8 +382,8 @@ def generate_main() -> None:
     N_COVERS = len(dates)
 
     os.makedirs(IMAGES_COVERS_DIR, exist_ok=True)
-    # Indices keeping track for 2023 | 2024 | 2025 images
-    indices = {y: 0 for y in range(2023, 2026)}
+    # Indices keeping track for 2023 | 2024 | 2025 | 2026 images
+    indices = {y: 0 for y in range(2023, 2027)}
 
     for stream in dates.iter_rows(named=True):
         check_stream(stream)
@@ -257,22 +395,25 @@ def generate_main() -> None:
         date_idx = indices[year]
         indices[year] += 1
 
+        print(who)
+
         i_solo, i_duet = singer_match(who, version)
 
         # Doesn't generate solo covers for Twins streams
         if i_solo != -1:
             # Solo thumbnail generation
-            apply_text(
-                SOLO_BG[i_solo],
-                DATES_IMAGES[year],
-                date_idx,
-            ).convert("RGB").save(IMAGES_COVERS_DIR / f"{date}.jpg")
+            month = digits.find(date[5]) * 10 + digits.find(date[6])
+            day = digits.find(date[8]) * 10 + digits.find(date[9])
+            apply_text_from_date_atlases(SOLO_BG[i_solo], year, month, day).convert("RGB").save(IMAGES_COVERS_DIR / f"{date}-{str(who).lower()}.jpg")
         # Duet thumbnail generation
-        apply_text(
-            DUET_BG[i_duet],
-            DATES_IMAGES[year],
-            date_idx,
-        ).convert("RGB").save(IMAGES_COVERS_DIR / f"duet-{date}.jpg")
+        month = digits.find(date[5]) * 10 + digits.find(date[6])
+        day = digits.find(date[8]) * 10 + digits.find(date[9])
+        apply_text_from_date_atlases(DUET_BG[i_duet], year, month, day).convert("RGB").save(IMAGES_COVERS_DIR / f"{date}-{str(who).lower()}-duet.jpg")
+
+        print(IMAGES_COVERS_DIR / f"{date}-{str(who).lower()}.jpg")
+        print(IMAGES_COVERS_DIR / f"{date}-{str(who).lower()}-duet.jpg")
+
+        
 
         i_total = sum(indices.values()) - 1
         logger.debug(f"[THUMB] [{i_total + 1:2d}/{N_COVERS}] Cover Pictures for {date} done")

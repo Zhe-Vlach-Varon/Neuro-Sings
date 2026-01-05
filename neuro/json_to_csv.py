@@ -12,6 +12,31 @@ from neuro.utils import file_check, format_logger, get_sha256
 
 
 def is_eliv(s: SongEntry) -> bool:
+    """Checks if the file from an Entry is sung by Evil.
+
+    Args:
+        s (SongEntry): Song Entry.
+
+    Returns:
+        bool: True if it's sung by Evil.
+    """
+    assert s["file"] is not None
+    return "Evil.v" in s["file"]
+
+def is_duet(s: SongEntry) -> bool:
+    """Checks if the file from an Entry is a duet.
+
+    Args:
+        s (SongEntry): Song Entry.
+
+    Returns:
+        bool: True if it's in the subfolder.
+    """
+    assert s["file"] is not None
+    return "(Duet.v" in s["file"] and "Neuro & Evil)" in s["file"]
+
+
+def is_eliv_old(s: SongEntry) -> bool:
     """Checks if the file from an Entry is in the Evil subdirectory.
 
     Args:
@@ -56,22 +81,31 @@ def get_flags(file: Path, eliv: Optional[bool] = None) -> Optional[str]:
     Returns:
         Optional[str]: String with flags if any, None otherwise.
     """
-    flags = "v3;"
+    flags = ""
+    if file.__str__().__contains__(".v1") and not file.__str__().__contains__("Evil") and not file.__str__().__contains__("Duet"):
+        flags = "v1;"
+    elif file.__str__().__contains__(".v2") and not file.__str__().__contains__("Evil") and not file.__str__().__contains__("Duet"):
+        flags = "v2;"
+    elif file.__str__().__contains__("Neuro.v3") or file.__str__().__contains__("Evil.v") or file.__str__().__contains__("Duet.v"):
+        flags = "v3;"
     if eliv is None:
-        if "/Evil" in str(file):
+        if "Evil" in str(file) :
             flags += "evil;"
     elif eliv:  # eliv is not None, then it's a bool, and here the bool is True
         flags += "evil;"
     else:
         flags += "neuro;"
-    if "/Duets" in str(file):
+    if "Duet.v" in str(file):
         flags += "duet;"
+    if file.__str__().__contains__("unofficialV3"):
+        flags += "as_drive;"
     if flags == "":
         flags = None
     return flags
 
 
-def update_db() -> None:
+# old function from when PB was hosting the files
+def update_db_from_pbDrive() -> None:
     """Updates the song databse, adding songs in the JSON files that aren't yet in it.
     The Date CSV/Table is also updated for each new stream."""
     format_logger(log_file=LOG_DIR / "json.log")
@@ -137,6 +171,108 @@ def update_db() -> None:
                     "Image": None,
                     "File_IN": str(file),
                     "Hash_IN": get_sha256(file),
+                    "Flags": get_flags(file, eliv),
+                    "Key": None,
+                    "Tempo (1/4 beat)": None,
+                }
+            )
+            id += 1
+            remove += 1
+            songs_df.extend(df)
+            logger.info(f"[Song][+] {artist} - {name}")
+
+        if remove == len(songs):
+            streams_done += [date]
+
+    for date in streams_done:
+        json_data.pop(date)
+        logger.info(f"All songs from {date} treated, removed stream")
+
+    # Updates JSON file with treated songs removed
+    with open(SONGS_JSON, "w") as f:
+        json.dump(json_data, f, indent=2, ensure_ascii=False)
+        f.write("\n")
+
+    # Write modifications if both CSVs
+    songs_df.write_csv(SONGS_CSV)
+    dates_df.write_csv(DATES_CSV)
+    # Write modifications if DBs
+    songs_df.write_database("Songs", f"sqlite:///{SONGS_DB}", if_table_exists="replace")
+    dates_df.write_database("Dates", f"sqlite:///{SONGS_DB}", if_table_exists="replace")
+
+def update_db() -> None:
+    """Updates the song database, adding songs from the JSON file that aren't yet in it
+    The Date CSV/Table is also updated for each new stream"""
+    format_logger(log_file=LOG_DIR / "json.log")
+    with open(SONGS_JSON, "r") as f:
+        json_data: SongJSON = json.load(f)
+
+    # Absolutely doesn't work if the CSV is empty
+    songs_df = load_db()
+    dates_df = load_dates()
+
+    # [-1] Makes sure id=0 if the column is empty
+    id = max(songs_df.get_column("id").to_list() + [-1]) + 1
+
+    streams_done: list[str] = []
+
+    # date is like 2025-04-02
+    # songs is a list of dict with song infos
+    for date, songs in json_data.items():
+        eliv = sum(map(is_eliv, songs)) > 0
+        singer = "Evil" if eliv else "Neuro"
+
+        if date[0] == "2" and date not in dates_df.get_column("Date"):
+            df = pl.DataFrame(
+                {
+                    "Date": date,
+                    "Singer": singer,
+                    "Duet Format": "v2",
+                }
+            )
+            # Adds a row for a new stream in the dates CSV
+            dates_df.extend(df)
+            logger.info(f"[Karaoke][+] {date} with {singer} singing")
+        
+        remove = 0
+        # Just ensures that when sorting by id, the songs from a same album will also be sorted
+        for song in sorted(songs, key=lambda x: x["id"] if x["id"] is not None else 5000):
+            if song["id"] is None:
+                continue
+
+            assert song["file"] is not None
+            file = Path(song["file"])
+            file_check(file)  # Checks if file exists on disk
+            if str(file) in songs_df.get_column("File_IN"):
+                remove += 1
+                logger.debug(f"File {str(file)} was already in database")
+                continue
+
+            # Using helper function to avoid code duplication
+            name, name_ascii = field_ascii(song, "Song")
+            artist, artist_ascii = field_ascii(song, "Artist")
+
+            album = ""
+
+            if date.__str__().startswith("20"):
+                album = f"{singer} {date} Karaoke"
+            else:
+                album = date
+
+            df = pl.DataFrame(
+                {
+                    "id": id,
+                    "Song": name,
+                    "Artist": artist,
+                    "Song_ASCII": name_ascii,
+                    "Artist_ASCII": artist_ascii,
+                    "Date": date,
+                    "Album": album,
+                    "Album_ID": song["id"],
+                    "Image": None,
+                    "File_IN": str(file),
+                    "Hash_IN": get_sha256(file),
+                    #"Flags": None ,
                     "Flags": get_flags(file, eliv),
                     "Key": None,
                     "Tempo (1/4 beat)": None,

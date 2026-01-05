@@ -126,6 +126,19 @@ def get_sha256(file: Path) -> str:
             sha256.update(data)
     return sha256.hexdigest()
 
+def get_audio_fingerprint(file: Path) -> str:
+    """calls ffmpeg to get the audio fingerprint of a given file.
+    
+    Args:
+        file (Path): File to get the fingerprint.
+
+    Returns:
+        str: A string with the fingerprint.
+    """
+    raise NotImplementedError
+
+    
+
 
 def time_format(dt: float, precise: bool = False) -> str:
     """Formats a floating point number of seconds as min/sec, sec, or ms, ...

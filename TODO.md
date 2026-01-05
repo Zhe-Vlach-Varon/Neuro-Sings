@@ -8,10 +8,12 @@
 - [ ] switch to checking for song presence in DB based on audio fingerprint instead of file hash, or just remove the hash checks if audio fingerprint checking isn't feasable
 - [ ] Update cover image generation system
   - [ ] create and use texture atlas or individual iamges of each possible character used in date strings
-    - [ ] is First Coffee a monospace font, if not figure out spacing
+    - [x] first pass text atlases
+    - [ ] figure out how to straighten up date segments so they line up better
   - [ ] add system to handle split karaoke streams like the 2025 Christmas Karaoke (by split I mean one twin did first half, and the other twin did the second half)
   - [ ] add configurable base image sources
     - [ ] add more background images
+      - [ ] Christmas 2025 cover
       - [ ] Neuro Background Images
         - [ ] Neuro v1
         - [ ] Neuro v2
@@ -21,6 +23,7 @@
           - [ ] check when Neuro got her new hairstyle and when she got her new Mc
         - [ ] Neuro v3 Long Hair New Mic
         - [ ] Neuro v3 Hair Loops New Mic
+        - [ ] Neuro v3 3D
       - [ ] Evil Background Images
         - [ ] Evil v3 Guitar
           - [ ] was their a Evil v2 Guitar?
@@ -31,19 +34,19 @@
         - [ ] Neuro on right
         - [ ] Evil on right
         - [ ] Both twins v2 Models
+          - [ ] Sometimes only one twin would have a Mic
         - [ ] Neuro v3 Evil v2
         - [ ] Both twins v3 Models
           - [ ] Evil New Mic Neuro Old Mic
           - [ ] Both twins New Mics
-        - [ ] Sometimes only one twin would have a Mic
+  - [x] fix image system so that "as_drive" flag will tell it to take the default cover image for the song's date
 - [ ] Add more error checking
   - [ ] Check for and remove empty rows in DB/CSV
   - [ ] Check for and handle entries that are empty string instead of Null
 - [ ] Add Debug Mode Print Statements for easier debugging when something goes wrong
-- [ ] Add way to specify that a song is a duplicate of one that is already in the DB
 - [ ] update Songlist.md
 - [ ] find and add credits for new cover arts
-
+- [ ] Code Cleanup and Refactoring
 
 
 
@@ -63,9 +66,9 @@
 - [x] Add roundabout from 1st subathon
 - [ ] See if I can use ID3 tags for a FLAC file (to merge most of the code + have access to the album artist tag)
 - [x] Check duets for last stream
-- [ ] Add 3D duplicates
+- [x] Add 3D duplicates
 
-- [ ] Add Baka Mitai GX Aura collab https://www.youtube.com/watch?v=K4iLtHy7G2Q
+- [x] Add Baka Mitai GX Aura collab https://www.youtube.com/watch?v=K4iLtHy7G2Q
 - [ ] Update thumbnail backgound
   - [ ] New thumbnails for duets depending on who's the main singer
   - [ ] Separate v3 cover before/after new neuro mic
@@ -75,7 +78,7 @@
 ## Mid-prio
 - [ ] Replace github screenshots with poweramp?
 - [ ] Preset prefix/suffix (pass preset to Song)
-- [ ] More complex flag selection with AND/OR
-  - [ ] Maybe at first just an option in the preset to tell include-type = "AND" | "OR" (same for exclude). Write stack_and function and check for option in preset.
+- [x] More complex flag selection with AND/OR
+  - [x] Maybe at first just an option in the preset to tell include-type = "AND" | "OR" (same for exclude). Write stack_and function and check for option in preset.
   - [ ] Or have a "complex mode" flag, tell if it's AND->OR or OR->AND. And put conditions in arrays of arrays and apply operation 1 between level1 arrays...
 - [x] Find where "fnaf.mp3" is from -> unused

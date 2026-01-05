@@ -31,6 +31,7 @@ def get_files(songs: pl.DataFrame) -> dict[str, list[Path]]:
             Keys: "Neuro", "Evil", "Duets", "V1", "V2", "Custom".
     """
     # Set of all files already treated and registered
+    # TODO add error checking for if a empty entry was accidentally added to the DB
     existing = set(map(lambda x: ROOT_DIR / Path(x), songs.get_column("File_IN").to_list()))
 
     def get_audios(p: Path, *, filetype: str = "mp3") -> list[Path]:
@@ -91,6 +92,18 @@ def get_regexes() -> dict[str, list[str]]:
         f"{DATE_V1} {TITLE_PART}{EXT}",
     ]
     return {"Neuro": common, "Evil": evil, "v1": v1}
+
+# def get_unofficialV3_regexes() -> dict[str, list[str]]:
+#     """gets the regexes to match filenames in unofficial archive v3
+    
+#     Returns:
+#         dict[str, list[str]]: list of patterns
+#     """
+#     V1V2 = r"\d+\. (?P<art>.+) - (?P<song>.+) \(Neuro\.v(?P<neuro_ver>\d)\)\.mp3"
+#     V3 = r"\d+\. (?P<art>.+) - (?P<song>.+) (\((?P<singer>.+)\..*\))\.mp3"
+#     DUET = r"\d+\. (?P<art>.+) - (?P<song>.+) (\(Duet.+\)) \((?P<singer>(Neuro|Evil) & (Neuro|Evil))\)\.mp3"
+#     COLLAB = r"\d+\. (?P<art>.+) - (?P<song>.+) (\(Duet.+\)) \((?P<singer>(Neuro|Evil) & (?!(Neuro|Evil)).+)\)\.mp3"
+#     SUBATHON_REMIX = r"\d+. Mixed by (?P<mixer>QueenPb) - (?P<song>Anniversary Mashup \(\d{4}\)) \(Duet.v\d\) \((?P<singers>.+)\).mp3"
 
 
 def get_artist_and_title(groups: dict[str, str]) -> tuple[str, str]:
@@ -240,6 +253,7 @@ def extract_custom(files: list[Path], out: SongJSON = {}) -> SongJSON:
     out["custom"] = outputs
     return out
 
+# TODO detect when month or day is a single digit and insert a "0"
 def extract_unofficialV3(files: list[Path], out: SongJSON = {}) -> SongJSON:
     """extract files from the Unofficial Neuro Karaoke Archvie v3
     
@@ -270,22 +284,24 @@ def extract_unofficialV3(files: list[Path], out: SongJSON = {}) -> SongJSON:
             title = 'Anniversary Mashup (' + year + ')'
             artist = 'Duet (Neuro & Evil) - Mixed by QueenPb'
         elif file.__str__().__contains__('ARG'):
-            date = 'ARG'
+            date = 'Neuro-sama ARG'
             artist = trackInfo.artist
             title = trackInfo.title
         data = {
             'CoverArtist': trackJSon['CoverArtist'],
             'Artist':artist,
+            'Artist ASCII':artist,
             'Song':title,
+            'Song ASCII':title,
             'file':file.__str__(),
             'id': id,
         }
-        if date.__contains__("2023-01"):
-            date = "Neuro [v1] January Stream Songs"
-        if date.__contains__("2023-02"):
-            date = "Neuro [v1] Feburary Stream Songs"
-        if date.__contains__("2023-03") and date < "2023-03-22":
-            date = "Neuro [v1] March Stream Songs"
+        # if date.__contains__("2023-01"):
+        #     date = "Neuro [v1] January Stream Songs"
+        # if date.__contains__("2023-02"):
+        #     date = "Neuro [v1] Feburary Stream Songs"
+        # if date.__contains__("2023-03") and date < "2023-03-22":
+        #     date = "Neuro [v1] March Stream Songs"
         # unused song from PBs drive, was inserted into Disc 3 of Unofficial Archive, not including in Neuro-Sings
         if (date == "2023" and title == "It's Been So Long") or (date == ""):
             date = "outlier"
@@ -302,6 +318,7 @@ def extract_unofficialV3(files: list[Path], out: SongJSON = {}) -> SongJSON:
 
  # TODO make date a sub-element of the song object, and make the top-level objects Album
  # TODO auto-detect what karaoke stream a song is from, and group songs by date and singer
+ # TODO take list of songs from a file, and auto-detect duplicates based on whether a new file for that song exists with a matching date
 
 
 def extract_all() -> SongJSON:

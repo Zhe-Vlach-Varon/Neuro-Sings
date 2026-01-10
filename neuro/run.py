@@ -43,11 +43,11 @@ def generate_from_preset(preset: Preset, dates_dict: DateDict) -> None:
         # Differenciate songs from drive and custom songs. Mainly because they aren't
         # from the same contexts (streams vs collabs mainly). Their format is different.
         # Subathon mixes are put in custom, so drive songs are only mp3
-        if Path(song_dict["File_IN"]).is_relative_to(DRIVE_DIR):
+        if Path(song_dict["File_IN"]).is_relative_to(DRIVE_DIR) or Path(song_dict["File_IN"]).is_relative_to(UNOFFICIALV3_DIR):
             date_dict = dates_dict.get(song_dict["Date"], {})
             s = DriveSong(song_dict, date_dict)
-        elif Path(song_dict["File_IN"]).is_relative_to(UNOFFICIALV3_DIR):
-            s = UnofficialV3Song(song_dict, date_dict)
+        # elif Path(song_dict["File_IN"]).is_relative_to(UNOFFICIALV3_DIR):
+        #     s = UnofficialV3Song(song_dict, date_dict)
         else:
             s = CustomSong(song_dict)
 
@@ -150,7 +150,7 @@ def generate_albums() -> None:
     for i, song_dict in enumerate(songDB.iter_rows(named=True)):
         N_SONGS = len(songDB)
 
-        if Path(song_dict["File_IN"]).is_relative_to(DRIVE_DIR):
+        if Path(song_dict["File_IN"]).is_relative_to(DRIVE_DIR) or Path(song_dict["File_IN"]).is_relative_to(UNOFFICIALV3_DIR):
             date_dict = dates_dict.get(song_dict["Date"], {})
             s = DriveSong(song_dict, date_dict)
         else:

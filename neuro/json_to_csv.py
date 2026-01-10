@@ -97,8 +97,8 @@ def get_flags(file: Path, eliv: Optional[bool] = None) -> Optional[str]:
         flags += "neuro;"
     if "Duet.v" in str(file):
         flags += "duet;"
-    if file.__str__().__contains__("unofficialV3"):
-        flags += "as_drive;"
+    # if file.__str__().__contains__("unofficialV3"):
+    #     flags += "as_drive;"
     if flags == "":
         flags = None
     return flags

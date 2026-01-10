@@ -334,16 +334,16 @@ def extract_all() -> SongJSON:
 
     out: SongJSON = {}
     # Neuro
-    extract_list(files["Neuro"], regex["Neuro"], out)
+    # extract_list(files["Neuro"], regex["Neuro"], out)
     # Evil
-    extract_list(files["Evil"], regex["Evil"], out)
+    # extract_list(files["Evil"], regex["Evil"], out)
     # Duets
-    extract_list(files["Duets"], regex["Neuro"], out)
+    # extract_list(files["Duets"], regex["Neuro"], out)
 
     # v1
-    extract_list(files["V1"], regex["v1"], out)
+    # extract_list(files["V1"], regex["v1"], out)
     # v2
-    extract_list(files["V2"], regex["Neuro"], out)
+    # extract_list(files["V2"], regex["Neuro"], out)
 
     # Custom
     extract_custom(files["Custom"], out)

@@ -3,6 +3,7 @@
 import json
 import re
 from datetime import datetime
+from dateutil.parser import parse
 from pathlib import Path
 from typing import Optional
 import tinytag
@@ -275,7 +276,8 @@ def extract_unofficialV3(files: list[Path], out: SongJSON = {}) -> SongJSON:
         trackInfo = tinytag.TinyTag.get(file)
         if trackInfo.other.keys().__contains__('comment'):
             trackJSon = json.loads(trackInfo.other['comment'][0])
-            date = trackJSon['Date']
+            input_date = parse(trackJSon['Date'])
+            date = input_date.strftime("%Y-%m-%d")
             artist = trackJSon['Artist']
             title = trackJSon['Title']
         elif file.__str__().__contains__('Mashup'):

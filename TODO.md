@@ -5,7 +5,8 @@
 - [ ] finish updating code to draw files from Unofficial Archive V3
 ## Medium-Priority
 - [ ] take list of songs from a file, and auto detect duplicates based on presence of file in list of new files
-- [ ] switch to checking for song presence in DB based on audio fingerprint instead of file hash, or just remove the hash checks if audio fingerprint checking isn't feasable
+- [ ] make it so that the officially released songs will be skipped if not present
+- [ ] switch to checking for song presence in DB based on audio fingerprint instead of file hash, or consider removing the hash checks if audio fingerprint checking isn't feasable
 - [ ] Update cover image generation system
   - [ ] create and use texture atlas or individual iamges of each possible character used in date strings
     - [x] first pass text atlases

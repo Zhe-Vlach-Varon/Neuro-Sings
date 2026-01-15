@@ -82,11 +82,11 @@ def get_flags(file: Path, eliv: Optional[bool] = None) -> Optional[str]:
         Optional[str]: String with flags if any, None otherwise.
     """
     flags = ""
-    if file.__str__().__contains__(".v1") and not file.__str__().__contains__("Evil") and not file.__str__().__contains__("Duet"):
+    if ".v1" in str(file) and "Evil" not in str(file) and "Duet" not in str(file):
         flags = "v1;"
-    elif file.__str__().__contains__(".v2") and not file.__str__().__contains__("Evil") and not file.__str__().__contains__("Duet"):
+    elif ".v2" in str(file) and "Evil" not in str(file) and "Duet" not in str(file):
         flags = "v2;"
-    elif file.__str__().__contains__("Neuro.v3") or file.__str__().__contains__("Evil.v") or file.__str__().__contains__("Duet.v"):
+    elif "Neuro.v3" in str(file) or "Evil.v" in str(file) or "Duet.v" in str(file):
         flags = "v3;"
     if eliv is None:
         if "Evil" in str(file) :
@@ -95,8 +95,10 @@ def get_flags(file: Path, eliv: Optional[bool] = None) -> Optional[str]:
         flags += "evil;"
     else:
         flags += "neuro;"
-    if "Duet.v" in str(file):
+    if "Duet.v" in str(file) and "(Neuro & Evil)" in str(file):
         flags += "duet;"
+    elif "Duet.v" in str(file) and "(Neuro & Evil)" not in str(file):
+        flags += "collab;"
     # if file.__str__().__contains__("unofficialV3"):
     #     flags += "as_drive;"
     if flags == "":

@@ -5,12 +5,12 @@ from time import time
 
 from loguru import logger
 
-from neuro import DRIVE_DIR, CUSTOM_DIR, UNOFFICIALV3_DIR, LOG_DIR
+from neuro import DRIVE_DIR, CUSTOM_DIR, UNOFFICIALV3_DIR, LOG_DIR, SONG_ROOT_DIR
 from neuro.checks import check_are_dbs_identical
 from neuro.detection import export_json, extract_all
 from neuro.file_tags import CustomSong, DriveSong, UnofficialV3Song
 from neuro.polars_utils import Preset, load_dates, load_db
-from neuro.utils import MP3GainMode, MP3ModeTuple, format_logger, time_format
+from neuro.utils import MP3GainMode, MP3ModeTuple, format_logger, time_format, get_audio_hash_to_file_mapping
 
 DateDict = dict[str, dict[str, str]]
 
@@ -25,7 +25,7 @@ def new_batch_detection() -> None:
     export_json(out)  # Writing into JSON
 
 
-def generate_from_preset(preset: Preset, dates_dict: DateDict) -> None:
+def generate_from_preset(preset: Preset, hash_dict: dict, dates_dict: DateDict) -> None:
     """Generates all songs from a preset, filters songs that respect filters.
 
     Args:
@@ -45,11 +45,11 @@ def generate_from_preset(preset: Preset, dates_dict: DateDict) -> None:
         # Subathon mixes are put in custom, so drive songs are only mp3
         if Path(song_dict["File_IN"]).is_relative_to(DRIVE_DIR) or Path(song_dict["File_IN"]).is_relative_to(UNOFFICIALV3_DIR):
             date_dict = dates_dict.get(song_dict["Date"], {})
-            s = DriveSong(song_dict, date_dict)
+            s = DriveSong(song_dict, hash_dict, date_dict)
         # elif Path(song_dict["File_IN"]).is_relative_to(UNOFFICIALV3_DIR):
         #     s = UnofficialV3Song(song_dict, date_dict)
         else:
-            s = CustomSong(song_dict)
+            s = CustomSong(song_dict, hash_dict)
 
         created = s.create_out_file(create=False, out_dir=preset.path)
         if created:
@@ -96,10 +96,12 @@ def generate_songs() -> None:
     # Easier data format to deal with
     dates_dict: DateDict = {k["Date"]: k for k in load_dates().iter_rows(named=True)}
 
+    hash_dict = get_audio_hash_to_file_mapping(SONG_ROOT_DIR)
+
     for preset in config["Presets"]:
         logger.info(f"[GEN] Generating preset '{preset['name']}'")
         preset_obj = Preset(preset, mp3gain, OUT_ROOT)
-        generate_from_preset(preset_obj, dates_dict)
+        generate_from_preset(preset_obj, hash_dict, dates_dict)
 
     logger.success(f"[GEN] Generated all presets in {time_format(time() - t)} !")
 
@@ -108,6 +110,8 @@ def generate_albums() -> None:
 
     format_logger(log_file=LOG_DIR / "generation.log")
     logger.info("[GEN] Starting generation batch")
+
+    hash_dict = get_audio_hash_to_file_mapping(SONG_ROOT_DIR)
 
     # Avoids wrong generations due to inconsistent databases
     try:
@@ -141,9 +145,9 @@ def generate_albums() -> None:
     dates_dict: DateDict = {k["Date"]: k for k in load_dates().iter_rows(named=True)}
 
     for album in albums:
-        if not album_names.__contains__(album):
+        if album not in album_names:
             album_names.append(album)
-            out_dir = OUT_ROOT.__str__() + "/albums/" + album
+            out_dir = str(OUT_ROOT) + "/albums/" + album
             os.makedirs(out_dir, exist_ok=True)
             album_paths.append(out_dir)
     
@@ -152,13 +156,13 @@ def generate_albums() -> None:
 
         if Path(song_dict["File_IN"]).is_relative_to(DRIVE_DIR) or Path(song_dict["File_IN"]).is_relative_to(UNOFFICIALV3_DIR):
             date_dict = dates_dict.get(song_dict["Date"], {})
-            s = DriveSong(song_dict, date_dict)
+            s = DriveSong(song_dict, hash_dict, date_dict)
         else:
-            s = CustomSong(song_dict)
+            s = CustomSong(song_dict, hash_dict)
 
         album = song_dict["Album"]
         
-        created = s.create_out_file(create=False, out_dir=OUT_ROOT.__str__() + "/albums/" + album)
+        created = s.create_out_file(create=False, out_dir=str(OUT_ROOT) + "/albums/" + album)
         if created:
             s.apply_tags()
         logger.debug(
@@ -255,11 +259,8 @@ def mp3gain_albums(album_paths: list) -> None:
 
     cfg_out = config["output"]
     OUT_ROOT = Path(cfg_out["out-root"])
-    # for path in album_paths:
-        # if not path.__str__() == "":
-            # escaped_path = path.__str__().replace(' ', '\\ ')
     logger.info(f"[GEN] Running mp3gain for albums") # {os.path.basename(path)}")
-    os.system(f"mp3gain {options} {OUT_ROOT.__str__() + "/albums"}/*/*.mp3 > {OUT_LOG}")
+    os.system(f"mp3gain {options} {str(OUT_ROOT) + "/albums"}/*/*.mp3 > {OUT_LOG}")
 
 if __name__ == "__main__":
     generate_songs()

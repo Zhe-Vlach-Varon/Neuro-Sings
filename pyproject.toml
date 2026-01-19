@@ -26,6 +26,7 @@ update-json = "neuro.run:new_batch_detection"
 thumbnails-generate = "neuro.thumbnails:generate_main"
 thumbnails-old = "neuro.thumbnails:generate_oldge"
 update-db = "neuro.json_to_csv:update_db"
+# update-hashes = "neuro.json_to_csv:update_db_hashes" # Shouldn't ever need to use this again, was used to update the database after switching from using file hashes to using hashes of just the audio data
 db-check = "neuro.checks:all_tests"
 drive-pull = "neuro._shortcuts:drive_pull"
 drive-push = "neuro._shortcuts:drive_push"

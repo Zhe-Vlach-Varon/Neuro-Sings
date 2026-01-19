@@ -61,7 +61,7 @@ class Song:
         # strings as the flags
         self.flags = self.Flags(**{flag: flag_check(flag, flags) for flag in self.Flags.__dataclass_fields__.keys()})
 
-    def __init__(self, song_dict: SongEntry, karaoke_dict: dict = {}) -> None:
+    def __init__(self, song_dict: SongEntry, hash_dict: dict, karaoke_dict: dict = {}) -> None:
         # Lots of asserts, mainly for type checking, but also detects irregular entries in database
         assert song_dict["Song"] is not None
         assert song_dict["Song_ASCII"] is not None
@@ -73,8 +73,12 @@ class Song:
         self.artist: str = song_dict["Artist"]
         self.artist_ascii: str = song_dict["Artist_ASCII"]
 
-        assert song_dict["File_IN"] is not None
-        self.file: Path = ROOT_DIR / Path(song_dict["File_IN"])
+        assert song_dict["Hash_IN"] is not None
+        self.hash_in: str = song_dict["Hash_IN"]
+
+        # assert song_dict["File_IN"] is not None
+        # self.file: Path = ROOT_DIR / Path(song_dict["File_IN"])
+        self.file: Path = hash_dict[self.hash_in]
         file_check(self.file)
 
         assert song_dict["Album_ID"] is not None
@@ -233,8 +237,8 @@ class Song:
 class DriveSong(Song):
     """Metadata for a song from the drive."""
 
-    def __init__(self, song_dict: dict, karaoke_dict: dict) -> None:
-        super().__init__(song_dict, karaoke_dict)
+    def __init__(self, song_dict: dict, hash_dict: dict, karaoke_dict: dict) -> None:
+        super().__init__(song_dict, hash_dict, karaoke_dict)
 
     def create_out_file(self, *, out_dir: Path = Path("out"), create: bool = True) -> bool:
         """Creates the output file on the filesystem by copying the original. The metadata are written later.
@@ -304,8 +308,8 @@ class DriveSong(Song):
 class CustomSong(Song):
     """Metadata for a song added manually (not from the drive)."""
 
-    def __init__(self, song_dict: dict, karaoke_dict: dict = {}) -> None:
-        super().__init__(song_dict, karaoke_dict)
+    def __init__(self, song_dict: dict, hash_dict: dict, karaoke_dict: dict = {}) -> None:
+        super().__init__(song_dict, hash_dict, karaoke_dict)
 
     def create_out_file(self, *, out_dir: Path, create: bool = True) -> bool:
         """Creates the output file on the filesystem by copying the original. The metadata are written later.
@@ -457,8 +461,8 @@ class CustomSong(Song):
 class UnofficialV3Song(Song):
     """Metadata for a song from the Unofficial Archive."""
 
-    def __init__(self, song_dict: dict, karaoke_dict) -> None:
-        super().__init__(song_dict, karaoke_dict)
+    def __init__(self, song_dict: dict, hash_dict: dict, karaoke_dict) -> None:
+        super().__init__(song_dict, hash_dict, karaoke_dict)
 
     def create_out_file(self, *, out_dir: Path = Path("out"), create: bool = True) -> bool:
         file = self.file

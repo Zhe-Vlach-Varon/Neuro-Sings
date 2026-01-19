@@ -1,14 +1,15 @@
 # TODO
 
-## High-Priority
-- [ ] update DB to point to the files in the Unofficial Archive V3
-- [ ] finish updating code to draw files from Unofficial Archive V3
-## Medium-Priority
+## Current Plans
+
 - [ ] take list of songs from a file, and auto detect duplicates based on presence of file in list of new files
 - [ ] make it so that the officially released songs will be skipped if not present
-- [ ] switch to checking for song presence in DB based on audio fingerprint instead of file hash, or consider removing the hash checks if audio fingerprint checking isn't feasable
+- [ ] switch to hashing audio data instead of whole file
+  - [x] switch to checking for song presence in DB based on hash of audio data instead of file hash
+  - [ ] detect when file metadata doesn't match the database and print a list of issues
+  - [x] when generating songs, create a dictionary mapping audio hashes to file names
 - [ ] Update cover image generation system
-  - [ ] create and use texture atlas or individual iamges of each possible character used in date strings
+  - [ ] create and use texture atlas or individual images of each possible character used in date strings
     - [x] first pass text atlases
     - [ ] figure out how to straighten up date segments so they line up better
   - [ ] add system to handle split karaoke streams like the 2025 Christmas Karaoke (by split I mean one twin did first half, and the other twin did the second half)
@@ -21,14 +22,15 @@
         - [ ] Neuro v3 Long Hair Old Mic
         - [ ] Neuro v3 Long Hair New Mic
         - [ ] Neuro v3 Hair Loops Old Mic ??
-          - [ ] check when Neuro got her new hairstyle and when she got her new Mc
+          - [ ] check when Neuro got her new hairstyle and when she got her new Mic
         - [ ] Neuro v3 Long Hair New Mic
         - [ ] Neuro v3 Hair Loops New Mic
+        - [ ] Neuro v3 Cyber Princess Outfit (has there been a karaoke with this outfit?)
         - [ ] Neuro v3 3D
       - [ ] Evil Background Images
         - [ ] Evil v3 Guitar
           - [ ] was their a Evil v2 Guitar?
-        - [ ] Evil early Neuro Recolors
+        - [ ] Evil early Neuro Recolors ??
         - [ ] Evil v2
         - [ ] Evil v3
       - [ ] Duet Backgrounds
@@ -43,20 +45,18 @@
   - [x] fix image system so that "as_drive" flag will tell it to take the default cover image for the song's date
 - [ ] Add more error checking
   - [ ] Check for and remove empty rows in DB/CSV
-  - [ ] Check for and handle entries that are empty string instead of Null
+  - [ ] Check for and handle fields that are empty string instead of Null
 - [ ] Add Debug Mode Print Statements for easier debugging when something goes wrong
 - [ ] update Songlist.md
 - [ ] find and add credits for new cover arts
+- [ ] check and update database
 - [ ] Code Cleanup and Refactoring
+  - [ ] find duplicated code and move into separate functions
+- [ ] update README and other documentation
 
 
-
-
-
-
-
-
-
+## later plans
+- [ ] figure out how to package as a graphical program that does everything except download/upload
 
 
 

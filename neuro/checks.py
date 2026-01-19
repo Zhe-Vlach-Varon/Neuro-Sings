@@ -11,7 +11,7 @@ from tqdm import tqdm
 
 from neuro import LOG_DIR, ROOT_DIR
 from neuro.polars_utils import load_db
-from neuro.utils import format_logger, get_sha256
+from neuro.utils import format_logger, get_sha256, get_audio_hash
 
 
 def check_ascii() -> None:
@@ -43,7 +43,8 @@ def check_hash() -> None:
         print(file)
         assert file.exists()
         hash = song["Hash_IN"]
-        assert get_sha256(file) == hash, f"{file}"
+        print(get_audio_hash(file))
+        assert get_audio_hash(file) == hash, f"{file}"
 
 
 # Test if there are case inconsitancies at all

@@ -13,6 +13,7 @@ from loguru import logger
 
 from neuro import CUSTOM_DIR, DRIVE_DIR, ROOT_DIR, SONGS_JSON, UNOFFICIALV3_DIR, UNOFFV3_DISC1, UNOFFV3_DISC2, UNOFFV3_DISC3, UNOFFV3_DISC4, UNOFFV3_DISC5, UNOFFV3_DISC6, UNOFFV3_DISC7, UNOFFV3_DISC8, UNOFFV3_DISC66
 from neuro.polars_utils import load_db
+from neuro.utils import get_audio_hash
 
 SongEntry = dict[str, Optional[str]]
 """Dictionary representing a song in the JSON, containing fields like "Song", "Artist", etc..."""
@@ -254,7 +255,6 @@ def extract_custom(files: list[Path], out: SongJSON = {}) -> SongJSON:
     out["custom"] = outputs
     return out
 
-# TODO detect when month or day is a single digit and insert a "0"
 def extract_unofficialV3(files: list[Path], out: SongJSON = {}) -> SongJSON:
     """extract files from the Unofficial Neuro Karaoke Archvie v3
     
@@ -274,18 +274,18 @@ def extract_unofficialV3(files: list[Path], out: SongJSON = {}) -> SongJSON:
         artist = ""
         title = ""
         trackInfo = tinytag.TinyTag.get(file)
-        if trackInfo.other.keys().__contains__('comment'):
+        if 'comment' in trackInfo.other.keys():
             trackJSon = json.loads(trackInfo.other['comment'][0])
             input_date = parse(trackJSon['Date'])
             date = input_date.strftime("%Y-%m-%d")
             artist = trackJSon['Artist']
             title = trackJSon['Title']
-        elif file.__str__().__contains__('Mashup'):
-            year = trackInfo.year.__str__()
+        elif 'Mashup' in str(file):
+            year = str(trackInfo.year)
             date = year + '-12-19'
             title = 'Anniversary Mashup (' + year + ')'
             artist = 'Duet (Neuro & Evil) - Mixed by QueenPb'
-        elif file.__str__().__contains__('ARG'):
+        elif 'ARG' in str(file):
             date = 'Neuro-sama ARG'
             artist = trackInfo.artist
             title = trackInfo.title
@@ -295,7 +295,7 @@ def extract_unofficialV3(files: list[Path], out: SongJSON = {}) -> SongJSON:
             'Artist ASCII':artist,
             'Song':title,
             'Song ASCII':title,
-            'file':file.__str__(),
+            'file':str(file),
             'id': id,
         }
         # if date.__contains__("2023-01"):

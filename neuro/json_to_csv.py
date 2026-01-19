@@ -5,10 +5,11 @@ from typing import Literal, Optional
 import polars as pl
 from loguru import logger
 
-from neuro import DATES_CSV, LOG_DIR, SONGS_CSV, SONGS_DB, SONGS_JSON
+from neuro import ROOT_DIR, DATES_CSV, LOG_DIR, SONGS_CSV, SONGS_DB, SONGS_JSON
 from neuro.detection import SongEntry, SongJSON
 from neuro.polars_utils import load_dates, load_db
-from neuro.utils import file_check, format_logger, get_sha256
+from neuro.utils import file_check, format_logger, get_sha256, get_audio_hash
+from tqdm import tqdm
 
 
 def is_eliv(s: SongEntry) -> bool:
@@ -99,8 +100,6 @@ def get_flags(file: Path, eliv: Optional[bool] = None) -> Optional[str]:
         flags += "duet;"
     elif "Duet.v" in str(file) and "(Neuro & Evil)" not in str(file):
         flags += "collab;"
-    # if file.__str__().__contains__("unofficialV3"):
-    #     flags += "as_drive;"
     if flags == "":
         flags = None
     return flags
@@ -172,7 +171,7 @@ def update_db_from_pbDrive() -> None:
                     "Album_ID": song["id"],
                     "Image": None,
                     "File_IN": str(file),
-                    "Hash_IN": get_sha256(file),
+                    "Hash_IN": get_audio_hash(file),
                     "Flags": get_flags(file, eliv),
                     "Key": None,
                     "Tempo (1/4 beat)": None,
@@ -256,7 +255,7 @@ def update_db() -> None:
 
             album = ""
 
-            if date.__str__().startswith("20"):
+            if str(date).startswith("20"):
                 album = f"{singer} {date} Karaoke"
             else:
                 album = date
@@ -273,7 +272,7 @@ def update_db() -> None:
                     "Album_ID": song["id"],
                     "Image": None,
                     "File_IN": str(file),
-                    "Hash_IN": get_sha256(file),
+                    "Hash_IN": get_audio_hash(file),
                     #"Flags": None ,
                     "Flags": get_flags(file, eliv),
                     "Key": None,
@@ -304,6 +303,29 @@ def update_db() -> None:
     songs_df.write_database("Songs", f"sqlite:///{SONGS_DB}", if_table_exists="replace")
     dates_df.write_database("Dates", f"sqlite:///{SONGS_DB}", if_table_exists="replace")
 
+
+# Shouldn't ever need to use this again, was used to update database after switching from using file hashes to using hashes of the audio data
+def update_db_hashes() -> None:
+    songs = load_db()
+    schema = songs.schema
+
+    new_songs_df = pl.DataFrame(schema=schema)
+
+    for song in tqdm(songs.iter_rows(named=True), total=len(songs)):
+        file = ROOT_DIR / Path(song["File_IN"])
+        # TODO add debug mode toggles
+        print(file)
+        assert file.exists()
+        hash = song["Hash_IN"]
+        print(get_audio_hash(file))
+        if get_audio_hash(file) != hash:
+            song["Hash_IN"] = get_audio_hash(file)
+        new_songs_df.extend(pl.DataFrame(song))
+            
+
+
+    new_songs_df.write_csv(SONGS_CSV)
+    new_songs_df.write_database("Songs", f"sqlite:///{SONGS_DB}", if_table_exists="replace")
 
 if __name__ == "__main__":
     update_db()

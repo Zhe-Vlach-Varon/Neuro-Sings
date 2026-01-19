@@ -9,6 +9,9 @@ from enum import Enum
 from pathlib import Path
 from typing import TextIO
 
+import hashlib
+from mutagen.id3 import ID3, ID3NoHeaderError
+
 import loguru
 from loguru import logger
 
@@ -126,17 +129,6 @@ def get_sha256(file: Path) -> str:
             sha256.update(data)
     return sha256.hexdigest()
 
-def get_audio_fingerprint(file: Path) -> str:
-    """calls ffmpeg to get the audio fingerprint of a given file.
-    
-    Args:
-        file (Path): File to get the fingerprint.
-
-    Returns:
-        str: A string with the fingerprint.
-    """
-    raise NotImplementedError
-
     
 
 
@@ -186,3 +178,72 @@ class MP3GainMode(Enum):
 
 
 MP3ModeTuple = tuple[MP3GainMode, MP3GainMode]
+
+
+# get_audio_hash function taken from 
+# https://github.com/Nyss777/Neuro-Karaoke-Archive-Metadata hash_mutagen.py
+# MIT License
+
+# Copyright (c) 2026 Nyss777
+
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+def get_audio_hash(file_path):
+    try:
+        try:
+            audio_tags = ID3(file_path)
+            header_size = audio_tags.size  # Mutagen provides the full tag size including header
+        except ID3NoHeaderError:
+            header_size = 0
+
+        with open(file_path, 'rb') as f:
+            # We read the whole file to handle the footer check
+            # For very large files, you can use f.seek() instead of loading everything
+            file_data = f.read()
+
+        # 2. Check for ID3v1 footer (always 128 bytes at the end starting with 'TAG')
+        # Mutagen doesn't always expose the ID3v1 offset as a single property,
+        # so a quick manual check of the last 128 bytes is still standard.
+        footer_size = 128 if file_data[-128:].startswith(b'TAG') else 0
+        
+        # 3. Slice the data to extract only the audio frames
+        # If footer_size is 0, file_data[header_size:] takes everything to the end
+        end_index = len(file_data) - footer_size
+        raw_audio = file_data[header_size:end_index]
+
+        # 4. Hash the raw audio
+        return hashlib.md5(raw_audio).hexdigest() # ZVV: using hashlib.md5 instead of xxhash.xxh64 because I cannot get python to recognize it as being installed on my system
+
+    except Exception as e:
+        print(f"Error processing {file_path}: {e}")
+        return None
+
+
+def get_audio_hash_to_file_mapping(p: Path, *, filetype: str = "mp3") -> dict:
+    print(p)
+    files = list(p.glob(f"**/*.{filetype}"))
+    file_mapping = {}
+
+    for file in files:
+        print(file)
+        hash = get_audio_hash(file)
+        file_mapping[hash] = Path(file)
+    
+    return file_mapping
+

@@ -11,7 +11,8 @@ import tinytag
 import polars as pl
 from loguru import logger
 
-from neuro import CUSTOM_DIR, DRIVE_DIR, ROOT_DIR, SONGS_JSON, UNOFFICIALV3_DIR, UNOFFV3_DISC1, UNOFFV3_DISC2, UNOFFV3_DISC3, UNOFFV3_DISC4, UNOFFV3_DISC5, UNOFFV3_DISC6, UNOFFV3_DISC7, UNOFFV3_DISC8, UNOFFV3_DISC66
+# TODO are the different unoffV3 subdirs actually needed, or just the root unoffV3 dir
+from neuro import CUSTOM_DIR, DRIVE_DIR, ROOT_DIR, SONGS_JSON, UNOFFICIALV3_DIR, UNOFFV3_DISC1, UNOFFV3_DISC2, UNOFFV3_DISC3, UNOFFV3_DISC4, UNOFFV3_DISC5, UNOFFV3_DISC6, UNOFFV3_DISC7, UNOFFV3_DISC8, UNOFFV3_DISC66, OFFICIAL_RELEASE_DIR
 from neuro.polars_utils import load_db
 from neuro.utils import get_audio_hash
 
@@ -290,13 +291,14 @@ def extract_unofficialV3(files: list[Path], out: SongJSON = {}) -> SongJSON:
             artist = trackInfo.artist
             title = trackInfo.title
         data = {
-            'CoverArtist': trackJSon['CoverArtist'],
+            'Cover Artist': trackJSon['Cover Artist'],
             'Artist':artist,
             'Artist ASCII':artist,
             'Song':title,
             'Song ASCII':title,
             'file':str(file),
             'id': id,
+            'duplicate': False,
         }
         # if date.__contains__("2023-01"):
         #     date = "Neuro [v1] January Stream Songs"
@@ -317,11 +319,6 @@ def extract_unofficialV3(files: list[Path], out: SongJSON = {}) -> SongJSON:
             out[date] = [data]
 
     return out
-
- # TODO make date a sub-element of the song object, and make the top-level objects Album
- # TODO auto-detect what karaoke stream a song is from, and group songs by date and singer
- # TODO take list of songs from a file, and auto-detect duplicates based on whether a new file for that song exists with a matching date
-
 
 def extract_all() -> SongJSON:
     """Runs all the extraction functions on all defined patterns.

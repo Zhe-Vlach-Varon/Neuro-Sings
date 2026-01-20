@@ -36,4 +36,6 @@ UNOFFV3_DISC7 = "DISC 7 - Background Running Process (2025-05-28 - 2025-11-26)"
 UNOFFV3_DISC8 = "DISC 8 - Third Anniversary (2025-12-19 - Present)"
 UNOFFV3_DISC66 = "EXTRA CONTENT/DISC 66 - ARG"
 
+OFFICIAL_RELEASE_DIR = SONG_ROOT_DIR / "officially released songs"
+
 LOG_DIR = ROOT_DIR / Path("logs")

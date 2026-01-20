@@ -12,10 +12,13 @@ from typing import TextIO
 import hashlib
 from mutagen.id3 import ID3, ID3NoHeaderError
 
+import tinytag
+import json
+
 import loguru
 from loguru import logger
 
-from neuro import LOG_DIR
+from neuro import LOG_DIR, OFFICIAL_RELEASE_DIR, UNOFFICIALV3_DIR, CUSTOM_DIR, DRIVE_DIR
 
 # It's ints to be easier to pass via CLI, instead of typing the level with a risk of typo
 VERBOSE = {
@@ -247,3 +250,30 @@ def get_audio_hash_to_file_mapping(p: Path, *, filetype: str = "mp3") -> dict:
     
     return file_mapping
 
+# used once to fill in "Cover Artist" field added to database
+def get_cover_artist(file: Path) -> str:
+    if file.is_relative_to(UNOFFICIALV3_DIR):
+        trackInfo = tinytag.TinyTag.get(file)
+        trackJSon = json.loads(trackInfo.other['comment'][0])
+        return trackJSon['Cover Artist']
+    elif file.is_relative_to(DRIVE_DIR):
+        if "/Duet" in str(file) or "/Anniversary" in str(file):
+            return "Neuro & Evil"
+        elif "/Evil" in str(file):
+            return "Evil"
+        elif "/v2 voice" in str(file):
+            return "Neuro [v2]"
+        elif "/v1 voice" in str(file):
+            return "Neuro [v1]"
+        else:
+            return "Neuro"
+    elif file.is_relative_to(CUSTOM_DIR):
+        if "Study-sama" in str(file):
+            return "Study-sama"
+        else:
+            return None
+    elif file.is_relative_to(OFFICIAL_RELEASE_DIR):
+        return None
+    else:
+        return None
+    # These last few return None because the bulk of songs are covered by the other cases and there will be few enough songs left to manually update in a reasonable time

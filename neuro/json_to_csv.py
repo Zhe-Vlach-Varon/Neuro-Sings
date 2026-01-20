@@ -8,7 +8,7 @@ from loguru import logger
 from neuro import ROOT_DIR, DATES_CSV, LOG_DIR, SONGS_CSV, SONGS_DB, SONGS_JSON
 from neuro.detection import SongEntry, SongJSON
 from neuro.polars_utils import load_dates, load_db
-from neuro.utils import file_check, format_logger, get_sha256, get_audio_hash
+from neuro.utils import file_check, format_logger, get_sha256, get_audio_hash, get_cover_artist
 from tqdm import tqdm
 
 
@@ -21,8 +21,10 @@ def is_eliv(s: SongEntry) -> bool:
     Returns:
         bool: True if it's sung by Evil.
     """
-    assert s["file"] is not None
-    return "Evil.v" in s["file"]
+    if s["file"] is not None:
+        return "Evil.v" in s["file"]
+    else:
+        return False
 
 def is_duet(s: SongEntry) -> bool:
     """Checks if the file from an Entry is a duet.
@@ -241,10 +243,20 @@ def update_db() -> None:
             if song["id"] is None:
                 continue
 
-            assert song["file"] is not None
-            file = Path(song["file"])
-            file_check(file)  # Checks if file exists on disk
-            if str(file) in songs_df.get_column("File_IN"):
+            print(song["Song"] + " - " + song["Artist"] + " - " + song["Cover Artist"])
+
+            if "duplicate" not in song.keys():
+                song["duplicate"] = False
+
+            if not song["duplicate"]:
+                file = Path(song["file"])
+                file_check(file)  # Checks if file exists on disk
+            else:
+                file = None
+
+            # TODO check if duplicate
+            
+            if file is not None and str(file) in songs_df.get_column("File_IN") and not song["duplicate"]:
                 remove += 1
                 logger.debug(f"File {str(file)} was already in database")
                 continue
@@ -267,6 +279,7 @@ def update_db() -> None:
                     "Artist": artist,
                     "Song_ASCII": name_ascii,
                     "Artist_ASCII": artist_ascii,
+                    "Cover Artist": singer,
                     "Date": date,
                     "Album": album,
                     "Album_ID": song["id"],
@@ -279,8 +292,14 @@ def update_db() -> None:
                     "Tempo (1/4 beat)": None,
                 }
             )
+            if song["duplicate"]:
+                df = get_most_recent_version(df.to_dict())
+
             id += 1
             remove += 1
+            with pl.Config(tbl_cols=-1):
+                print(songs_df.tail(5))
+                print(df)
             songs_df.extend(df)
             logger.info(f"[Song][+] {artist} - {name}")
 
@@ -313,7 +332,6 @@ def update_db_hashes() -> None:
 
     for song in tqdm(songs.iter_rows(named=True), total=len(songs)):
         file = ROOT_DIR / Path(song["File_IN"])
-        # TODO add debug mode toggles
         print(file)
         assert file.exists()
         hash = song["Hash_IN"]
@@ -322,10 +340,68 @@ def update_db_hashes() -> None:
             song["Hash_IN"] = get_audio_hash(file)
         new_songs_df.extend(pl.DataFrame(song))
             
-
-
     new_songs_df.write_csv(SONGS_CSV)
     new_songs_df.write_database("Songs", f"sqlite:///{SONGS_DB}", if_table_exists="replace")
+
+def add_cover_artist() -> None:
+    songs = load_db()
+    schema = songs.schema
+    print(schema)
+
+    new_songs_df = pl.DataFrame(schema=schema)
+
+    for song in tqdm(songs.iter_rows(named=True), total=len(songs)):
+        file = ROOT_DIR / Path(song["File_IN"])
+        print(file)
+        assert file.exists()
+        singer = get_cover_artist(file)
+        song["Cover Artist"] = singer
+        new_songs_df.extend(pl.DataFrame(song))
+            
+    new_songs_df.write_csv(SONGS_CSV)
+    new_songs_df.write_database("Songs", f"sqlite:///{SONGS_DB}", if_table_exists="replace")
+
+
+def get_most_recent_version(song: dict) -> pl.DataFrame:
+    # if json for song has duplicate true, search database for most recent version of song with same singer
+    # either detect singer from existing data, or add cover_artist field to database
+    songDB = load_db()
+
+    # TODO add cover artist field to database
+    filtered_songs = songDB.filter((pl.col("Artist") == song["Artist"]) & (pl.col("Song") == song["Song"]) & (pl.col("Cover Artist") == song["Cover Artist"])).sort(pl.col("Date"), descending=True)
+    print("filtered_songs")
+    print(filtered_songs)
+    assert filtered_songs.height > 0
+    latest_version = filtered_songs.row(0, named=True)
+    print("latest_version")
+    print(latest_version)
+
+    flags = latest_version["Flags"]
+    if "duplicate;" not in latest_version["Flags"]:
+        flags = flags + "duplicate;"
+
+   
+    new_duplicate_song = pl.DataFrame(
+       {
+           "id": song["id"],
+           "Song": latest_version["Song"],
+           "Artist": latest_version["Artist"],
+           "Song_ASCII": latest_version["Song_ASCII"],
+           "Artist_ASCII": latest_version["Artist_ASCII"],
+           "Cover Artist": latest_version["Cover Artist"],
+           "Date": song["Date"],
+           "Album": song["Album"],
+           "Album_ID": song["Album_ID"],
+           "Image": latest_version["Image"],
+           "File_IN": latest_version["File_IN"],
+           "Hash_IN": latest_version["Hash_IN"],
+           "Flags": flags,
+           "Key": latest_version["Key"],
+           "Tempo (1/4 beat)": latest_version["Tempo (1/4 beat)"],
+        }
+    )
+
+    return new_duplicate_song
 
 if __name__ == "__main__":
     update_db()

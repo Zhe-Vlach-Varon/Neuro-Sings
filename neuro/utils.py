@@ -255,7 +255,7 @@ def get_cover_artist(file: Path) -> str:
     if file.is_relative_to(UNOFFICIALV3_DIR):
         trackInfo = tinytag.TinyTag.get(file)
         trackJSon = json.loads(trackInfo.other['comment'][0])
-        return trackJSon['Cover Artist']
+        return trackJSon['CoverArtist']
     elif file.is_relative_to(DRIVE_DIR):
         if "/Duet" in str(file) or "/Anniversary" in str(file):
             return "Neuro & Evil"

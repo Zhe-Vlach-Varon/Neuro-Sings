@@ -291,7 +291,7 @@ def extract_unofficialV3(files: list[Path], out: SongJSON = {}) -> SongJSON:
             artist = trackInfo.artist
             title = trackInfo.title
         data = {
-            'Cover Artist': trackJSon['Cover Artist'],
+            'Cover Artist': trackJSon['CoverArtist'],
             'Artist':artist,
             'Artist ASCII':artist,
             'Song':title,

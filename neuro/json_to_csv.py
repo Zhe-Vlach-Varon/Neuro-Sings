@@ -228,7 +228,12 @@ def update_db() -> None:
         # get date from song JSON object
         for song in songs:
             print(song)
-            date = song["Date"]
+            if 'Date' in song.keys():
+                date = song["Date"]
+                named_album = True
+            else:
+                date = album
+                named_album = False
             singer = song['Cover Artist']
             eliv = singer == "Evil"
             if date[0] == "2" and date not in dates_df.get_column("Date"):
@@ -278,8 +283,12 @@ def update_db() -> None:
                 # album = date
 
 
-            cover_image = song["Image"]
-            print("cover image: " + cover_image)
+            if 'Image' in song.keys():
+                cover_image = song["Image"]
+                print("cover image: " + cover_image)
+            else:
+                cover_image = None
+                print("cover image: None")
 
             in_hash = None
 
@@ -324,7 +333,10 @@ def update_db() -> None:
             streams_done += [date]
 
     for date in streams_done:
-        json_data.pop(album)
+        if named_album:
+            json_data.pop(album)
+        else:
+            json_data.pop(date)
         logger.info(f"All songs from {date} treated, removed stream")
 
     # Updates JSON file with treated songs removed

@@ -2,8 +2,9 @@
 
 ## Current Plans
 
-- [ ] take list of songs from a file, and auto detect duplicates based on presence of file in list of new files
+- [x] take list of songs from a file, and auto detect duplicates based on presence of file in list of new files
 - [ ] make it so that the officially released songs will be skipped if not present
+  - [ ] generate place-holder text files, and include the cover art in a folder with the name of the mp3 file that would have been made for officially released songs
 - [ ] switch to hashing audio data instead of whole file
   - [x] switch to checking for song presence in DB based on hash of audio data instead of file hash
   - [ ] detect when file metadata doesn't match the database and print a list of issues
@@ -12,7 +13,7 @@
   - [ ] create and use texture atlas or individual images of each possible character used in date strings
     - [x] first pass text atlases
     - [ ] figure out how to straighten up date segments so they line up better
-  - [ ] add system to handle split karaoke streams like the 2025 Christmas Karaoke (by split I mean one twin did first half, and the other twin did the second half)
+  - [x] add system to handle split karaoke streams like the 2025 Christmas Karaoke (by split I mean one twin did first half, and the other twin did the second half)
   - [ ] add configurable base image sources
     - [ ] add more background images
       - [ ] Christmas 2025 cover
@@ -43,6 +44,7 @@
           - [ ] Evil New Mic Neuro Old Mic
           - [ ] Both twins New Mics
   - [x] fix image system so that "as_drive" flag will tell it to take the default cover image for the song's date
+  - [ ] add support for more image file types
 - [ ] Add more error checking
   - [ ] Check for and remove empty rows in DB/CSV
   - [ ] Check for and handle fields that are empty string instead of Null
@@ -50,14 +52,19 @@
 - [ ] update Songlist.md
 - [ ] find and add credits for new cover arts
 - [ ] check and update database
+- [ ] fix tagging of albums so songs are grouped correctly in media players that expect all songs in an album to be tagged a certain way
+- [ ] for generate albums, consider adding track numbers to start of file name
+- [ ] generate zvv sort and original sort presets seperately
+  - [ ] add preset grouping to preset config file
 - [ ] Code Cleanup and Refactoring
   - [ ] find duplicated code and move into separate functions
+  - [ ] find non-pythonic code and refactor it to be more pythonic
 - [ ] update README and other documentation
 
 
 ## later plans
 - [ ] figure out how to package as a graphical program that does everything except download/upload
-
+- [ ] catalog alternate titles and artist names
 
 
 # Old TODOS
@@ -79,7 +86,7 @@
 ## Mid-prio
 - [ ] Replace github screenshots with poweramp?
 - [ ] Preset prefix/suffix (pass preset to Song)
-- [x] More complex flag selection with AND/OR
+- [ ] More complex flag selection with AND/OR
   - [x] Maybe at first just an option in the preset to tell include-type = "AND" | "OR" (same for exclude). Write stack_and function and check for option in preset.
   - [ ] Or have a "complex mode" flag, tell if it's AND->OR or OR->AND. And put conditions in arrays of arrays and apply operation 1 between level1 arrays...
 - [x] Find where "fnaf.mp3" is from -> unused

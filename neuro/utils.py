@@ -9,6 +9,8 @@ from enum import Enum
 from pathlib import Path
 from typing import TextIO
 
+import xxhash
+
 import hashlib
 from mutagen.id3 import ID3, ID3NoHeaderError
 
@@ -231,7 +233,7 @@ def get_audio_hash(file_path):
         raw_audio = file_data[header_size:end_index]
 
         # 4. Hash the raw audio
-        return hashlib.md5(raw_audio).hexdigest() # ZVV: using hashlib.md5 instead of xxhash.xxh64 because I cannot get python to recognize it as being installed on my system
+        return xxhash.xxh64(raw_audio).hexdigest()
 
     except Exception as e:
         print(f"Error processing {file_path}: {e}")

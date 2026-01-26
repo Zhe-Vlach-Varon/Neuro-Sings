@@ -221,21 +221,27 @@ def update_db() -> None:
 
     # date is like 2025-04-02
     # songs is a list of dict with song infos
-    for date, songs in json_data.items():
-        eliv = sum(map(is_eliv, songs)) > 0
-        singer = "Evil" if eliv else "Neuro"
+    for album, songs in json_data.items():
+        # eliv = sum(map(is_eliv, songs)) > 0 # this assumed that only one twin would main in a karaoke stream, which is now false, as of 2025-12-25 Christmas Karaoke, where Neuro started the set, then swapped to Evil for second half
+        # singer = "Evil" if eliv else "Neuro"
 
-        if date[0] == "2" and date not in dates_df.get_column("Date"):
-            df = pl.DataFrame(
-                {
-                    "Date": date,
-                    "Singer": singer,
-                    "Duet Format": "v2",
-                }
-            )
-            # Adds a row for a new stream in the dates CSV
-            dates_df.extend(df)
-            logger.info(f"[Karaoke][+] {date} with {singer} singing")
+        # get date from song JSON object
+        for song in songs:
+            print(song)
+            date = song["Date"]
+            singer = song['Cover Artist']
+            eliv = singer == "Evil"
+            if date[0] == "2" and date not in dates_df.get_column("Date"):
+                df = pl.DataFrame(
+                    {
+                        "Date": date,
+                        "Singer": song['Cover Artist'],
+                        "Duet Format": "v2",
+                    }
+                )
+                # Adds a row for a new stream in the dates CSV
+                dates_df.extend(df)
+                logger.info(f"[Karaoke][+] {date} with {singer} singing")
         
         remove = 0
         # Just ensures that when sorting by id, the songs from a same album will also be sorted
@@ -265,12 +271,20 @@ def update_db() -> None:
             name, name_ascii = field_ascii(song, "Song")
             artist, artist_ascii = field_ascii(song, "Artist")
 
-            album = ""
+            # date is assumed to be a date used to form the album title, and if not a date is used as the album title
+            # if str(date).startswith("20"):
+                # album = f"{singer} {date} Karaoke" # move this to detection, and replace date with album here
+            # else:
+                # album = date
 
-            if str(date).startswith("20"):
-                album = f"{singer} {date} Karaoke"
-            else:
-                album = date
+
+            cover_image = song["Image"]
+            print("cover image: " + cover_image)
+
+            in_hash = None
+
+            if not song['duplicate']:
+                in_hash = get_audio_hash(file)
 
             df = pl.DataFrame(
                 {
@@ -283,16 +297,19 @@ def update_db() -> None:
                     "Date": date,
                     "Album": album,
                     "Album_ID": song["id"],
-                    "Image": None,
+                    "Image": cover_image,
                     "File_IN": str(file),
-                    "Hash_IN": get_audio_hash(file),
-                    #"Flags": None ,
+                    "Hash_IN": in_hash,
                     "Flags": get_flags(file, eliv),
                     "Key": None,
                     "Tempo (1/4 beat)": None,
                 }
             )
+            with pl.Config(tbl_cols=-1):
+                print(df)
             if song["duplicate"]:
+                print(song)
+                print(song['duplicate'])
                 df = get_most_recent_version(df.to_dict())
 
             id += 1
@@ -307,7 +324,7 @@ def update_db() -> None:
             streams_done += [date]
 
     for date in streams_done:
-        json_data.pop(date)
+        json_data.pop(album)
         logger.info(f"All songs from {date} treated, removed stream")
 
     # Updates JSON file with treated songs removed
@@ -371,6 +388,7 @@ def get_most_recent_version(song: dict) -> pl.DataFrame:
     filtered_songs = songDB.filter((pl.col("Artist") == song["Artist"]) & (pl.col("Song") == song["Song"]) & (pl.col("Cover Artist") == song["Cover Artist"])).sort(pl.col("Date"), descending=True)
     print("filtered_songs")
     print(filtered_songs)
+    print(song)
     assert filtered_songs.height > 0
     latest_version = filtered_songs.row(0, named=True)
     print("latest_version")
@@ -392,7 +410,7 @@ def get_most_recent_version(song: dict) -> pl.DataFrame:
            "Date": song["Date"],
            "Album": song["Album"],
            "Album_ID": song["Album_ID"],
-           "Image": latest_version["Image"],
+           "Image": song["Image"],
            "File_IN": latest_version["File_IN"],
            "Hash_IN": latest_version["Hash_IN"],
            "Flags": flags,
@@ -400,6 +418,7 @@ def get_most_recent_version(song: dict) -> pl.DataFrame:
            "Tempo (1/4 beat)": latest_version["Tempo (1/4 beat)"],
         }
     )
+    print(song["Image"])
 
     return new_duplicate_song
 

@@ -14,6 +14,7 @@ dependencies = [
     "sqlalchemy>=2.0.41",
     "tqdm>=4.67.1",
     "tinytag>=2.2.0",
+    "xxhash>=3.6.0",
 ]
 requires-python = ">=3.11, <3.13"
 readme = "README.md"
@@ -26,7 +27,8 @@ update-json = "neuro.run:new_batch_detection"
 thumbnails-generate = "neuro.thumbnails:generate_main"
 thumbnails-old = "neuro.thumbnails:generate_oldge"
 update-db = "neuro.json_to_csv:update_db"
-# update-hashes = "neuro.json_to_csv:update_db_hashes" # Shouldn't ever need to use this again, was used to update the database after switching from using file hashes to using hashes of just the audio data
+# Shouldn't ever need to use this again, was used to update the database after switching from using file hashes to using hashes of just the audio data
+update-hashes = "neuro.json_to_csv:update_db_hashes" 
 db-check = "neuro.checks:all_tests"
 drive-pull = "neuro._shortcuts:drive_pull"
 drive-push = "neuro._shortcuts:drive_push"

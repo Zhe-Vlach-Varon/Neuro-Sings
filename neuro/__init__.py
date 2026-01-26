@@ -38,4 +38,6 @@ UNOFFV3_DISC66 = "EXTRA CONTENT/DISC 66 - ARG"
 
 OFFICIAL_RELEASE_DIR = SONG_ROOT_DIR / "officially released songs"
 
+SETLISTS_DIR = ROOT_DIR / "setlists"
+
 LOG_DIR = ROOT_DIR / Path("logs")

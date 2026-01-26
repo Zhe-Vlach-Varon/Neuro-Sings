@@ -482,7 +482,7 @@ def fill_in_duplicates(out: SongJSON = {}) -> SongJSON:
 
             for song in out[album]:
                 for entry in albums[album]:
-                    if song['Artist'] == entry['Artist'] or song['Song'] == entry['Song']:
+                    if song['Artist'] == entry['Artist'] and song['Song'] == entry['Song']:
                         song['id'] = entry['id']
                         found_ids.append(entry["id"])
                         print(entry)

@@ -60,6 +60,8 @@
   - [ ] find duplicated code and move into separate functions
   - [ ] find non-pythonic code and refactor it to be more pythonic
 - [ ] update README and other documentation
+- [ ] find better cover image for 2024-12-30 version of blinding lights
+- [ ] find glorp alien Neuro and Evil art for Alien Alien covers
 
 
 ## later plans

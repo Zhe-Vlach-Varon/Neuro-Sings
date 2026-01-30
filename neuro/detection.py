@@ -174,7 +174,7 @@ def extract_common(file: Path, regexes: list[str]) -> tuple[str, SongEntry]:
         ValueError: If none of the patterns matched.
 
     Returns:
-        tuple[str, SongEntry]: A tuple with the 'date' (can be "outlier") and the main info\
+        tuple[str, SongEntry]: A tuple with the 'Date' (can be "outlier") and the main info\
             about the song: artist, song title, the original file and an album id.
     """
     data, date = {}, ""  # Avoids unbound variable error
@@ -291,8 +291,13 @@ def extract_unofficialV3(files: list[Path], out: SongJSON = {}) -> SongJSON:
             date = 'Neuro-sama ARG'
             artist = trackInfo.artist
             title = trackInfo.title
+        cover_artist = trackJSon['CoverArtist']
+        if cover_artist == "Neuro" and date <= "2023-05-17":
+            cover_artist += " [v1]"
+        elif cover_artist == "Neuro" and date <= "2023-06-08":
+            cover_artist += " [v2]"
         data = {
-            'Cover Artist' : trackJSon['CoverArtist'],
+            'Cover Artist' : cover_artist,
             'Artist' : artist,
             'Artist ASCII' : artist,
             'Song' : title,
@@ -300,13 +305,17 @@ def extract_unofficialV3(files: list[Path], out: SongJSON = {}) -> SongJSON:
             'file' : str(file),
             'id' : id,
             'duplicate' : False,
+            'Date' : date,
         }
-        # if date.__contains__("2023-01"):
-        #     date = "Neuro [v1] January Stream Songs"
-        # if date.__contains__("2023-02"):
-        #     date = "Neuro [v1] Feburary Stream Songs"
-        # if date.__contains__("2023-03") and date < "2023-03-22":
-        #     date = "Neuro [v1] March Stream Songs"
+        if date.startswith("2023-01"):
+            date = "Neuro [v1] January Stream Songs"
+        if date.startswith("2023-02"):
+            date = "Neuro [v1] February Stream Songs"
+        if date.startswith("2023-03") and date < "2023-03-22":
+            date = "Neuro [v1] March Stream Songs"
+        print(date)
+        print("extract_unofficialV3")
+        print(data)
         # unused song from PBs drive, was inserted into Disc 3 of Unofficial Archive, not including in Neuro-Sings
         # if (date == "2023" and title == "It's Been So Long") or (date == ""):
         #     date = "outlier"
@@ -378,12 +387,16 @@ def parse_setlist(p: Path) -> SongJSON:
             input_date = parse(fields[0])
             date = input_date.strftime(date_format)
             singer = fields[1]
+            print(fields[1])
+            assert fields[1] == "Neuro [v1]"
             if date in dates_df.get_column("Date"):
                 continue
+            print(len(fields))
             if len(fields) == 2:
                 # need to know singer to name karaoke stream albums, but current setlist format has singer changes on seperate line from date and album title
                 # solution, add singer as second field of album info line
                 album = f"{singer} {date} Karaoke"
+                print(album)
                 songs[album] = []
             else:
                 album = fields[2]
@@ -419,7 +432,7 @@ def parse_setlist(p: Path) -> SongJSON:
                 'Artist ASCII': artist,
                 'Song': song_title,
                 'Song ASCII': song_title,
-                'Cover Artist': lead_singer,
+                'Cover Artist': singer,
                 'Image' : song_art,
                 'Date' : date,
                 'id': id,
@@ -446,35 +459,57 @@ def fill_in_duplicates(out: SongJSON = {}) -> SongJSON:
 
     # keep track of which setlist files have been seen before
 
+    songs_df =load_db()
     dates_df = load_dates()
 
-    files = list(SETLISTS_DIR.glob(f"*.txt"))
+    files = list(SETLISTS_DIR.glob(f"**/*.txt"))
+    print("files")
+    print(files)
 
     format = "%Y-%m-%d"
 
     for file in files:
+        print("file")
+        print(file)
         file_stem = file.stem
         res = True
         try:
             date = parse(file_stem, fuzzy=True).strftime(format)
+            print(date)
         except ValueError:
             res = False
+            with open(file) as f:
+                first_line = f.readline()
+                first_field = first_line.split(' ')[0]
+                date = first_field
 
-        print(date)
 
         if not res:
             # TODO log "file " + str(file) + " does not match expected naming convention, skipping"
-            continue
+            # continue
+            print("placeholder code: if not res")
+            print(file)
 
-        if date in dates_df.get_column("Date"):
-            # TODO log f"date from filename {date} is already in dates table"
-            continue
-        
+        print("if not date in dates_df.get_column(\"Date\"):")
+        print(date)
+        # if not date in dates_df.get_column("Date"):
+        #     # TODO log f"date from filename {date} is already in dates table"
+        #     continue
+        print("file")
+        print(file)
         albums = parse_setlist(file)
 
         for album, songs in albums.items():
-            # TODO actually insert duplicate songs into SongJSON out
-
+            # TODO un-comment these lines once the database has been updated to the new archive
+            # if album in songs_df.get_column('Album'):
+            #     continue
+            # TODO what about the case where a song is added to a setlist??? (i.e. Original Songs, Officially Released Covers, etc...)
+            #           maybe leave original songs and whatnot to be added manually
+            print("fill_in_duplicates")
+            print(out.keys())
+            print(album)
+            # print(date)
+            print(songs)
             if album not in out.keys() and date in out.keys():
                 out[album] = out.pop(date)
             
@@ -495,17 +530,25 @@ def fill_in_duplicates(out: SongJSON = {}) -> SongJSON:
                 print(entry)
                 if entry["id"] not in found_ids:
                     out[album].insert((entry["id"]-1), entry)
+                    print('if entry["id"] not in found_ids:')
                 else:
-                    out[album][entry['id']- 1 ]['Date'] = entry['Date']
+                    print(out[album][entry['id']- 1 ])
+                    print(entry)
+                    print(out[album][entry['id']- 1 ]['Date'])
+                    print(entry['Date'])
+                    if res:
+                        print("res: True")
+                        out[album][entry['id']- 1 ]['Date'] = entry['Date']
+                    else:
+                        print("res: False")
+                    print(out[album][entry['id']- 1 ]['Date'])
+                    
                     out[album][entry['id']- 1 ]['id'] = entry['id']
                     if entry['Image'] is not None:
                         out[album][entry['id']- 1 ]['Image'] = entry['Image']
-                    else:
-                        out[album][entry['id']- 1 ]['Image'] = art
 
+                print("print(out[album][entry['id']- 1 ])")
                 print(out[album][entry['id']- 1 ])
-
-            out[album].sort(key=song_entry_sort_by_id)
 
     return out
 
@@ -554,11 +597,17 @@ def export_json(all_songs: SongJSON) -> None:
     Args:
         all_songs (SongJSON): Dictionary with lists of files grouped by date.
     """
-    songs = {}
+
+    print(all_songs)
+    all_keys = sorted(all_songs)
+    print(all_keys)
+    
+    print("")
+    print(all_songs.items())
+
     # Sorting songs by date for easier treatment
-    for k in sorted(list(all_songs.keys())):
-        songs[k] = all_songs[k]
+    sorted_songs = dict(sorted(all_songs.items(), key=lambda item: item[1][0]['Date']))
 
     with open(SONGS_JSON, "w") as f:
-        json.dump(songs, f, indent=2, ensure_ascii=False)
+        json.dump(sorted_songs, f, indent=2, ensure_ascii=False)
         f.write("\n")

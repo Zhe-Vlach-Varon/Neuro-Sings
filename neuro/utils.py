@@ -209,7 +209,8 @@ MP3ModeTuple = tuple[MP3GainMode, MP3GainMode]
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-def get_audio_hash(file_path):
+def get_audio_hash(file_path, slicer: slice = slice(None)): # ZVV: add an optional list slice argument
+    print(slicer)
     try:
         try:
             audio_tags = ID3(file_path)
@@ -233,24 +234,85 @@ def get_audio_hash(file_path):
         raw_audio = file_data[header_size:end_index]
 
         # 4. Hash the raw audio
-        return xxhash.xxh64(raw_audio).hexdigest()
+        return xxhash.xxh64(raw_audio[slicer]).hexdigest() # ZVV: add optional list slice argument
 
     except Exception as e:
         print(f"Error processing {file_path}: {e}")
         return None
 
 
-def get_audio_hash_to_file_mapping(p: Path, *, filetype: str = "mp3") -> dict:
+def get_audio_hash_to_file_mapping(p: Path, *, filetype: str = "mp3", slicer: slice = slice(None)) -> dict:
     print(p)
     files = list(p.glob(f"**/*.{filetype}"))
     file_mapping = {}
 
     for file in files:
         print(file)
-        hash = get_audio_hash(file)
+        hash = get_audio_hash(file, slicer=slicer)
         file_mapping[hash] = Path(file)
     
     return file_mapping
+
+def get_old_to_new_file_mapping_by_audio_hash(old_dir: Path, new_dir: Path, filetype: str = "mp3") -> dict:
+    old_to_new_mapping: dict = {}
+
+    old_file_map = get_audio_hash_to_file_mapping(old_dir, slicer=slice(-10000, None))
+    new_file_map = get_audio_hash_to_file_mapping(new_dir, slicer=slice(-10000, None))
+
+    old_hashes = list(dict.fromkeys(old_file_map.keys()))
+    new_hashes = list(dict.fromkeys(new_file_map.keys()))
+
+    in_both_count = 0
+    in_new_only_count = 0
+    in_old_only_count = 0
+
+    in_old_only_list = []
+    in_new_only_list = []
+    in_both_list = []
+
+    for hash in old_hashes:
+        print("")
+        print(hash)
+        print(old_file_map[hash])
+        if hash in new_hashes:
+            print(new_file_map[hash])
+            in_both_count += 1
+            in_both_list.append((hash, old_file_map[hash], new_file_map[hash]))
+        else:
+            print("not in new")
+            in_old_only_count += 1
+            in_old_only_list.append((hash, old_file_map[hash], "N/A"))
+    
+    for hash in new_hashes:
+        print("")
+        print(hash)
+        print(new_file_map[hash])
+        if hash in old_hashes:
+            print(old_file_map[hash])
+        else:
+            print("not in old")
+            in_new_only_count += 1
+            in_new_only_list.append((hash, "N/A", new_file_map[hash]))
+
+    print("counts")
+    print("in both: " + str(in_both_count))
+    print("in new only: " + str(in_new_only_count))
+    print("in old only: " + str(in_old_only_count))
+
+    print("\n\n")
+
+    print("In new archive only")
+    for song in in_new_only_list:
+        print(song)
+    
+    print("\n\n")
+
+    print("In old archive only:")
+    for song in in_old_only_list:
+        print(song)
+
+    return old_to_new_mapping
+
 
 # used once to fill in "Cover Artist" field added to database
 def get_cover_artist(file: Path) -> str:

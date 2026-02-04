@@ -387,10 +387,13 @@ def parse_setlist(p: Path) -> SongJSON:
             input_date = parse(fields[0])
             date = input_date.strftime(date_format)
             singer = fields[1]
+            lead_singer = singer
             print(fields[1])
-            assert fields[1] == "Neuro [v1]"
+
             if date in dates_df.get_column("Date"):
-                continue
+                # continue
+                # TODO check if song is in database with the same date, and only if it isn't, add the setlist entry to the json
+                print("placeholder code")
             print(len(fields))
             if len(fields) == 2:
                 # need to know singer to name karaoke stream albums, but current setlist format has singer changes on seperate line from date and album title
@@ -418,8 +421,14 @@ def parse_setlist(p: Path) -> SongJSON:
             song_title = fields[1]
             artist = fields[2]
             cover_artist = fields[3]
+            dupe = False
+            encore = False
+            print("fields[4]: " + fields[4])
             if fields[4].lower() == "new":
                 dupe = False
+            elif fields[4].lower() == "encore":
+                dupe = True
+                encore = True
             else:
                 dupe = True
             if len(fields) == 6:
@@ -432,11 +441,13 @@ def parse_setlist(p: Path) -> SongJSON:
                 'Artist ASCII': artist,
                 'Song': song_title,
                 'Song ASCII': song_title,
-                'Cover Artist': singer,
-                'Image' : song_art,
-                'Date' : date,
+                'Cover Artist': cover_artist, # all singers on song
+                'Lead Singer' : lead_singer, # the lead singer of the karaoke stream, used for assigning cover art for duets
+                'Image': song_art,
+                'Date': date,
                 'id': id,
                 'duplicate': dupe,
+                'encore': encore,
             }
             songs[album].append(data)
 
@@ -459,7 +470,7 @@ def fill_in_duplicates(out: SongJSON = {}) -> SongJSON:
 
     # keep track of which setlist files have been seen before
 
-    songs_df =load_db()
+    songs_df = load_db()
     dates_df = load_dates()
 
     files = list(SETLISTS_DIR.glob(f"**/*.txt"))
@@ -495,6 +506,7 @@ def fill_in_duplicates(out: SongJSON = {}) -> SongJSON:
         # if not date in dates_df.get_column("Date"):
         #     # TODO log f"date from filename {date} is already in dates table"
         #     continue
+        # TODO remove this commented out code so songs can be added to albums at later dates
         print("file")
         print(file)
         albums = parse_setlist(file)
@@ -517,38 +529,47 @@ def fill_in_duplicates(out: SongJSON = {}) -> SongJSON:
 
             for song in out[album]:
                 for entry in albums[album]:
-                    if song['Artist'] == entry['Artist'] and song['Song'] == entry['Song']:
+                    if song['Artist'] == entry['Artist'] and song['Song'] == entry['Song'] and song['Cover Artist'] == entry['Cover Artist'] and not entry['encore']:
                         song['id'] = entry['id']
+                        song['Lead Singer'] = entry['Lead Singer']
                         found_ids.append(entry["id"])
                         print(entry)
 
+            print("found_ids")
             print(found_ids)
 
             out[album].sort(key=song_entry_sort_by_id)
             
             for entry in albums[album]:
+                print(out)
+                print("")
                 print(entry)
+                print("")
+                print(found_ids)
+                print("")
+                print(entry['id'])
                 if entry["id"] not in found_ids:
                     out[album].insert((entry["id"]-1), entry)
                     print('if entry["id"] not in found_ids:')
                 else:
-                    print(out[album][entry['id']- 1 ])
+                    print(entry['id'] - 1)
+                    print(out[album][entry['id'] - 1 ])
                     print(entry)
-                    print(out[album][entry['id']- 1 ]['Date'])
+                    print(out[album][entry['id'] - 1 ]['Date'])
                     print(entry['Date'])
                     if res:
                         print("res: True")
-                        out[album][entry['id']- 1 ]['Date'] = entry['Date']
+                        out[album][entry['id'] - 1 ]['Date'] = entry['Date']
                     else:
                         print("res: False")
-                    print(out[album][entry['id']- 1 ]['Date'])
+                    print(out[album][entry['id'] - 1 ]['Date'])
                     
-                    out[album][entry['id']- 1 ]['id'] = entry['id']
+                    out[album][entry['id'] - 1 ]['id'] = entry['id']
                     if entry['Image'] is not None:
-                        out[album][entry['id']- 1 ]['Image'] = entry['Image']
+                        out[album][entry['id'] - 1 ]['Image'] = entry['Image']
 
-                print("print(out[album][entry['id']- 1 ])")
-                print(out[album][entry['id']- 1 ])
+                print("print(out[album][entry['id'] - 1 ])")
+                print(out[album][entry['id'] - 1 ])
 
     return out
 
@@ -577,7 +598,7 @@ def extract_all() -> SongJSON:
     # extract_list(files["V2"], regex["Neuro"], out)
 
     # Custom
-    extract_custom(files["Custom"], out)
+    # extract_custom(files["Custom"], out)
 
     # unofficial v3
     extract_unofficialV3(files["UnofficialV3"], out)
@@ -585,7 +606,7 @@ def extract_all() -> SongJSON:
 
     # TODO attempt to automatically strip non-ASCII characters from the _ASCII fields
 
-    if len(out["custom"]) == 0:
+    if 'custom' in out.keys() and len(out["custom"]) == 0:
         out.pop("custom")
 
     return out
@@ -598,12 +619,18 @@ def export_json(all_songs: SongJSON) -> None:
         all_songs (SongJSON): Dictionary with lists of files grouped by date.
     """
 
+    print("")
     print(all_songs)
     all_keys = sorted(all_songs)
+    print("")
     print(all_keys)
     
     print("")
-    print(all_songs.items())
+    for key, songs in all_songs.items():
+        print(key)
+        for song in songs:
+            print(song)
+            assert 'Date' in song.keys()
 
     # Sorting songs by date for easier treatment
     sorted_songs = dict(sorted(all_songs.items(), key=lambda item: item[1][0]['Date']))

@@ -276,8 +276,32 @@ def extract_unofficialV3(files: list[Path], out: SongJSON = {}) -> SongJSON:
         artist = ""
         title = ""
         trackInfo = tinytag.TinyTag.get(file)
-        if 'comment' in trackInfo.other.keys():
-            trackJSon = json.loads(trackInfo.other['comment'][0])
+        print("")
+        print("")
+        print(file)
+        print(trackInfo.comment)
+        print(trackInfo.other.keys())
+        for key in trackInfo.other.keys():
+            print(key)
+            print(trackInfo.other[key])
+        if len(trackInfo.comment) > 0 and trackInfo.comment.startswith('{') and trackInfo.comment.endswith('}'):
+            trackJSon = json.loads(trackInfo.comment)
+            input_date = parse(trackJSon['Date'])
+            date = input_date.strftime("%Y-%m-%d")
+            artist = trackJSon['Artist']
+            title = trackJSon['Title']
+        elif 'comment' in trackInfo.other.keys():
+            found_json = False
+            print("")
+            print(trackInfo.other['comment'])
+            assert len(trackInfo.other['comment'])
+            for comment in trackInfo.other['comment']:
+                print("")
+                print(comment)
+                if comment.startswith('{') and comment.endswith('}'):
+                    trackJSon = json.loads(comment)
+                    found_json = True
+            assert found_json
             input_date = parse(trackJSon['Date'])
             date = input_date.strftime("%Y-%m-%d")
             artist = trackJSon['Artist']

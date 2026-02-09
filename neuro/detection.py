@@ -14,7 +14,7 @@ from loguru import logger
 # TODO are the different unoffV3 subdirs actually needed, or just the root unoffV3 dir
 from neuro import CUSTOM_DIR, DRIVE_DIR, ROOT_DIR, SONGS_JSON, UNOFFICIALV3_DIR, UNOFFV3_DISC1, UNOFFV3_DISC2, UNOFFV3_DISC3, UNOFFV3_DISC4, UNOFFV3_DISC5, UNOFFV3_DISC6, UNOFFV3_DISC7, UNOFFV3_DISC8, UNOFFV3_DISC66, OFFICIAL_RELEASE_DIR, SETLISTS_DIR
 from neuro.polars_utils import load_db, load_dates
-from neuro.utils import get_audio_hash
+from neuro.utils import get_audio_hash, do_song_titles_match, get_song_artists_match_count
 
 SongEntry = dict[str, Optional[str]]
 """Dictionary representing a song in the JSON, containing fields like "Song", "Artist", etc..."""
@@ -330,6 +330,8 @@ def extract_unofficialV3(files: list[Path], out: SongJSON = {}) -> SongJSON:
             'id' : id,
             'duplicate' : False,
             'Date' : date,
+            'Lead Singer': cover_artist,
+            'additional flags': "",
         }
         if date.startswith("2023-01"):
             date = "Neuro [v1] January Stream Songs"
@@ -472,6 +474,7 @@ def parse_setlist(p: Path) -> SongJSON:
                 'id': id,
                 'duplicate': dupe,
                 'encore': encore,
+                'additional flags': "",
             }
             songs[album].append(data)
 
@@ -487,12 +490,14 @@ def song_entry_sort_by_id(e):
     return e['id']
 
 
-def fill_in_duplicates(out: SongJSON = {}) -> SongJSON:
+def fill_in_setlists(out: SongJSON = {}) -> SongJSON:
     # check if a setlist file with a date not already in dates exists
     # check each existing entry under the date in out:SongJSON, and update "id", removing those entries from the in-memory copy of the setlist
     # for each remaining entry in the setlist, create a duplicate entry using the most recent version of the song from the same singer from the setlist date or before
 
     # keep track of which setlist files have been seen before
+
+    # TODO split artist field on ', ' and when checking if track is the same, compare by sub-field
 
     songs_df = load_db()
     dates_df = load_dates()
@@ -507,16 +512,17 @@ def fill_in_duplicates(out: SongJSON = {}) -> SongJSON:
         print("file")
         print(file)
         file_stem = file.stem
-        res = True
-        try:
-            date = parse(file_stem, fuzzy=True).strftime(format)
-            print(date)
-        except ValueError:
-            res = False
-            with open(file) as f:
-                first_line = f.readline()
-                first_field = first_line.split(' ')[0]
-                date = first_field
+        # res = True
+        # try:
+        #     date = parse(file_stem, fuzzy=True).strftime(format)
+        #     print(date)
+        # except ValueError:
+        res = False
+        with open(file) as f:
+            first_line = f.readline()
+            first_field = first_line.split(' | ')[0]
+            date = parse(first_field, fuzzy=True).strftime(format)
+        # TODO remove the code for getting the date from the filename
 
 
         if not res:
@@ -543,8 +549,8 @@ def fill_in_duplicates(out: SongJSON = {}) -> SongJSON:
             #           maybe leave original songs and whatnot to be added manually
             print("fill_in_duplicates")
             print(out.keys())
-            print(album)
-            # print(date)
+            print("album: " + album)
+            print("date: " + date)
             print(songs)
             if album not in out.keys() and date in out.keys():
                 out[album] = out.pop(date)
@@ -553,7 +559,7 @@ def fill_in_duplicates(out: SongJSON = {}) -> SongJSON:
 
             for song in out[album]:
                 for entry in albums[album]:
-                    if song['Artist'] == entry['Artist'] and song['Song'] == entry['Song'] and song['Cover Artist'] == entry['Cover Artist'] and not entry['encore']:
+                    if get_song_artists_match_count(song['Artist'], entry['Artist']) and do_song_titles_match(song['Song'], entry['Song']) and song['Cover Artist'].lower() == entry['Cover Artist'].lower() and not entry['encore']:
                         song['id'] = entry['id']
                         song['Lead Singer'] = entry['Lead Singer']
                         found_ids.append(entry["id"])
@@ -626,7 +632,7 @@ def extract_all() -> SongJSON:
 
     # unofficial v3
     extract_unofficialV3(files["UnofficialV3"], out)
-    fill_in_duplicates(out)
+    fill_in_setlists(out)
 
     # TODO attempt to automatically strip non-ASCII characters from the _ASCII fields
 

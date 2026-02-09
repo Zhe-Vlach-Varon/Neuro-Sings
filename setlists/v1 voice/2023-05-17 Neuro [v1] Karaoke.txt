@@ -1,24 +1,24 @@
 2023-05-17 | Neuro [v1]
 1 | Rap God | Eminem | Neuro [v1] | Duplicate
 2 | Careless Whisper | George Michael | Neuro [v1] | Duplicate
-3 | ゴーストルール (Ghost Rule) | DECO*27 | Neuro [v1] | Duplicate
+3 | Ghost Rule | DECO*27 | Neuro [v1] | Duplicate
 4 | Viva La Vida | Coldplay | Neuro [v1] | New
 5 | I Am Machine | Three Days Grace | Neuro [v1] | Duplicate
-6 | 24時間シンデレラ (24-hour Cinderella) | ZENTA, Ryosuke Horii | Neuro [v1] | New
+6 | 24-hour Cinderella | ZENTA, Ryosuke Horii | Neuro [v1] | New
 7 | Moves Like Jagger | Maroon 5 | Neuro [v1] | Duplicate
-8 | 千本桜 (Senbonzakura) | Kurousa-P | Neuro [v1] | New
+8 | Senbonzakura | KurousaP | Neuro [v1] | New
 9 | The Phoenix | Fall Out Boy | Neuro [v1] | Duplicate
 10 | Radioactive | Imagine Dragons | Neuro [v1] | Duplicate
 11 | Fluorite Eye's Song | Kairi Yagi | Neuro [v1] | New
 12 | Shelter | Porter Robinson | Neuro [v1] | Duplicate
-13 | ルカルカ★ナイトフィーバー (Luka Luka★Night Fever) | Samfree | Neuro [v1] | Duplicate
+13 | Luka Luka Night Fever | Samfree | Neuro [v1] | Duplicate
 14 | Legends Never Die | Against The Current | Neuro [v1] | Duplicate
-15 | えれくとりっく・えんじぇぅ (Electric Angel) | Yasuo-P | Neuro [v1] | New
+15 | Electric Angel | Yasuo-P | Neuro [v1] | New
 16 | Lagtrain | inabakumori | Neuro [v1] | Duplicate
 17 | Hello, World | Louie Zong | Neuro [v1] | New
 18 | A Thousand Years | Christina Perri | Neuro [v1] | Duplicate
 19 | Behind Blue Eyes | Limp Bizkit | Neuro [v1] | Duplicate
-20 | 神っぽいな (God-ish) | PinocchioP, DECO*27 | Neuro [v1] | Duplicate
+20 | God-ish | PinocchioP, DECO*27 | Neuro [v1] | Duplicate
 21 | golden hour | JVKE | Neuro [v1] | New
 22 | oddloop | Frederic | Neuro [v1] | Duplicate
 23 | Chandelier | Sia | Neuro [v1] | New

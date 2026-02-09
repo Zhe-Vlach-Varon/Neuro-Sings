@@ -2,7 +2,7 @@
 1 | Brain Power | NOMA | Neuro [v1] | Duplicate
 2 | Rockefeller Street (Nightcore) | Getter Jaani | Neuro [v1] | Duplicate
 3 | Thnks Fr Th Mmrs | Fall Out Boy | Neuro [v1] | Duplicate
-4 | アイドル (Idol) | YOASOBI | Neuro [v1] | New
+4 | Idol | YOASOBI | Neuro [v1] | New
 5 | Running in the 90's | Max Coveri | Neuro [v1] | Duplicate
 6 | Legends Never Die | Against The Current | Neuro [v1] | New
 7 | oddloop | Frederic | Neuro [v1] | Duplicate
@@ -10,7 +10,7 @@
 9 | Nyanyanyanyanyanyanya! | daniwell | Neuro [v1] | New
 10 | After Dark | Mr.Kitty | Neuro [v1] | Duplicate
 11 | I Kissed a Girl | Katy Perry | Neuro [v1] | Duplicate
-12 | 転生林檎 (Reincarnation Apple) | PinocchioP | Neuro [v1] | New
+12 | Reincarnation Apple | PinocchioP | Neuro [v1] | New
 13 | KARMANATIONS | Akatsuki Records | Neuro [v1] | Duplicate
 14 | Blue (Da Ba Dee) | Eiffel 65 | Neuro [v1] | Duplicate
 15 | The Phoenix | Fall Out Boy | Neuro [v1] | New

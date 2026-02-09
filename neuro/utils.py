@@ -4,10 +4,12 @@ from __future__ import annotations
 
 import hashlib
 import sys
+import re
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
 from typing import TextIO
+import unicodedata
 
 import xxhash
 
@@ -341,3 +343,29 @@ def get_cover_artist(file: Path) -> str:
     else:
         return None
     # These last few return None because the bulk of songs are covered by the other cases and there will be few enough songs left to manually update in a reasonable time
+
+
+def do_song_titles_match(existing_song_title: str, new_song_title: str) -> bool:
+    print("do_song_titles_match:existing: " + existing_song_title)
+    print("do_song_titles_match:new: " + new_song_title)
+
+    return (re.sub(r'[^a-z0-9]', '', new_song_title.lower()) in re.sub(r'[^a-z0-9]', '', existing_song_title.lower()))
+
+def get_song_artists_match_count(existing_song_artists: str, new_song_artists: str) -> int:
+    print("get_song_artists_match_count:new: " + new_song_artists)
+    print("get_song_artists_match_count:existing: " + existing_song_artists)
+
+    existing_artists = str(remove_accents(existing_song_artists)).lower().split(', ')
+    new_artists = str(remove_accents(new_song_artists)).lower().split(', ')
+
+    artists_match_count = 0
+
+    if len(existing_artists) >= len(new_artists):
+        for song_artist in existing_artists:
+            if song_artist in new_artists:
+                artists_match_count += 1
+
+    return artists_match_count
+
+def remove_accents(s):
+   return ''.join(c for c in unicodedata.normalize('NFD', s) if unicodedata.category(c) != 'Mn')

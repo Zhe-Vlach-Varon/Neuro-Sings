@@ -268,7 +268,7 @@ def update_db() -> None:
                 streams_done += [date]
 
     for date in streams_done:
-        sorted_songs.pop(album)
+        json_data.pop(album)
         logger.info(f"All songs from {date} treated, removed stream")
     for album in album_names:
         json_data.pop(album)

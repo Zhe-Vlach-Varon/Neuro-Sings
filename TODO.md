@@ -67,6 +67,7 @@
 ## later plans
 - [ ] figure out how to package as a graphical program that does everything except download/upload
 - [ ] catalog alternate titles and artist names
+- [ ] automate updating Duplicates.md and Song List.md
 
 
 # Old TODOS

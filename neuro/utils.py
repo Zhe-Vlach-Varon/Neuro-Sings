@@ -351,21 +351,13 @@ def do_song_titles_match(existing_song_title: str, new_song_title: str) -> bool:
 
     songTitleNonAlphaNumStripRegex = r'[^a-z0-9]'
 
-<<<<<<< HEAD
-    return (re.sub(songTitleNonAlphaNumStripRegex, '', new_song_title.lower()) in re.sub(songTitleNonAlphaNumStripRegex, '', existing_song_title.lower()))
-=======
     return (re.sub(songTitleNonAlphaNumStripRegex, '', str(remove_accents(new_song_title)).lower()) in re.sub(songTitleNonAlphaNumStripRegex, '', str(remove_accents(existing_song_title)).lower()))
->>>>>>> unofficialV3_extract
 
 def get_song_artists_match_count(existing_song_artists: str, new_song_artists: str) -> int:
     print("get_song_artists_match_count:new: " + new_song_artists)
     print("get_song_artists_match_count:existing: " + existing_song_artists)
 
-<<<<<<< HEAD
-    artistCharacterStripRegex = r'[_\-\(\)\[\]\{\}\<\> ]'
-=======
     artistCharacterStripRegex = r'[\_\-\(\)\[\]\{\}\<\> ]'
->>>>>>> unofficialV3_extract
 
     existing_artists = re.sub(artistCharacterStripRegex, '', str(remove_accents(existing_song_artists))).lower().split(',')
     new_artists = re.sub(artistCharacterStripRegex, '', str(remove_accents(new_song_artists))).lower().split(',')

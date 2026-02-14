@@ -13,7 +13,7 @@
 12 | California Gurls | Katy Perry | Neuro [v1] | Duplicate
 13 | ビターチョコデコレーション (Bitter Choco Decoration) | syudou | Neuro [v1] | Duplicate
 14 | Somebody That I Used To Know | Gotye, Kimbra | Neuro [v1] | Duplicate
-15 | Gotta Catch 'Em All (Pokémon Theme Song) | John Siegler, Jason Paige | Neuro [v1] | Duplicate
+15 | Gotta Catch 'Em All | John Siegler, Jason Paige | Neuro [v1] | Duplicate
 16 | KARMANATIONS | Akatsuki Records | Neuro [v1] | New
 17 | I Am Machine | Three Days Grace | Neuro [v1] | Duplicate
 18 | Careless Whisper | George Michael | Neuro [v1] | Duplicate

@@ -6,8 +6,8 @@
 5 | Running in the 90's | Max Coveri | Neuro [v1] | Duplicate
 6 | Legends Never Die | Against The Current | Neuro [v1] | New
 7 | oddloop | Frederic | Neuro [v1] | Duplicate
-8 | Gotta Catch 'Em All (Pokémon Theme Song) | John Siegler, Jason Paige | Neuro [v1] | Duplicate
-9 | Nyanyanyanyanyanyanya! | daniwell | Neuro [v1] | New
+8 | Gotta Catch 'Em All | John Siegler, Jason Paige | Neuro [v1] | Duplicate
+9 | Nyan Cat | daniwell | Neuro [v1] | New
 10 | After Dark | Mr.Kitty | Neuro [v1] | Duplicate
 11 | I Kissed a Girl | Katy Perry | Neuro [v1] | Duplicate
 12 | Reincarnation Apple | PinocchioP | Neuro [v1] | New

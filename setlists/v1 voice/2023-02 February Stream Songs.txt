@@ -9,11 +9,11 @@
 8 | KING | Kanaria | Neuro [v1] | New
 9 | phony | Tsumiki | Neuro [v1] | New
 10 | Careless Whisper | George Michael | Neuro [v1] | New
-11 | Dreamin Chuchu | emon | Neuro [v1] | New
+11 | Dreamin Chuchu | emon(Tes) | Neuro [v1] | New
 12 | Bad Guy | Billie Eilish | Neuro [v1] | New
 13 | Blue | Eiffel 65 | Neuro [v1] | New
 14 | ECHO | Crusher | Neuro [v1] | New
-15 | All The Things She Said | t.A.T.u | Neuro [v1] | New
+15 | All The Things She Said | tATu | Neuro [v1] | New
 16 | God-ish | DECO*27, PinocchioP | Neuro [v1] | New
 17 | I Am Machine | Three Days Grace | Neuro [v1] | New
 18 | Snow Halation | μ's | Neuro [v1] | New

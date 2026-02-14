@@ -351,25 +351,35 @@ def do_song_titles_match(existing_song_title: str, new_song_title: str) -> bool:
 
     songTitleNonAlphaNumStripRegex = r'[^a-z0-9]'
 
-    return (re.sub(songTitleNonAlphaNumStripRegex, '', str(remove_accents(new_song_title)).lower()) in re.sub(songTitleNonAlphaNumStripRegex, '', str(remove_accents(existing_song_title)).lower()))
+    new_title = re.sub(songTitleNonAlphaNumStripRegex, '', str(remove_accents(new_song_title)).lower())
+    existing_title = re.sub(songTitleNonAlphaNumStripRegex, '', str(remove_accents(existing_song_title)).lower())
+
+    print(new_title)
+    print(existing_title)
+
+    titles_match = (new_title in existing_title)
+
+    return titles_match
 
 def get_song_artists_match_count(existing_song_artists: str, new_song_artists: str) -> int:
     print("get_song_artists_match_count:new: " + new_song_artists)
     print("get_song_artists_match_count:existing: " + existing_song_artists)
 
-    artistCharacterStripRegex = r'[\_\-\(\)\[\]\{\}\<\> ]'
+    artistCharacterStripRegex = r'[\_\-\(\)\[\]\{\}\<\>\.\* ]'
+    artistNameSplitRegex = r'\,|\&'
 
-    existing_artists = re.sub(artistCharacterStripRegex, '', str(remove_accents(existing_song_artists))).lower().split(',')
-    new_artists = re.sub(artistCharacterStripRegex, '', str(remove_accents(new_song_artists))).lower().split(',')
+    existing_artists = re.split(artistNameSplitRegex,  str(re.sub(artistCharacterStripRegex, '', str(remove_accents(existing_song_artists)).lower())))
+    new_artists = re.split(artistNameSplitRegex,  str(re.sub(artistCharacterStripRegex, '', str(remove_accents(new_song_artists)).lower())))
 
     print(existing_artists)
     print(new_artists)
 
     artists_match_count = 0
 
-    if len(existing_artists) >= len(new_artists):
-        for song_artist in existing_artists:
-            if song_artist in new_artists:
+
+    for existing_artist in existing_artists:
+        for new_artist in new_artists:
+            if new_artist in existing_artist:
                 artists_match_count += 1
 
     return artists_match_count

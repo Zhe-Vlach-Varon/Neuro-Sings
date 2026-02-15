@@ -33,6 +33,6 @@ Lists info about a song, fields are separated by `|`
 | Original Artist | full artist credits as given by Unofficial Neuro Karaoke Archive | Required |
 | Singer | Neuro, Evil, Twin-Duet, Collab-Duet(Singers) defaults to Album Lead Singer | Optional |
 | Is New Song | if a song is a duplicate, there is no new file from the archive | Required |
-<!-- automate detection of new songs vs duplicates -->
 | Cover Art | custom cover art to use for this song (see Album Cover Art above for details) if omitted falls back to first the Album Cover Art, then the default karaoke stream cover art generation | Optional |
 | Additional Flags | additional flags to be added to the song record in the database, can be anything you might want to filter by, as long as each flag is followed by a `;` with no spaces before or after | Optional
+<!-- automate detection of new songs vs duplicates -->

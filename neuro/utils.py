@@ -357,12 +357,20 @@ def do_song_titles_match(existing_song_title: str, new_song_title: str) -> bool:
     print(new_title)
     print(existing_title)
 
-    titles_match = (new_title in existing_title)
-    
-    print("titles match: " + str(titles_match))
+    nightcore_regex = r'((nightcore|chipmunk)(ver(sion)?)?)'
 
-    # if 'fireworks' in new_title and 'fireworks' in existing_title:
-    #     exit()
+    new_is_nightcore = False
+    existing_is_nightcore = False
+
+    if re.search(nightcore_regex, new_title):
+        new_is_nightcore = True
+        new_title = re.sub(nightcore_regex, '', new_title)
+
+    if re.search(nightcore_regex, existing_title):
+        existing_is_nightcore = True
+        existing_title = re.sub(nightcore_regex, '', existing_title)
+
+    titles_match = (new_title in existing_title) and (new_is_nightcore == existing_is_nightcore)
 
     return titles_match
 

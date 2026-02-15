@@ -349,7 +349,7 @@ def do_song_titles_match(existing_song_title: str, new_song_title: str) -> bool:
     print("do_song_titles_match:existing: " + existing_song_title)
     print("do_song_titles_match:new: " + new_song_title)
 
-    songTitleNonAlphaNumStripRegex = r'[^a-z0-9]'
+    songTitleNonAlphaNumStripRegex = r'[^a-z0-9\/]'
 
     new_title = re.sub(songTitleNonAlphaNumStripRegex, '', str(remove_accents(new_song_title)).lower())
     existing_title = re.sub(songTitleNonAlphaNumStripRegex, '', str(remove_accents(existing_song_title)).lower())
@@ -358,6 +358,11 @@ def do_song_titles_match(existing_song_title: str, new_song_title: str) -> bool:
     print(existing_title)
 
     titles_match = (new_title in existing_title)
+    
+    print("titles match: " + str(titles_match))
+
+    # if 'fireworks' in new_title and 'fireworks' in existing_title:
+    #     exit()
 
     return titles_match
 
@@ -366,15 +371,19 @@ def get_song_artists_match_count(existing_song_artists: str, new_song_artists: s
     print("get_song_artists_match_count:existing: " + existing_song_artists)
 
     artistCharacterStripRegex = r'[\_\-\(\)\[\]\{\}\<\>\.\* ]'
+    artistStripProducerPRegex = r'-?[pP]\b'
     artistNameSplitRegex = r'\,|\&'
 
-    existing_artists = re.split(artistNameSplitRegex,  str(re.sub(artistCharacterStripRegex, '', str(remove_accents(existing_song_artists)).lower())))
-    new_artists = re.split(artistNameSplitRegex,  str(re.sub(artistCharacterStripRegex, '', str(remove_accents(new_song_artists)).lower())))
+    existing_artists = re.split(artistNameSplitRegex,  str(re.sub(artistStripProducerPRegex, '', re.sub(artistCharacterStripRegex, '', str(remove_accents(existing_song_artists))).lower())))
+    new_artists = re.split(artistNameSplitRegex,  str(re.sub(artistStripProducerPRegex, '', re.sub(artistCharacterStripRegex, '', str(remove_accents(new_song_artists))).lower())))
 
     print(existing_artists)
     print(new_artists)
 
     artists_match_count = 0
+
+    # if 'daoko' in existing_artists and 'daoko' in new_artists:
+    #     exit()
 
 
     for existing_artist in existing_artists:

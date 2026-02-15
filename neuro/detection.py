@@ -379,7 +379,8 @@ def parse_setlist(p: Path) -> SongJSON:
     dates_df = load_dates()
 
     for line in lines:
-        fields = line.strip('\n').split(' | ')
+        fields = line.strip('\n').split('|')
+        fields = [f.strip() for f in fields]
         print(fields)
 
         date_format = "%Y-%m-%d"
@@ -421,16 +422,25 @@ def parse_setlist(p: Path) -> SongJSON:
                 # TODO check if song is in database with the same date, and only if it isn't, add the setlist entry to the json
                 print("placeholder code")
             print(len(fields))
+            if len(fields) < 2:
+                logger.error("not enough fields in album info line in setlist file: " + str(p))
+                exit()
             if len(fields) == 2:
                 # need to know singer to name karaoke stream albums, but current setlist format has singer changes on seperate line from date and album title
                 # solution, add singer as second field of album info line
                 album = f"{singer} {date} Karaoke"
-                print(album)
+                # print(album)
+                songs[album] = []
+            elif len(fields) >= 3 and not fields[2] == '':
+                album = fields[2]
+                # print(album)
                 songs[album] = []
             else:
-                album = fields[2]
+                album = f"{singer} {date} Karaoke"
+                # print(album)
                 songs[album] = []
-            if len(fields) == 4:
+
+            if len(fields) >= 4:
                 album_art = fields[3]
             found_album_line = True
             continue
@@ -446,10 +456,14 @@ def parse_setlist(p: Path) -> SongJSON:
             id = int(fields[0])
             song_title = fields[1]
             artist = fields[2]
-            cover_artist = fields[3]
+            if not fields[3] == '':
+                cover_artist = fields[3]
+            else:
+                cover_artist = lead_singer
             dupe = False
             encore = False
             print("fields[4]: " + fields[4])
+            
             if fields[4].lower() == "new":
                 dupe = False
             elif fields[4].lower() == "encore":
@@ -457,10 +471,17 @@ def parse_setlist(p: Path) -> SongJSON:
                 encore = True
             else:
                 dupe = True
-            if len(fields) == 6:
+            
+            if len(fields) >= 6:
                 song_art = fields[5]
             else:
                 song_art = album_art
+
+            if len(fields) >= 7:
+                additionalFlags = fields[6]
+            else:
+                additionalFlags = ''
+
             print(song_art)
             data = {
                 'Artist': artist,
@@ -474,7 +495,7 @@ def parse_setlist(p: Path) -> SongJSON:
                 'id': id,
                 'duplicate': dupe,
                 'encore': encore,
-                'additional flags': "",
+                'additional flags': additionalFlags,
             }
             songs[album].append(data)
 
@@ -520,7 +541,7 @@ def fill_in_setlists(out: SongJSON = {}) -> SongJSON:
         res = False
         with open(file) as f:
             first_line = f.readline()
-            first_field = first_line.split(' | ')[0]
+            first_field = first_line.split('|')[0].strip()
             date = parse(first_field, fuzzy=True).strftime(format)
         # TODO remove the code for getting the date from the filename
 
@@ -547,11 +568,11 @@ def fill_in_setlists(out: SongJSON = {}) -> SongJSON:
             #     continue
             # TODO what about the case where a song is added to a setlist??? (i.e. Original Songs, Officially Released Covers, etc...)
             #           maybe leave original songs and whatnot to be added manually
-            print("fill_in_duplicates")
-            print(out.keys())
-            print("album: " + album)
-            print("date: " + date)
-            print(songs)
+            # print("fill_in_duplicates")
+            # print(out.keys())
+            # print("album: " + album)
+            # print("date: " + date)
+            # print(songs)
             if album not in out.keys() and date in out.keys():
                 out[album] = out.pop(date)
             
@@ -563,43 +584,52 @@ def fill_in_setlists(out: SongJSON = {}) -> SongJSON:
                         song['id'] = entry['id']
                         song['Lead Singer'] = entry['Lead Singer']
                         found_ids.append(entry["id"])
-                        print(entry)
+                        # print(entry)
 
-            print("found_ids")
-            print(found_ids)
+            # print("found_ids")
+            # print(found_ids)
 
             out[album].sort(key=song_entry_sort_by_id)
             
             for entry in albums[album]:
-                print(out)
-                print("")
-                print(entry)
-                print("")
-                print(found_ids)
-                print("")
-                print(entry['id'])
+                # print(out)
+                # print("")
+                # print(entry)
+                # print("")
+                # print(found_ids)
+                # print("")
+                # print(entry['id'])
                 if entry["id"] not in found_ids:
                     out[album].insert((entry["id"]-1), entry)
                     print('if entry["id"] not in found_ids:')
                 else:
-                    print(entry['id'] - 1)
-                    print(out[album][entry['id'] - 1 ])
-                    print(entry)
-                    print(out[album][entry['id'] - 1 ]['Date'])
-                    print(entry['Date'])
+                    # print(entry['id'] - 1)
+                    # print(out[album][entry['id'] - 1 ])
+                    # print(entry)
+                    # print(out[album][entry['id'] - 1 ]['Date'])
+                    # print(entry['Date'])
                     if res:
                         print("res: True")
                         out[album][entry['id'] - 1 ]['Date'] = entry['Date']
                     else:
                         print("res: False")
-                    print(out[album][entry['id'] - 1 ]['Date'])
+                    # print(out[album][entry['id'] - 1 ]['Date'])
                     
                     out[album][entry['id'] - 1 ]['id'] = entry['id']
                     if entry['Image'] is not None:
                         out[album][entry['id'] - 1 ]['Image'] = entry['Image']
+                    else:
+                        out[album][entry['id'] - 1 ]['Image'] = ''
 
-                print("print(out[album][entry['id'] - 1 ])")
-                print(out[album][entry['id'] - 1 ])
+                    if entry['additional flags'] is not None:
+                        out[album][entry['id'] - 1 ]['additional flags'] = entry['additional flags']
+                    else:
+                        out[album][entry['id'] - 1 ]['additional flags'] = ''
+
+
+
+                # print("print(out[album][entry['id'] - 1 ])")
+                # print(out[album][entry['id'] - 1 ])
 
     return out
 

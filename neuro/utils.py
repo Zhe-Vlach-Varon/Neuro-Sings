@@ -378,7 +378,7 @@ def get_song_artists_match_count(existing_song_artists: str, new_song_artists: s
     print("get_song_artists_match_count:new: " + new_song_artists)
     print("get_song_artists_match_count:existing: " + existing_song_artists)
 
-    artistCharacterStripRegex = r'[\_\-\(\)\[\]\{\}\<\>\.\* ]'
+    artistCharacterStripRegex = r'[\_\-\(\)\[\]\{\}\<\>\.\*\/\\ ]'
     artistStripProducerPRegex = r'-?[pP]\b'
     artistNameSplitRegex = r'\,|\&'
 
@@ -389,10 +389,6 @@ def get_song_artists_match_count(existing_song_artists: str, new_song_artists: s
     print(new_artists)
 
     artists_match_count = 0
-
-    # if 'daoko' in existing_artists and 'daoko' in new_artists:
-    #     exit()
-
 
     for existing_artist in existing_artists:
         for new_artist in new_artists:

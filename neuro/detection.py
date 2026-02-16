@@ -450,7 +450,7 @@ def parse_setlist(p: Path) -> SongJSON:
             lead_singer = fields[0]
 
         if is_song_line and found_album_line:
-            # TRACK# | SONG_TITLE | ARTIST | COVER_ARTIST | NEW/DUPLICATE | SONG_COVER_ART(OPTIONAL)
+            # TRACK# | SONG_TITLE | ARTIST | COVER_ARTIST | NEW/DUPLICATE | SONG_COVER_ART(OPTIONAL) | additional flags
             song_art = None # reset song specific art to None
             print("song line")
             id = int(fields[0])

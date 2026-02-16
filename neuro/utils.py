@@ -380,7 +380,7 @@ def get_song_artists_match_count(existing_song_artists: str, new_song_artists: s
 
     artistCharacterStripRegex = r'[\_\-\(\)\[\]\{\}\<\>\.\*\/\\ ]'
     artistStripProducerPRegex = r'-?[pP]\b'
-    artistNameSplitRegex = r'\,|\&'
+    artistNameSplitRegex = r'\,|\&|\+'
 
     existing_artists = re.split(artistNameSplitRegex,  str(re.sub(artistStripProducerPRegex, '', re.sub(artistCharacterStripRegex, '', str(remove_accents(existing_song_artists))).lower())))
     new_artists = re.split(artistNameSplitRegex,  str(re.sub(artistStripProducerPRegex, '', re.sub(artistCharacterStripRegex, '', str(remove_accents(new_song_artists))).lower())))

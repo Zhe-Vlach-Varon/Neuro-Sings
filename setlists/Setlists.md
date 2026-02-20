@@ -9,6 +9,7 @@ There are three types of lines in a setlist file
 |Album Info | The first line must be an Album Info line, specifies date, singer, and optional album title and album cover |
 | Lead Singer Change | specifies lead singer for the following block of songs |
 | Song | lists track nuber, song title, original artist, singer(s), whether it is a new song or a duplicate and optional song cover art |
+| Comment or other line not to process | Start a line with two exclamation points `!!` to tell the setlist parser not to parse this line |
 ### Album Info Line
 Lists info about the karaoke stream
 | Field  | Notes             | Required |

@@ -379,6 +379,8 @@ def parse_setlist(p: Path) -> SongJSON:
     dates_df = load_dates()
 
     for line in lines:
+        if line.startswith('!!'):
+            continue # this is a comment line, do not process
         fields = line.strip('\n').split('|')
         fields = [f.strip() for f in fields]
         print(fields)

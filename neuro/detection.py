@@ -523,13 +523,15 @@ def fill_in_setlists(out: SongJSON = {}) -> SongJSON:
     songs_df = load_db()
     dates_df = load_dates()
 
-    files = list(SETLISTS_DIR.glob(f"**/*.txt"))
+    files = list(SETLISTS_DIR.glob(f"**/*"))
     print("files")
     print(files)
 
     format = "%Y-%m-%d"
 
     for file in files:
+        if file.name == 'Setlists.md' or file.is_dir():
+            continue
         print("file")
         print(file)
         file_stem = file.stem
@@ -679,21 +681,32 @@ def export_json(all_songs: SongJSON) -> None:
         all_songs (SongJSON): Dictionary with lists of files grouped by date.
     """
 
-    print("")
-    print(all_songs)
+    # print("")
+    # print(all_songs)
     all_keys = sorted(all_songs)
-    print("")
-    print(all_keys)
+    # print("")
+    # print(all_keys)
     
-    print("")
+    # print("")
     for key, songs in all_songs.items():
-        print(key)
-        for song in songs:
-            print(song)
-            assert 'Date' in song.keys()
+        # print(key)
+        if not key == 'custom':
+            for song in songs:
+                # print(song)
+                assert 'Date' in song.keys()
+
+    keys_to_exclude = ['custom']
+    print(keys_to_exclude)
+    dated_songs = {k:v for k,v in all_songs.items() if k not in keys_to_exclude}
 
     # Sorting songs by date for easier treatment
-    sorted_songs = dict(sorted(all_songs.items(), key=lambda item: item[1][0]['Date']))
+    # print(dated_songs)
+    assert 'custom' not in dated_songs.keys()
+    sorted_songs = dict(sorted(dated_songs.items(), key=lambda item: item[1][0]['Date']))
+
+    for key in keys_to_exclude:
+        if key in all_songs.keys():
+            sorted_songs[key] = all_songs[key]
 
     with open(SONGS_JSON, "w") as f:
         json.dump(sorted_songs, f, indent=2, ensure_ascii=False)

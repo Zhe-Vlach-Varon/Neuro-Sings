@@ -577,63 +577,69 @@ def fill_in_setlists(out: SongJSON = {}) -> SongJSON:
             # print("album: " + album)
             # print("date: " + date)
             # print(songs)
+            contains_new_songs = False
+            for song in songs:
+                contains_new_songs = contains_new_songs or not song['duplicate']
+            if not contains_new_songs:
+                out[album] = albums[album]
             if album not in out.keys() and date in out.keys():
                 out[album] = out.pop(date)
-            
+
             found_ids = []
 
-            for song in out[album]:
-                for entry in albums[album]:
-                    if get_song_artists_match_count(song['Artist'], entry['Artist']) and do_song_titles_match(song['Song'], entry['Song']) and song['Cover Artist'].lower() == entry['Cover Artist'].lower() and not entry['encore']:
-                        song['id'] = entry['id']
-                        song['Lead Singer'] = entry['Lead Singer']
-                        found_ids.append(entry["id"])
-                        # print(entry)
+            if contains_new_songs:
+                for song in out[album]:
+                    for entry in albums[album]:
+                        if get_song_artists_match_count(song['Artist'], entry['Artist']) and do_song_titles_match(song['Song'], entry['Song']) and song['Cover Artist'].lower() == entry['Cover Artist'].lower() and not entry['encore']:
+                            song['id'] = entry['id']
+                            song['Lead Singer'] = entry['Lead Singer']
+                            found_ids.append(entry["id"])
+                            # print(entry)
 
-            # print("found_ids")
-            # print(found_ids)
-
-            out[album].sort(key=song_entry_sort_by_id)
-            
-            for entry in albums[album]:
-                # print(out)
-                # print("")
-                # print(entry)
-                # print("")
+                # print("found_ids")
                 # print(found_ids)
-                # print("")
-                # print(entry['id'])
-                if entry["id"] not in found_ids:
-                    out[album].insert((entry["id"]-1), entry)
-                    print('if entry["id"] not in found_ids:')
-                else:
-                    # print(entry['id'] - 1)
-                    # print(out[album][entry['id'] - 1 ])
+
+                out[album].sort(key=song_entry_sort_by_id)
+                
+                for entry in albums[album]:
+                    # print(out)
+                    # print("")
                     # print(entry)
-                    # print(out[album][entry['id'] - 1 ]['Date'])
-                    # print(entry['Date'])
-                    if res:
-                        print("res: True")
-                        out[album][entry['id'] - 1 ]['Date'] = entry['Date']
+                    # print("")
+                    # print(found_ids)
+                    # print("")
+                    # print(entry['id'])
+                    if entry["id"] not in found_ids:
+                        out[album].insert((entry["id"]-1), entry)
+                        print('if entry["id"] not in found_ids:')
                     else:
-                        print("res: False")
-                    # print(out[album][entry['id'] - 1 ]['Date'])
-                    
-                    out[album][entry['id'] - 1 ]['id'] = entry['id']
-                    if entry['Image'] is not None:
-                        out[album][entry['id'] - 1 ]['Image'] = entry['Image']
-                    else:
-                        out[album][entry['id'] - 1 ]['Image'] = ''
+                        # print(entry['id'] - 1)
+                        # print(out[album][entry['id'] - 1 ])
+                        # print(entry)
+                        # print(out[album][entry['id'] - 1 ]['Date'])
+                        # print(entry['Date'])
+                        if res:
+                            print("res: True")
+                            out[album][entry['id'] - 1 ]['Date'] = entry['Date']
+                        else:
+                            print("res: False")
+                        # print(out[album][entry['id'] - 1 ]['Date'])
+                        
+                        out[album][entry['id'] - 1 ]['id'] = entry['id']
+                        if entry['Image'] is not None:
+                            out[album][entry['id'] - 1 ]['Image'] = entry['Image']
+                        else:
+                            out[album][entry['id'] - 1 ]['Image'] = ''
 
-                    if entry['additional flags'] is not None:
-                        out[album][entry['id'] - 1 ]['additional flags'] = entry['additional flags']
-                    else:
-                        out[album][entry['id'] - 1 ]['additional flags'] = ''
+                        if entry['additional flags'] is not None:
+                            out[album][entry['id'] - 1 ]['additional flags'] = entry['additional flags']
+                        else:
+                            out[album][entry['id'] - 1 ]['additional flags'] = ''
 
 
 
-                # print("print(out[album][entry['id'] - 1 ])")
-                # print(out[album][entry['id'] - 1 ])
+                    # print("print(out[album][entry['id'] - 1 ])")
+                    # print(out[album][entry['id'] - 1 ])
 
     return out
 

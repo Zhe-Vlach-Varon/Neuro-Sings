@@ -242,18 +242,31 @@ def extract_custom(files: list[Path], out: SongJSON = {}) -> SongJSON:
         filename = file.stem
         # We can require this format for custom songs as the filename is chosen
         try:
-            artist, song = map(str.strip, filename.split(" - "))
-        except ValueError:
+            fields = filename.split(" - ")
+            data = {
+                "Artist": str.strip(fields[0]),
+                "Song": str.strip(fields[1]),
+                "file": str(file),
+                "id": None,
+            }
+            if len(fields) == 3:
+                if str.strip(fields[2]) not in out.keys():
+                    out[str.strip(fields[2])] = []
+                out[str.strip(fields[2])].append(data)
+            else:
+                outputs.append(data)
+        except:
             logger.warning(f"Couldn't extract artist - song pattern for {file}")
             artist = ""
             song = filename
-        data = {
-            "Artist": artist,
-            "Song": song,
-            "file": str(file),
-            "id": None,
-        }
-        outputs.append(data)
+
+            data = {
+                "Artist": artist,
+                "Song": song,
+                "file": str(file),
+                "id": None,
+            }
+            outputs.append(data)
     out["custom"] = outputs
     return out
 
@@ -584,12 +597,29 @@ def fill_in_setlists(out: SongJSON = {}) -> SongJSON:
                 out[album] = albums[album]
             if album not in out.keys() and date in out.keys():
                 out[album] = out.pop(date)
+            elif album not in out.keys() and date not in out.keys():
+                # fill in setlist album from custom songs
+                # TODO what about case where only some of the songs are from custom folder
+                print(albums[album])
+                print("")
+                print(out['custom'])
+                out[album] = []
+                for song in reversed(out['custom']):
+                    for entry in albums[album]:
+                        if get_song_artists_match_count(song['Artist'], entry['Artist']) and do_song_titles_match(song['Song'], entry['Song']):
+                            entry['file'] = song['file']
+                            out['custom'].remove(song)
+                out[album].append(entry)
+                        
 
             found_ids = []
 
             if contains_new_songs:
                 for song in out[album]:
                     for entry in albums[album]:
+                        for key in entry.keys():
+                            if key not in song.keys():
+                                song[key] = entry[key]
                         if get_song_artists_match_count(song['Artist'], entry['Artist']) and do_song_titles_match(song['Song'], entry['Song']) and song['Cover Artist'].lower() == entry['Cover Artist'].lower() and not entry['encore']:
                             song['id'] = entry['id']
                             song['Lead Singer'] = entry['Lead Singer']
@@ -668,7 +698,7 @@ def extract_all() -> SongJSON:
     # extract_list(files["V2"], regex["Neuro"], out)
 
     # Custom
-    # extract_custom(files["Custom"], out)
+    extract_custom(files["Custom"], out)
 
     # unofficial v3
     extract_unofficialV3(files["UnofficialV3"], out)

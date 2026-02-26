@@ -9,6 +9,29 @@ import polars as pl
 from neuro import DATES_CSV, ROOT_DIR, SONGS_CSV, SONGS_DB
 from neuro.utils import MP3GainMode, MP3ModeTuple
 
+songs_schema = {
+    'id': pl.Int64,
+    'Song': pl.String,
+    'Artist': pl.String,
+    'Song_ASCII': pl.String,
+    'Artist_ASCII': pl.String,
+    'Cover Artist': pl.String,
+    'Date': pl.String,
+    'Album': pl.String,
+    'Album_ID': pl.Int64,
+    'Image': pl.String,
+    'File_IN': pl.String,
+    'Hash_IN': pl.String,
+    'Flags': pl.String,
+    'Key': pl.String,
+    'Tempo (1/4 beat)': pl.String
+    }
+
+dates_schema = {
+    'Date': pl.String,
+    'Singer': pl.String,
+    'Duet Format': pl.String
+    }
 
 def flag_expr(flag: str) -> pl.Expr:
     """Small helper function to avoid heavy expressions.

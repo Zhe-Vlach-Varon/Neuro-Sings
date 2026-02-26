@@ -22,6 +22,8 @@ Lists info about the karaoke stream
 Fields are seperated by `|` a vertical bar (pipe) character with optional spaces on either side to make it more readable\
 Example: ```2026-01-06 | Neuro | Neuro Subathon 3 VR Karaoke Concert | neuro 3d 2026-01-06```\
 If you ommit a field, you still need to put a `|` to mark where it would be if you include later fields
+
+If a Setlist spans multiple dates, an additional album info line with the new date is needed, and all album info lines need to have the same custom album title in order to be grouped together correctly (besides Januray-March 2023 Stream Covers which are treated specially)
 ### Lead Singer Change
 Specifies the primary singer, the one on the left in duets, has changed.\
 Options are ```Neuro``` or ```Evil```

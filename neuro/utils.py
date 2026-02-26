@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 import hashlib
 import sys
 import re
@@ -188,10 +189,10 @@ MP3ModeTuple = tuple[MP3GainMode, MP3GainMode]
 
 
 # get_audio_hash function taken from 
-# https://github.com/Nyss777/Neuro-Karaoke-Archive-Metadata hash_mutagen.py
+# # https://github.com/GamerTuruu/DF-Metadata-Customizer/blob/3fc7cba24397865bbbf9c2bf9787bd05f9696dff/df_metadata_customizer/core/audio_hash.py
 # MIT License
 
-# Copyright (c) 2026 Nyss777
+# Copyright (c) 2025 GamerTuruu
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -210,33 +211,46 @@ MP3ModeTuple = tuple[MP3GainMode, MP3GainMode]
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-
-def get_audio_hash(file_path, slicer: slice = slice(None)): # ZVV: add an optional list slice argument
-    print(slicer)
+def get_audio_hash(file_path: str) -> str | None:
+    """
+    Calculate hash using a fixed window near the end of the audio data.
+    
+    This uses a 987-byte window that ends 1,000,000 bytes before the file end
+    (excluding a possible ID3v1 footer). This matches the reference hashing
+    behavior used for new song additions.
+    
+    Args:
+        file_path: Path to the audio file
+        
+    Returns:
+        Hexadecimal hash string, or None if an error occurred
+    """
     try:
-        try:
-            audio_tags = ID3(file_path)
-            header_size = audio_tags.size  # Mutagen provides the full tag size including header
-        except ID3NoHeaderError:
-            header_size = 0
+        file_size = os.path.getsize(file_path)
+        if file_size < 1_000_000:
+            print(f"{file_path} is too small!")
+            return None
 
         with open(file_path, 'rb') as f:
-            # We read the whole file to handle the footer check
-            # For very large files, you can use f.seek() instead of loading everything
-            file_data = f.read()
+            footer_size = 0
+            if file_size > 128:
+                f.seek(-128, os.SEEK_END)
+                if f.read(3) == b'TAG':
+                    footer_size = 128
 
-        # 2. Check for ID3v1 footer (always 128 bytes at the end starting with 'TAG')
-        # Mutagen doesn't always expose the ID3v1 offset as a single property,
-        # so a quick manual check of the last 128 bytes is still standard.
-        footer_size = 128 if file_data[-128:].startswith(b'TAG') else 0
-        
-        # 3. Slice the data to extract only the audio frames
-        # If footer_size is 0, file_data[header_size:] takes everything to the end
-        end_index = len(file_data) - footer_size
-        raw_audio = file_data[header_size:end_index]
+            end_index = file_size - footer_size - 1_000_000
+            start_index = end_index - 987
+            if start_index < 0:
+                print(f"{file_path} is too small for hashing window!")
+                return None
 
-        # 4. Hash the raw audio
-        return xxhash.xxh64(raw_audio[slicer]).hexdigest() # ZVV: add optional list slice argument
+            f.seek(start_index)
+            raw_audio = f.read(987)
+            if len(raw_audio) != 987:
+                print(f"Error processing {file_path}: insufficient data read")
+                return None
+
+        return xxhash.xxh64(raw_audio).hexdigest()
 
     except Exception as e:
         print(f"Error processing {file_path}: {e}")
@@ -381,6 +395,8 @@ def get_song_artists_match_count(existing_song_artists: str, new_song_artists: s
     artistCharacterStripRegex = r'[\_\-\(\)\[\]\{\}\<\>\.\*\/\'\\]'
     artistStripProducerPRegex = r'p$'
     artistNameSplitRegex = r'\,|\&|\+|( [xX] )'
+
+    # TODO if needed add special case for September - Earth, Wind & Fire
 
     existing_artists = re.split(artistNameSplitRegex,  str(re.sub(artistStripProducerPRegex, '', re.sub(artistCharacterStripRegex, '', str(remove_accents(existing_song_artists))).lower())))
     new_artists = re.split(artistNameSplitRegex,  str(re.sub(artistStripProducerPRegex, '', re.sub(artistCharacterStripRegex, '', str(remove_accents(new_song_artists))).lower())))

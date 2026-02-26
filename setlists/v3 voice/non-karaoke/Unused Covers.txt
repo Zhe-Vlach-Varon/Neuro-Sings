@@ -1,0 +1,14 @@
+!! using multiple album info lines in order to catch multiple tracks from
+!! different dates that belong to the same album
+2023-08-01 | Neuro | Unused Covers
+1 | It's Been So Long | The Living Tombstone | Neuro | New || unused;
+2023-08-21 | Neuro | Unused Covers
+2 | world.execute(me); | Mili | Neuro | New || unused;
+2023-11-12 | Neuro | Unused Covers
+3 | Money Machine | 100 gecs | Neuro | New || unused;
+2024-06-26 | Neuro | Unused Covers
+4 | Die For You | Grabbitz | Neuro & Evil | New || unused;
+2024-09-04 | Neuro | Unused Covers
+5 | Angel With A Shotgun | The Cab | Neuro | New || unused;
+2024-12-30 | Neuro | Unused Covers
+6 | Blinding Lights | The Weeknd | Neuro | New || unused;

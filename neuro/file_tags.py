@@ -295,10 +295,10 @@ class DriveSong(Song):
         else:
             cover = IMAGES_CUSTOM_DIR / f"{self.image}.jpg"
         
-        print(self.who)
+        # print(self.who)
 
-        print(self.file)
-        print(self.flags)
+        # print(self.file)
+        # print(self.flags)
         file_check(cover)
         id3.delall("APIC")
         id3.add(self.id3_pic(cover))
@@ -341,8 +341,8 @@ class CustomSong(Song):
             ValueError: If the file isn't a .mp3 or .flac file.
         """
         ext = self.file.suffix
-        print(self.file)
-        print(self.flags)
+        # print(self.file)
+        # print(self.flags)
         if self.image is None and not self.flags.as_drive:
             logger.error(f"Image can't be None for custom song {self.file}")
 
@@ -356,22 +356,22 @@ class CustomSong(Song):
         # Cover Image
         if self.image is None:
             if self.flags.duet:
-                print("duet")
+                # print("duet")
                 self.cover = IMAGES_COVERS_DIR / Path(f"{self.date}-{self.who}-duet.jpg")
             elif self.flags.v1 or self.flags.v2:
-                print("v1 or v2")
+                # print("v1 or v2")
                 self.cover = IMAGES_COVERS_DIR / Path(f"{self.date}.jpg")
             else:
-                print("v3")
+                # print("v3")
                 self.cover = IMAGES_COVERS_DIR / Path(f"{self.date}-{self.who}.jpg")
         else:
-            print("Custom image")
+            # print("Custom image")
             self.cover = IMAGES_CUSTOM_DIR / f"{self.image}.jpg"
         
-        print(self.who)
+        # print(self.who)
 
-        print(self.file)
-        print(self.flags)
+        # print(self.file)
+        # print(self.flags)
         file_check(self.cover)
 
         match ext:
@@ -504,8 +504,8 @@ class UnofficialV3Song(Song):
         else:
             cover = IMAGES_CUSTOM_DIR / f"{self.image}.jpg"
 
-        print(self.file)
-        print(self.flags)
+        # print(self.file)
+        # print(self.flags)
         file_check(cover)
         id3.delall("APIC")
         id3.add(self.id3_pic(cover))

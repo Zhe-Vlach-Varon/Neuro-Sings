@@ -155,7 +155,7 @@ def update_db() -> None:
 
         # get date from song JSON object
         for song in songs:
-            print(song)
+            # print(song)
             if 'Date' in song.keys():
                 date = song["Date"]
                 named_album = True
@@ -164,8 +164,8 @@ def update_db() -> None:
                 named_album = False
             singer = song['Cover Artist']
             eliv = song['Lead Singer'] == "Evil"
-            print("adding dates to database")
-            print(date)
+            # print("adding dates to database")
+            # print(date)
             if date[0] == "2" and date not in dates_df.get_column("Date") and date > "2023-06-08":
                 df = pl.DataFrame(
                     {
@@ -186,12 +186,20 @@ def update_db() -> None:
 
             date = song["Date"]
 
-            print(f"{song["Song"]} - {song["Artist"]} - {song["Cover Artist"]} - {song['Date']}")
+            # print(f"{song["Song"]} - {song["Artist"]} - {song["Cover Artist"]} - {song['Date']}")
 
             if "duplicate" not in song.keys():
                 song["duplicate"] = False
 
+            if not song["duplicate"] and "File_IN" not in song.keys():
+                print("How did we get here ?!")
+                print("Song is not duplicate but has no File_IN")
+                print("")
+                print(song)
+                exit()
+
             if not song["duplicate"]:
+                # print(song)
                 file = Path(song["File_IN"])
                 file_check(file)  # Checks if file exists on disk
             else:
@@ -205,6 +213,7 @@ def update_db() -> None:
                 continue
 
             # Using helper function to avoid code duplication
+            # print(song)
             name, name_ascii = field_ascii(song, "Song")
             artist, artist_ascii = field_ascii(song, "Artist")
 
@@ -217,13 +226,13 @@ def update_db() -> None:
 
             if 'Image' in song.keys():
                 cover_image = song["Image"]
-                if not cover_image is None:
-                    print("cover image: " + cover_image)
-                else:
-                    print("using default cover image system")
+                # if not cover_image is None:
+                    # print("cover image: " + cover_image)
+                # else:
+                    # print("using default cover image system")
             else:
                 cover_image = None
-                print("cover image: None")
+                # print("cover image: None")
 
             in_hash = None
 
@@ -253,18 +262,18 @@ def update_db() -> None:
                     "Tempo (1/4 beat)": None,
                 }
             )
-            with pl.Config(tbl_cols=-1):
-                print(df)
+            # with pl.Config(tbl_cols=-1):
+                # print(df)
             if song["duplicate"]:
-                print(song)
-                print(song['duplicate'])
+                # print(song)
+                # print(song['duplicate'])
                 df = get_most_recent_version(df.to_dict(), json_data)
 
             id += 1
             remove += 1
-            with pl.Config(tbl_cols=-1):
-                print(songs_df.tail(5))
-                print(df)
+            # with pl.Config(tbl_cols=-1):
+                # print(songs_df.tail(5))
+                # print(df)
             songs_df.extend(df)
             logger.info(f"[Song][+] {artist} - {name}")
 
@@ -307,10 +316,10 @@ def update_db_hashes() -> None:
 
     for song in tqdm(songs.iter_rows(named=True), total=len(songs)):
         file = ROOT_DIR / Path(song["File_IN"])
-        print(file)
+        # print(file)
         assert file.exists()
         hash = song["Hash_IN"]
-        print(get_audio_hash(file))
+        # print(get_audio_hash(file))
         if get_audio_hash(file) != hash:
             song["Hash_IN"] = get_audio_hash(file)
         new_songs_df.extend(pl.DataFrame(song))
@@ -324,13 +333,13 @@ def update_db_hashes() -> None:
 def add_cover_artist() -> None:
     songs = load_db()
     schema = songs.schema
-    print(schema)
+    # print(schema)
 
     new_songs_df = pl.DataFrame(schema=schema)
 
     for song in tqdm(songs.iter_rows(named=True), total=len(songs)):
         file = ROOT_DIR / Path(song["File_IN"])
-        print(file)
+        # print(file)
         assert file.exists()
         singer = get_cover_artist(file)
         song["Cover Artist"] = singer
@@ -355,9 +364,9 @@ def get_most_recent_version(song: dict, json_data: SongJSON) -> pl.DataFrame:
         (~pl.col("Flags").str.contains("duplicate"))
     ).sort(pl.col("Date"), descending=True)
 
-    print("filtered_songs")
-    print(filtered_songs)
-    print("get_most_recent_version:song")
+    # print("filtered_songs")
+    # print(filtered_songs)
+    # print("get_most_recent_version:song")
     # print(song)
     # TODO if filtered_songs.height is 0, check the the new_songs JSONObject and find the most recent version that is not the current song
     #          will need this for karaoke setlists that have an encore
@@ -370,20 +379,20 @@ def get_most_recent_version(song: dict, json_data: SongJSON) -> pl.DataFrame:
         for json_song in json_songs:
             # print(song)
             # print(json_song)
-            print(song['Song'][0] + " - " + song['Artist'][0] + " - " + song['Cover Artist'][0] + " - " + song['Date'][0] + " - " + str(song['Album_ID'][0]))
-            print(json_song['Song'] + " - " + json_song['Artist'] + " - " + json_song['Cover Artist'] + " - " + json_song['Date'] + " - " + str(json_song['id']))
-            print("")
+            # print(song['Song'][0] + " - " + song['Artist'][0] + " - " + song['Cover Artist'][0] + " - " + song['Date'][0] + " - " + str(song['Album_ID'][0]))
+            # print(json_song['Song'] + " - " + json_song['Artist'] + " - " + json_song['Cover Artist'] + " - " + json_song['Date'] + " - " + str(json_song['id']))
+            # print("")
             if get_song_artists_match_count(json_song['Artist'], song['Artist'][0]) and do_song_titles_match(json_song["Song"], song["Song"][0]) and (json_song["Cover Artist"] == song["Cover Artist"][0]) and ((not json_song["Date"] > song["Date"][0]) or (not json_song["id"] == song['Album_ID'][0])) and "File_IN" in json_song.keys():
                 filtered_json_songs.append(json_song)
 
     # TODO sort filtered json data
     sorted_filtered_json_songs = sorted(filtered_json_songs, key=lambda d:  ['Date'])
 
-    print(sorted_filtered_json_songs)
+    # print(sorted_filtered_json_songs)
 
-    print("songs filtered")
-    print(filtered_songs.height)
-    print(len(filtered_json_songs))
+    # print("songs filtered")
+    # print(filtered_songs.height)
+    # print(len(filtered_json_songs))
 
     latest_db_version = None
     latest_json_version = None
@@ -411,12 +420,12 @@ def get_most_recent_version(song: dict, json_data: SongJSON) -> pl.DataFrame:
         latest_version = latest_json_version
         flags = json_flags
     else:
-        print("How did we get here?!")
+        # print("How did we get here?!")
         assert True == False
 
 
-    print("latest_version")
-    print(latest_version)
+    # print("latest_version")
+    # print(latest_version)
 
     # TODO get latest version of the two from json and db
 
@@ -460,7 +469,7 @@ def get_most_recent_version(song: dict, json_data: SongJSON) -> pl.DataFrame:
                "Album_ID": song["Album_ID"],
                "Image": song["Image"],
                "File_IN": latest_version["File_IN"],
-               "Hash_IN": get_audio_hash(latest_version["File_IN"]),
+               "Hash_IN": get_audio_hash(Path(latest_version["File_IN"])),
                "Flags": flags,
                "Key": song["Key"],
                "Tempo (1/4 beat)": song["Tempo (1/4 beat)"],
@@ -468,7 +477,9 @@ def get_most_recent_version(song: dict, json_data: SongJSON) -> pl.DataFrame:
         )
     else:
         print("How did we get here?!")
-    print(song["Image"])
+        print("unable to get latest version")
+        exit()
+    # print(song["Image"])
 
     return new_duplicate_song
 

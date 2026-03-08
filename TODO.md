@@ -62,7 +62,7 @@
 - [ ] update README and other documentation
 - [ ] find better cover image for 2024-12-30 version of blinding lights
 - [ ] find glorp alien Neuro and Evil art for Alien Alien covers
-
+- [x] attempt to automatically get ASCII song titles by finding sets of characters inside parantheses and striping non-alphanumeric characters from that
 
 ## later plans
 - [ ] figure out how to package as a graphical program that does everything except download/upload

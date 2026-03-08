@@ -40,10 +40,10 @@ def check_hash() -> None:
     for song in tqdm(songs.iter_rows(named=True), total=len(songs)):
         file = ROOT_DIR / Path(song["File_IN"])
         # TODO add debug mode toggles
-        print(file)
+        # print(file)
         assert file.exists()
         hash = song["Hash_IN"]
-        print(get_audio_hash(file))
+        # print(get_audio_hash(file))
         assert get_audio_hash(file) == hash, f"{file}"
 
 

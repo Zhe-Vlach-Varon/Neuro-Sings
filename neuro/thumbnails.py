@@ -395,7 +395,7 @@ def generate_main() -> None:
         date_idx = indices[year]
         indices[year] += 1
 
-        print(who)
+        # print(who)
 
         i_solo, i_duet = singer_match(who, version)
 
@@ -410,8 +410,8 @@ def generate_main() -> None:
         day = digits.find(date[8]) * 10 + digits.find(date[9])
         apply_text_from_date_atlases(DUET_BG[i_duet], year, month, day).convert("RGB").save(IMAGES_COVERS_DIR / f"{date}-{str(who).lower()}-duet.jpg")
 
-        print(IMAGES_COVERS_DIR / f"{date}-{str(who).lower()}.jpg")
-        print(IMAGES_COVERS_DIR / f"{date}-{str(who).lower()}-duet.jpg")
+        # print(IMAGES_COVERS_DIR / f"{date}-{str(who).lower()}.jpg")
+        # print(IMAGES_COVERS_DIR / f"{date}-{str(who).lower()}-duet.jpg")
 
         
 

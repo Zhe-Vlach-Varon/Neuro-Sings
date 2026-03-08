@@ -1,0 +1,14 @@
+2024-12-19 | Neuro | Originals
+1 | LIFE | Neuro | Neuro | Duplicate | LIFE | originals;
+2025-06-25 | Evil | Originals
+2 | BOOM | Evil | Evil | Duplicate | BOOM | originals;
+!! the code needs a single lead singer
+!! TODO fix NEVER to only have the duet flag
+2025-08-31 | Neuro | Originals
+3 | NEVER | Neuro-sama & Evil Neuro | Neuro & Evil | New | NEVER | originals;
+2025-12-19 | Neuro | Originals
+4 | Colorful Array | Neuro | Neuro | Duplicate | Colorful Array | originals;
+!! LIFE, BOOM, and Colorful Array are listed here as Duplicates as they were first shown
+!! on stream, even though they were released at the same time on YouTube, I chose to make
+!! the ones in the stream playlists the first instance, and therefore they need to be
+!! duplicates in this setlist

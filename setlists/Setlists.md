@@ -1,7 +1,7 @@
 # Karaoke Stream Setlist File Format
 Specifies the order of songs and other info for a karaoke stream
 ## Filename
-The filename should start with the date in YYYY-mm-dd format, optionally followed by a space and other text to help identify the stream. The file must be a .txt file
+The filename should start with the date in YYYY-mm-dd format, optionally followed by a space and other text to help identify the stream. The file may have any text file type, the files are similar to csv (pipe) files, but because of the inclusion of comments, and not having a fixed number of fields on all lines I chose to make them .txt files
 ## File Content
 There are three types of lines in a setlist file
 | Line | Notes |

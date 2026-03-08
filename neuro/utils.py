@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import os
-import hashlib
 import sys
 import re
 from datetime import datetime
@@ -187,12 +186,12 @@ class MP3GainMode(Enum):
 
 MP3ModeTuple = tuple[MP3GainMode, MP3GainMode]
 
+# TODO update attribution and get link to one of Nyss's repos
 
-# get_audio_hash function taken from 
-# # https://github.com/GamerTuruu/DF-Metadata-Customizer/blob/3fc7cba24397865bbbf9c2bf9787bd05f9696dff/df_metadata_customizer/core/audio_hash.py
+# get_audio_hash function taken from Nyss
 # MIT License
 
-# Copyright (c) 2025 GamerTuruu
+# Copyright (c) 2026 Nyss
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -211,59 +210,49 @@ MP3ModeTuple = tuple[MP3GainMode, MP3GainMode]
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-def get_audio_hash(file_path: str) -> str | None:
-    """
-    Calculate hash using a fixed window near the end of the audio data.
-    
-    This uses a 987-byte window that ends 1,000,000 bytes before the file end
-    (excluding a possible ID3v1 footer). This matches the reference hashing
-    behavior used for new song additions.
-    
-    Args:
-        file_path: Path to the audio file
-        
-    Returns:
-        Hexadecimal hash string, or None if an error occurred
-    """
+def get_audio_hash(file_path: Path) -> (str | None):
     try:
-        file_size = os.path.getsize(file_path)
-        if file_size < 1_000_000:
-            print(f"{file_path} is too small!")
+
+        file_size = file_path.stat().st_size
+        if file_size < 3000:
+            logger.error(f"{file_path.name} is too small!")
             return None
 
         with open(file_path, 'rb') as f:
+            file_data = f.read()
+
             footer_size = 0
-            if file_size > 128:
-                f.seek(-128, os.SEEK_END)
-                if f.read(3) == b'TAG':
-                    footer_size = 128
+            f.seek(-128, 2) # Seek 128 bytes from the end (2)
+            if f.read(3) == b'TAG':
+                footer_size = 128
+            
 
-            end_index = file_size - footer_size - 1_000_000
-            start_index = end_index - 987
-            if start_index < 0:
-                print(f"{file_path} is too small for hashing window!")
-                return None
+            if (file_size - footer_size - 1_000_000) > 987: # check to prevent negative indexes
+                end_index = file_size - footer_size - 1_000_000 ### about a Mb offset for the audio
 
-            f.seek(start_index)
-            raw_audio = f.read(987)
-            if len(raw_audio) != 987:
-                print(f"Error processing {file_path}: insufficient data read")
-                return None
+            else:
+                end_index = int((file_size - footer_size)/2)
 
+            logger.info(f"End Index: {end_index}")
+
+            start_index = end_index - 987 ### reads a 987 bytes for the hash
+
+            raw_audio = file_data[start_index:end_index]
+
+        # 4. Hash the raw audio
         return xxhash.xxh64(raw_audio).hexdigest()
 
     except Exception as e:
-        print(f"Error processing {file_path}: {e}")
+        logger.error(f"Error processing {file_path}: {e}")
         return None
 
-
 def get_audio_hash_to_file_mapping(p: Path, *, filetype: str = "mp3", slicer: slice = slice(None)) -> dict:
-    print(p)
+    # print(p)
     files = list(p.glob(f"**/*.{filetype}"))
     file_mapping = {}
 
     for file in files:
-        print(file)
+        # print(file)
         hash = get_audio_hash(file, slicer=slicer)
         file_mapping[hash] = Path(file)
     
@@ -287,45 +276,46 @@ def get_old_to_new_file_mapping_by_audio_hash(old_dir: Path, new_dir: Path, file
     in_both_list = []
 
     for hash in old_hashes:
-        print("")
-        print(hash)
-        print(old_file_map[hash])
+        # print("")
+        # print(hash)
+        # print(old_file_map[hash])
         if hash in new_hashes:
-            print(new_file_map[hash])
+            # print(new_file_map[hash])
             in_both_count += 1
             in_both_list.append((hash, old_file_map[hash], new_file_map[hash]))
         else:
-            print("not in new")
+            # print("not in new")
             in_old_only_count += 1
             in_old_only_list.append((hash, old_file_map[hash], "N/A"))
     
     for hash in new_hashes:
-        print("")
-        print(hash)
-        print(new_file_map[hash])
-        if hash in old_hashes:
-            print(old_file_map[hash])
-        else:
-            print("not in old")
+        # print("")
+        # print(hash)
+        # print(new_file_map[hash])
+        # if hash in old_hashes:
+        if not hash in old_hashes:
+            # print(old_file_map[hash])
+        # else:
+            # print("not in old")
             in_new_only_count += 1
             in_new_only_list.append((hash, "N/A", new_file_map[hash]))
 
-    print("counts")
-    print("in both: " + str(in_both_count))
-    print("in new only: " + str(in_new_only_count))
-    print("in old only: " + str(in_old_only_count))
+    # print("counts")
+    # print("in both: " + str(in_both_count))
+    # print("in new only: " + str(in_new_only_count))
+    # print("in old only: " + str(in_old_only_count))
 
-    print("\n\n")
+    # print("\n\n")
 
-    print("In new archive only")
-    for song in in_new_only_list:
-        print(song)
+    # print("In new archive only")
+    # for song in in_new_only_list:
+        # print(song)
     
-    print("\n\n")
+    # print("\n\n")
 
-    print("In old archive only:")
-    for song in in_old_only_list:
-        print(song)
+    # print("In old archive only:")
+    # for song in in_old_only_list:
+        # print(song)
 
     return old_to_new_mapping
 
@@ -360,16 +350,26 @@ def get_cover_artist(file: Path) -> str:
 
 
 def do_song_titles_match(existing_song_title: str, new_song_title: str) -> bool:
-    print("do_song_titles_match:existing: " + existing_song_title)
-    print("do_song_titles_match:new: " + new_song_title)
+    # print("do_song_titles_match:existing: " + existing_song_title)
+    # print("do_song_titles_match:new: " + new_song_title)
+
+    if existing_song_title.startswith('Numbers') and new_song_title.startswith('Numbers'):
+        if existing_song_title == 'Numbers' and new_song_title == 'Numbers':
+            return True
+        elif existing_song_title == 'Numbers II' and new_song_title == 'Numbers II':
+            return True
+        elif existing_song_title == 'Numbers III' and new_song_title == 'Numbers III':
+            return True
+        else:
+            return False
 
     songTitleNonAlphaNumStripRegex = r'[^a-z0-9\/]'
 
     new_title = re.sub(songTitleNonAlphaNumStripRegex, '', str(remove_accents(new_song_title)).lower())
     existing_title = re.sub(songTitleNonAlphaNumStripRegex, '', str(remove_accents(existing_song_title)).lower())
 
-    print(new_title)
-    print(existing_title)
+    # print(new_title)
+    # print(existing_title)
 
     nightcore_regex = r'((nightcore|chipmunk)(ver(sion)?)?)'
 
@@ -389,20 +389,20 @@ def do_song_titles_match(existing_song_title: str, new_song_title: str) -> bool:
     return titles_match
 
 def get_song_artists_match_count(existing_song_artists: str, new_song_artists: str) -> int:
-    print("get_song_artists_match_count:new: " + new_song_artists)
-    print("get_song_artists_match_count:existing: " + existing_song_artists)
+    # print("get_song_artists_match_count:new: " + new_song_artists)
+    # print("get_song_artists_match_count:existing: " + existing_song_artists)
 
     artistCharacterStripRegex = r'[\_\-\(\)\[\]\{\}\<\>\.\*\/\'\\]'
     artistStripProducerPRegex = r'p$'
-    artistNameSplitRegex = r'\,|\&|\+|( [xX] )'
+    artistNameSplitRegex = r',|&|\+|( [xX] )'
 
     # TODO if needed add special case for September - Earth, Wind & Fire
 
     existing_artists = re.split(artistNameSplitRegex,  str(re.sub(artistStripProducerPRegex, '', re.sub(artistCharacterStripRegex, '', str(remove_accents(existing_song_artists))).lower())))
     new_artists = re.split(artistNameSplitRegex,  str(re.sub(artistStripProducerPRegex, '', re.sub(artistCharacterStripRegex, '', str(remove_accents(new_song_artists))).lower())))
 
-    print(existing_artists)
-    print(new_artists)
+    # print(new_artists)
+    # print(existing_artists)
 
     artists_match_count = 0
 
@@ -415,3 +415,89 @@ def get_song_artists_match_count(existing_song_artists: str, new_song_artists: s
 
 def remove_accents(s):
    return ''.join(c for c in unicodedata.normalize('NFD', s) if unicodedata.category(c) != 'Mn')
+
+english_title_translation_regex = r'\(.*?\)'
+# TODO load from file
+title_ascii_special_negative_cases = [
+    'short',
+    'da ba dee',
+    'jp ver.',
+    'gotta catch \'em all!',
+    'nightcore',
+    'chipmunk ver.',
+    'me',
+    'you',
+    'ski-ba-bop-ba-dop-bop',
+    'neuro ver.',
+    'evil ver.',
+    '2023', '2024', '2025',
+    'birthday ver.',
+    'bread',
+    'karaoke ver.',
+    'sad cat ver.',
+    'what about us',
+    'let\'s lament',
+    'i believe in you',
+    '500 miles',
+    'o',
+    '99.999999999%',
+    'acoustic',
+    'number one victory royal',
+    'i\'ve had',
+    'don\'t fear',
+    'out your eyes then drown you to death',
+    'christmas version',
+]
+
+title_ascii_special_replace_cases = {
+    '/ / // / /': 'Slash Slash Slash',
+    'S!CK': 'SICK',
+    'デビルじゃないもん ((Not) A Devil)': '(Not) A Devil',
+    '真夜中のドア〜Stay With Me': 'Stay With Me',
+    '学猫叫 (Xue Miao Jiao)': 'Xue Miao Jiao (Learn To Meow)',
+}
+
+ascii_character_replacement_mapping = {
+    '’': '\'',
+    '＊': '*',
+}
+
+def replace_non_ascii_chars(s: str) -> str:
+    # TODO why doesn't this work
+    # return s.translate(ascii_character_replacement_mapping)
+
+    for key in ascii_character_replacement_mapping.keys():
+        s = s.replace(key, ascii_character_replacement_mapping[key])
+    
+    return s
+
+def extract_english_title_translation(title: str) -> (str | None):
+    if title in title_ascii_special_replace_cases.keys():
+        return title_ascii_special_replace_cases[title]
+
+    title_ascii_search_result = re.search(english_title_translation_regex, title)
+    if title_ascii_search_result is not None:
+        title_ascii = str(title_ascii_search_result.group())[1:-1]
+        title_ascii = replace_non_ascii_chars(remove_accents(title_ascii))
+        if title_ascii.lower() in title_ascii_special_negative_cases:
+            title_ascii = None
+    else:
+        title_ascii = None
+
+    if title == 'Secret Base 君がくれたもの (Kimi ga Kureta Mono)':
+        title_ascii = 'Secret Base Kimi ga Kureta Mono'
+
+    return title_ascii
+
+# TODO load from file
+artist_ascii_special_cases_mapping = {
+    "μ's": "muse",
+    "DECO*27": "DECO 27",
+}
+
+def get_artist_ascii(artist: str) -> str:
+    if artist in artist_ascii_special_cases_mapping.keys():
+        return artist_ascii_special_cases_mapping[artist]
+
+    return replace_non_ascii_chars(remove_accents(artist))
+

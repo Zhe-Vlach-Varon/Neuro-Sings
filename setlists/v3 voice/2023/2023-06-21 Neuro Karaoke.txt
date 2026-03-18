@@ -14,7 +14,7 @@
 13 | Ocean Man | Ween | Neuro | New
 14 | Radioactive | Imagine Dragons | Neuro | New
 15 | 24-hour Cinderella | ZENTA, Ryosuke Horii | Neuro | New
-16 | Snow Halation | μ's | Neuro | New
+16 | Snow Halation | μ's | Neuro | New || christmas;
 17 | Teo | Omoi | Neuro | New
 18 | Dreamin Chuchu | emon | Neuro | New
 19 | The Disappearance of Hatsune Miku | cosMo | Neuro | New

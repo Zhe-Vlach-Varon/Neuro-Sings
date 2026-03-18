@@ -27,6 +27,19 @@ If a Setlist spans multiple dates, an additional album info line with the new da
 ### Lead Singer Change
 Specifies the primary singer, the one on the left in duets, has changed.\
 Options are ```Neuro``` or ```Evil```
+
+#### Outit and Microphones TO BE IMPLEMENTED will replace above
+
+| Field | Notes | required |
+|-------|-------|----------|
+| Right Singer | The singer on the right | Required |
+| Right Outfit | what outfit (v1, v2, v2 Pirate, v2 clown, v3, etc) | Required |
+| Right Microphone | what mic (None, Pink, Red, Evil's Custom, Neuro's Custom, etc) | Required |
+| Left Singer | second singer in duet | Optional |
+| Left Outfit | same as right outfit | Optional |
+| Left Microphone | same as right mic | Optional |
+
+
 ### Song Entry
 Lists info about a song, fields are separated by `|`
 | Field | Notes | Required |

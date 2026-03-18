@@ -38,6 +38,8 @@ Still Alive [CONFIRMED]
 #### 25-01-2023 [here](https://youtu.be/e3wSvSnRGBQ)
 1. Your Reality around 21:00 [CONFIRMED]
 2. Rickroll around 4:51:15 [CONFIRMED]
+#### 27-01-2023 [here](https://youtu.be/V7eSyhQh7-s)
+Oddloop around 2:04:00 [CONFIRMED]
 #### 28-01-2023 [here](https://youtu.be/LuYhSDqzMMs)
 Oddloop around 1:57:00 [CONFIRMED]
 #### 29-01-2023 [here](https://youtu.be/td_py8jQwik)
@@ -53,13 +55,12 @@ Revenge around 1:02:00 [CONFIRMED]
 1. 01-02-23 World is mine
 2. 02-02-23 Enemy
 3. 03-02-23 Brain Power
-4. 06-02-23 Numb (Not the 5th)
+4. 05-02-23 Numb (actually yes the 5th, also on the 6th)
 5. 07-02-23 Baka Mitai
 6. 09-02-23 Contry Road
 7. 10-02-23 Shelter
 8. 12-02-23 KING
 9. 13-02-23 Phony
-<!---TODO Check order-->
 10. 14-02-23 Careless Whisper
 11. 14-02-23 Dreamin Chuchu
 12. 16-02-23 Bad Guy
@@ -79,6 +80,8 @@ World is Mine around 2h01 (Muted)
 Enemy around 3h28 [CONFIRMED]
 #### 03-02-2023 [here](https://youtu.be/q7rZNBH1PwI)
 Brain Power around 2h56 [CONFIRMED]
+#### 05-02-2023 [here](https://youtu.be/xJcpjuij-Sg)
+Numb around 2h50 [CONFIRMED]
 #### 06-02-2023 [here](https://youtu.be/MA-xksdXQz0)
 Numb around 2h54 [CONFIRMED]
 #### 07-02-2023 [here](https://youtu.be/3PFgn9e_7jo)
@@ -1660,6 +1663,8 @@ Only duplicates
 9. Intergalactia - Kira - Duplicate
 10. She Used To Be Mine - Sara Bareilles - New
 
+<!--- other new karaoke setlists to be added` --->
+
 ## Collabs
 ### "Official" (not on stream, separate release)
 Put as special album: Collabs, list in order
@@ -1674,6 +1679,7 @@ Put as special album: Collabs, list in order
 - [x] 7. Mesmerizer ft Bao 19-08-2025
 - [x] 8. Crazy Fuckin' Robot Body 03-12-2025
 - [x] 9. Chinatown Blues ft Vedal 06-12-2025
+- [ ] 10. Come Down Evil ft Numi 10-02-2026
 
 ### Stream Covers
 [I see the light](https://youtu.be/dIyByMwOaD8)

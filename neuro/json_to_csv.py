@@ -7,14 +7,13 @@ import polars as pl
 from loguru import logger
 
 from neuro import ROOT_DIR, DATES_CSV, LOG_DIR, SONGS_CSV, SONGS_DB, SONGS_JSON
-from neuro.detection import SongEntry, SongJSON
 from neuro.polars_utils import load_dates, load_db, songs_schema, dates_schema
-from neuro.utils import file_check, format_logger, get_audio_hash, get_cover_artist, do_song_titles_match, get_song_artists_match_count
+import neuro.utils as neutils
 
 from tqdm import tqdm
 
 
-def is_eliv(s: SongEntry) -> bool:
+def is_eliv(s: neutils.SongEntry) -> bool:
     """Checks if the file from an Entry is sung by Evil.
 
     Args:
@@ -28,7 +27,7 @@ def is_eliv(s: SongEntry) -> bool:
     else:
         return False
 
-def is_duet(s: SongEntry) -> bool:
+def is_duet(s: neutils.SongEntry) -> bool:
     """Checks if the file from an Entry is a duet.
 
     Args:
@@ -41,7 +40,7 @@ def is_duet(s: SongEntry) -> bool:
     return "(Duet.v" in s["File_IN"] and "Neuro & Evil)" in s["File_IN"]
 
 
-def is_eliv_old(s: SongEntry) -> bool:
+def is_eliv_old(s: neutils.SongEntry) -> bool:
     """Checks if the file from an Entry is in the Evil subdirectory.
 
     Args:
@@ -54,7 +53,7 @@ def is_eliv_old(s: SongEntry) -> bool:
     return "/Evil" in s["File_IN"]
 
 
-def field_ascii(song: SongEntry, field: Literal["Song", "Artist"]) -> tuple[str, str]:
+def field_ascii(song: neutils.SongEntry, field: Literal["Song", "Artist"]) -> tuple[str, str]:
     """Gets the "normal" and "ASCII" versions of the 2 fields that have these variants.
 
     Args:
@@ -67,13 +66,16 @@ def field_ascii(song: SongEntry, field: Literal["Song", "Artist"]) -> tuple[str,
     normal = song[f"{field}"]
     assert normal is not None
 
-    ascii = song.get(f"{field} ASCII", normal)
+    ascii = song.get(f"{field}_ASCII", normal)
     assert ascii is not None
+
+    if normal == 'K/DA':
+        assert ascii == 'KDA'
 
     return normal, ascii
 
 
-def get_flags(file: Path, eliv: Optional[bool] = None) -> Optional[str]:
+def get_flags_old(file: Path, eliv: Optional[bool] = None) -> Optional[str]:
     """Gets the common evil/duet flag given a file. Evil flag can be set from \
         another boolean.
 
@@ -122,13 +124,65 @@ def get_flags(file: Path, eliv: Optional[bool] = None) -> Optional[str]:
 
     return flags
 
+def get_flags(song: neutils.SongEntry) -> str:
+
+    """ Singing voice version: 'v1', 'v2', 'v3', ''
+        Lead singer: 'neuro', 'evil'
+        Duet: 'duet', ''
+        Duplicate: 'duplicate', ''
+        Encore: 'encore', ''
+        Collab: 'collab', ''
+        Official: 'official', ''
+        Original: 'original', ''
+        Halloween: 'halloween', ''
+            manually added flag
+        Christmas: 'christmas', ''
+            manually added flag
+        Quarantine: 'quarantine', ''
+            manually added flag
+        Mashup: 'mashup', ''
+        ARG: 'arg', ''
+        arg songs have only the arg flag"""
+
+    flags: str = ""
+
+    cover_artist = song['Cover Artist']
+    lead_singer = song['Lead Singer']
+    duplicate = song['duplicate']
+    encore = song['encore']
+
+    if lead_singer == 'Study-sama':
+        return 'arg;'
+
+    if '[v1]' in cover_artist:
+        flags = 'v1;neuro;'
+    elif '[v2]' in cover_artist:
+        flags = 'v2;neuro;'
+    else:
+        flags = 'v3;'
+
+        if lead_singer == 'Neuro':
+            flags += 'neuro;'
+        if lead_singer == 'Evil':
+            flags += 'evil;'
+    if cover_artist == 'Neuro & Evil':
+        flags += 'duet;'
+    elif ('Neuro ' in cover_artist and ' & ' in cover_artist and 'Evil' not in cover_artist) or 'Evil & ' in cover_artist or 'Neuro, Evil, ' in cover_artist:
+        flags += 'collab;'
+    
+    
+
+
+
+    return flags
+
 
 def update_db() -> None:
     """Updates the song database, adding songs from the JSON file that aren't yet in it
     The Date CSV/Table is also updated for each new stream"""
-    format_logger(log_file=LOG_DIR / "json.log")
+    neutils.format_logger(log_file=LOG_DIR / "json.log")
     with open(SONGS_JSON, "r") as f:
-        json_data: SongJSON = json.load(f)
+        json_data: neutils.SongJSON = json.load(f)
 
     # Absolutely doesn't work if the CSV is empty
     songs_df = load_db()
@@ -163,15 +217,24 @@ def update_db() -> None:
                 date = album
                 named_album = False
             singer = song['Cover Artist']
+            if singer == 'Neuro & Evil':
+                singer = "Twins"
             eliv = song['Lead Singer'] == "Evil"
             # print("adding dates to database")
             # print(date)
-            if date[0] == "2" and date not in dates_df.get_column("Date") and date > "2023-06-08":
+            if date[0] == "2" and date not in dates_df.get_column("Date") and date > "2023-06-08" and song['Cover Artist'] in ['Neuro', 'Evil', 'Neuro & Evil']:
+                duet_format: str
+                if date >= '2025-03-25':
+                    duet_format = 'v2'
+                elif date >= '2024-12-19':
+                    duet_format = 'v2v1'
+                else:
+                    duet_format = 'v1'
                 df = pl.DataFrame(
                     {
                         "Date": date,
-                        "Singer": song['Cover Artist'],
-                        "Duet Format": "v2",
+                        "Singer": singer,
+                        "Duet Format": duet_format,
                     }
                 )
                 # Adds a row for a new stream in the dates CSV
@@ -196,12 +259,12 @@ def update_db() -> None:
                 print("Song is not duplicate but has no File_IN")
                 print("")
                 print(song)
-                exit()
+                exit(1)
 
             if not song["duplicate"]:
                 # print(song)
                 file = Path(song["File_IN"])
-                file_check(file)  # Checks if file exists on disk
+                neutils.file_check(file)  # Checks if file exists on disk
             else:
                 file = None
 
@@ -224,7 +287,7 @@ def update_db() -> None:
                 # album = date
 
 
-            if 'Image' in song.keys():
+            if 'Image' in song.keys() and not song['Image'] == "":
                 cover_image = song["Image"]
                 # if not cover_image is None:
                     # print("cover image: " + cover_image)
@@ -237,11 +300,16 @@ def update_db() -> None:
             in_hash = None
 
             if not song['duplicate']:
-                in_hash = get_audio_hash(file)
+                in_hash = neutils.get_audio_hash(file)
 
-            flags = get_flags(file, eliv)
+            # flags = get_flags(file, eliv)
+            flags = get_flags(song)
             assert flags is not None
             flags += song['additional flags']
+
+            if song['encore']:
+                name += ' - Encore'
+                name_ascii += ' - Encore'
 
             df = pl.DataFrame(
                 {
@@ -260,6 +328,7 @@ def update_db() -> None:
                     "Flags": flags,
                     "Key": None,
                     "Tempo (1/4 beat)": None,
+                    'Version': song['Version'],
                 }
             )
             # with pl.Config(tbl_cols=-1):
@@ -267,7 +336,8 @@ def update_db() -> None:
             if song["duplicate"]:
                 # print(song)
                 # print(song['duplicate'])
-                df = get_most_recent_version(df.to_dict(), json_data)
+                # print(song['encore'])
+                df = get_most_recent_version(df.to_dicts()[0], json_data, song['encore'], song['Lead Singer'])
 
             id += 1
             remove += 1
@@ -320,8 +390,8 @@ def update_db_hashes() -> None:
         assert file.exists()
         hash = song["Hash_IN"]
         # print(get_audio_hash(file))
-        if get_audio_hash(file) != hash:
-            song["Hash_IN"] = get_audio_hash(file)
+        if neutils.get_audio_hash(file) != hash:
+            song["Hash_IN"] = neutils.get_audio_hash(file)
         new_songs_df.extend(pl.DataFrame(song))
             
     new_songs_df.write_csv(SONGS_CSV)
@@ -341,7 +411,7 @@ def add_cover_artist() -> None:
         file = ROOT_DIR / Path(song["File_IN"])
         # print(file)
         assert file.exists()
-        singer = get_cover_artist(file)
+        singer = neutils.get_cover_artist(file)
         song["Cover Artist"] = singer
         new_songs_df.extend(pl.DataFrame(song))
             
@@ -349,16 +419,18 @@ def add_cover_artist() -> None:
     new_songs_df.write_database("Songs", f"sqlite:///{SONGS_DB}", if_table_exists="replace")
 
 
-def get_most_recent_version(song: dict, json_data: SongJSON) -> pl.DataFrame:
+def get_most_recent_version(song: dict, json_data: neutils.SongJSON, encore: bool, lead_singer: str) -> pl.DataFrame:
     # if json for song has duplicate true, search database for most recent version of song with same singer
     # either detect singer from existing data, or add cover_artist field to database
     songDB = load_db()
 
+    # print(song['Album'][0])
+
     latest_version = None
 
     filtered_songs = songDB.filter(
-        (pl.col("Artist").map_elements(lambda x: get_song_artists_match_count(x, song['Artist'][0]) > 0, return_dtype=pl.Boolean)) &
-        (pl.col("Song").map_elements(lambda x: do_song_titles_match(x, song['Song'][0]), return_dtype=pl.Boolean)) &
+        (pl.col("Artist").map_elements(lambda x: neutils.get_song_artists_match_count(x, song['Artist'][0]) > 0, return_dtype=pl.Boolean)) &
+        (pl.col("Song").map_elements(lambda x: neutils.do_song_titles_match(x, song['Song'][0]), return_dtype=pl.Boolean)) &
         (pl.col("Cover Artist") == song["Cover Artist"][0]) &
         (pl.col("Date") <= song["Date"][0]) &
         (~pl.col("Flags").str.contains("duplicate"))
@@ -374,19 +446,30 @@ def get_most_recent_version(song: dict, json_data: SongJSON) -> pl.DataFrame:
 
     filtered_json_songs = []
 
+    # print(song)
     # TODO filter json data
     for album, json_songs in json_data.items():
+        # print(album)
         for json_song in json_songs:
+            # print(json.dumps(json_song))
             # print(song)
             # print(json_song)
-            # print(song['Song'][0] + " - " + song['Artist'][0] + " - " + song['Cover Artist'][0] + " - " + song['Date'][0] + " - " + str(song['Album_ID'][0]))
-            # print(json_song['Song'] + " - " + json_song['Artist'] + " - " + json_song['Cover Artist'] + " - " + json_song['Date'] + " - " + str(json_song['id']))
-            # print("")
-            if get_song_artists_match_count(json_song['Artist'], song['Artist'][0]) and do_song_titles_match(json_song["Song"], song["Song"][0]) and (json_song["Cover Artist"] == song["Cover Artist"][0]) and ((not json_song["Date"] > song["Date"][0]) or (not json_song["id"] == song['Album_ID'][0])) and "File_IN" in json_song.keys():
+            # print('new: ' + song['Song'][0] + " - " + song['Artist'][0] + " - " + song['Cover Artist'][0] + " - " + song['Date'][0] + " - " + str(song['Album_ID'][0]))
+            # print('old: ' + json_song['Song'] + " - " + json_song['Artist'] + " - " + json_song['Cover Artist'] + " - " + json_song['Date'] + " - " + str(json_song['id']))
+            # print((get_song_artists_match_count(json_song['Artist'], song['Artist'][0]) or get_song_artists_match_count(song['Artist'][0], json_song['Artist'])) and do_song_titles_match(json_song["Song"], song["Song"][0]) and (json_song["Cover Artist"] == song["Cover Artist"][0]) and ((song["Date"][0] >= json_song["Date"]) or (not json_song["id"] == song['Album_ID'][0])) and "File_IN" in json_song.keys())
+            # print((get_song_artists_match_count(json_song['Artist'], song['Artist'][0]) or get_song_artists_match_count(song['Artist'][0], json_song['Artist'])))
+            # print(do_song_titles_match(json_song["Song"], song["Song"][0]))
+            # print((json_song["Cover Artist"] == song["Cover Artist"][0]))
+            # print(((song["Date"][0] >= json_song["Date"]) or (not json_song["id"] == song['Album_ID'][0])) and "File_IN" in json_song.keys())
+            # print()
+            if (neutils.do_songs_match(song, json_song, ignore_date=True)) and ((song["Date"] >= json_song["Date"]) or (not json_song["id"] == song['Album_ID'])) and "File_IN" in json_song.keys():
+                # print("adding song to filtered songs")
                 filtered_json_songs.append(json_song)
+            # print()
 
     # TODO sort filtered json data
-    sorted_filtered_json_songs = sorted(filtered_json_songs, key=lambda d:  ['Date'])
+    sorted_filtered_json_songs = sorted(filtered_json_songs, key=lambda d:  d['Date'])                              
+    # print(sorted_filtered_json_songs)
 
     # print(sorted_filtered_json_songs)
 
@@ -403,7 +486,8 @@ def get_most_recent_version(song: dict, json_data: SongJSON) -> pl.DataFrame:
     if len(filtered_json_songs) > 0:
         latest_json_version = sorted_filtered_json_songs[0]
         # add way to specify flags in setlist files
-        json_flags = get_flags(latest_json_version['File_IN'])
+        # json_flags = get_flags(latest_json_version['File_IN'])
+        json_flags = get_flags(latest_json_version)
 
     if not latest_db_version is None:
         if not latest_json_version is None:
@@ -420,8 +504,14 @@ def get_most_recent_version(song: dict, json_data: SongJSON) -> pl.DataFrame:
         latest_version = latest_json_version
         flags = json_flags
     else:
-        # print("How did we get here?!")
-        assert True == False
+        print("How did we get here?!")
+        print("check for typos in setlists")
+        print(song['Album'])
+        for key in song.keys():
+            print(f'{key}: {song[key]}')
+        # with open("get_most_recent_version_json_data.txt", "w") as f:
+        #     json.dump(json_data, f, indent=4)
+        exit(1)
 
 
     # print("latest_version")
@@ -432,16 +522,21 @@ def get_most_recent_version(song: dict, json_data: SongJSON) -> pl.DataFrame:
     # already checked that flags does not contain duplicate when filtering
     flags += "duplicate;"
     
-    if 'encore' in song.keys() and song['encore']:
+    if encore:
         flags += 'encore;'
+
+    if lead_singer == 'Neuro':
+        flags = flags.replace('evil', 'neuro')
+    if lead_singer == 'Evil':
+        flags = flags.replace('neuro', 'evil')
 
     if filtered_songs.height > 0 and latest_version == latest_db_version:
         new_duplicate_song = pl.DataFrame(
         {
                "id": song["id"],
-               "Song": latest_version["Song"],
+               "Song": latest_version["Song"] if not encore else latest_version["Song"] + ' - Encore',
                "Artist": latest_version["Artist"],
-               "Song_ASCII": song["Song_ASCII"],
+               "Song_ASCII": latest_version["Song_ASCII"] if not encore else latest_version["Song_ASCII"] + ' - Encore',
                "Artist_ASCII": song["Artist_ASCII"],
                "Cover Artist": latest_version["Cover Artist"],
                "Date": song["Date"],
@@ -453,15 +548,18 @@ def get_most_recent_version(song: dict, json_data: SongJSON) -> pl.DataFrame:
                "Flags": flags,
                "Key": latest_version["Key"],
                "Tempo (1/4 beat)": latest_version["Tempo (1/4 beat)"],
+               "Version": latest_version["Version"],
             }
         )
     elif len(filtered_json_songs) > 0 and latest_version == latest_json_version:
+        # print(song)
+        # print(latest_version)
         new_duplicate_song = pl.DataFrame(
         {
                "id": song["id"],
-               "Song": latest_version["Song"],
+               "Song": latest_version["Song"] if not encore else latest_version["Song"] + ' - Encore',
                "Artist": latest_version["Artist"],
-               "Song_ASCII": song["Song_ASCII"],
+               "Song_ASCII": latest_version["Song_ASCII"] if not encore else latest_version["Song_ASCII"] + ' - Encore',
                "Artist_ASCII": song["Artist_ASCII"],
                "Cover Artist": latest_version["Cover Artist"],
                "Date": song["Date"],
@@ -469,16 +567,17 @@ def get_most_recent_version(song: dict, json_data: SongJSON) -> pl.DataFrame:
                "Album_ID": song["Album_ID"],
                "Image": song["Image"],
                "File_IN": latest_version["File_IN"],
-               "Hash_IN": get_audio_hash(Path(latest_version["File_IN"])),
+               "Hash_IN": neutils.get_audio_hash(Path(latest_version["File_IN"])),
                "Flags": flags,
                "Key": song["Key"],
                "Tempo (1/4 beat)": song["Tempo (1/4 beat)"],
+               "Version": song["Version"],
             }
         )
     else:
         print("How did we get here?!")
         print("unable to get latest version")
-        exit()
+        exit(1)
     # print(song["Image"])
 
     return new_duplicate_song

@@ -24,7 +24,8 @@ songs_schema = {
     'Hash_IN': pl.String,
     'Flags': pl.String,
     'Key': pl.String,
-    'Tempo (1/4 beat)': pl.String
+    'Tempo (1/4 beat)': pl.String,
+    'Version': pl.String,
     }
 
 dates_schema = {
@@ -86,7 +87,7 @@ def load_db(as_db: bool = True, root: Path = ROOT_DIR) -> pl.DataFrame:
         REQ = "SELECT * FROM Songs"
         return pl.read_database_uri(REQ, f"sqlite://{root / SONGS_DB}")
     else:
-        return pl.read_csv(root / SONGS_CSV)
+        return pl.read_csv(root / SONGS_CSV, schema=songs_schema)
 
 
 def load_dates(as_db: bool = True) -> pl.DataFrame:

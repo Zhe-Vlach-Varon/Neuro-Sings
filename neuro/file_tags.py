@@ -14,8 +14,7 @@ from mutagen.id3._frames import APIC, TALB, TBPM, TDRC, TDRL, TIT2, TKEY, TPE1, 
 from PIL import Image
 
 from neuro import IMAGES_COVERS_DIR, IMAGES_CUSTOM_DIR, LOG_DIR, ROOT_DIR
-from neuro.detection import SongEntry
-from neuro.utils import file_check, format_logger
+from neuro.utils import file_check, format_logger, SongEntry
 
 
 class Song:
@@ -77,8 +76,8 @@ class Song:
         self.hash_in: str = song_dict["Hash_IN"]
 
         # assert song_dict["File_IN"] is not None
-        # self.file: Path = ROOT_DIR / Path(song_dict["File_IN"])
-        self.file: Path = hash_dict[self.hash_in]
+        self.file: Path = ROOT_DIR / Path(song_dict["File_IN"])
+        # self.file: Path = hash_dict[self.hash_in]
         file_check(self.file)
 
         assert song_dict["Album_ID"] is not None

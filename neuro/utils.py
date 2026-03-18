@@ -10,6 +10,7 @@ from enum import Enum
 from pathlib import Path
 from typing import TextIO
 import unicodedata
+from typing import Optional
 
 import xxhash
 
@@ -23,6 +24,11 @@ import loguru
 from loguru import logger
 
 from neuro import LOG_DIR, OFFICIAL_RELEASE_DIR, UNOFFICIALV3_DIR, CUSTOM_DIR, DRIVE_DIR
+
+SongEntry = dict[str, Optional[str]]
+"""Dictionary representing a song in the JSON, containing fields like "Song", "Artist", etc..."""
+SongJSON = dict[str, list[SongEntry]]
+"""Whole JSON file expected format. A list of date-indexed lists of songs."""
 
 # It's ints to be easier to pass via CLI, instead of typing the level with a risk of typo
 VERBOSE = {
@@ -253,7 +259,7 @@ def get_audio_hash_to_file_mapping(p: Path, *, filetype: str = "mp3", slicer: sl
 
     for file in files:
         # print(file)
-        hash = get_audio_hash(file, slicer=slicer)
+        hash = get_audio_hash(file)
         file_mapping[hash] = Path(file)
     
     return file_mapping
@@ -455,12 +461,17 @@ title_ascii_special_replace_cases = {
     'デビルじゃないもん ((Not) A Devil)': '(Not) A Devil',
     '真夜中のドア〜Stay With Me': 'Stay With Me',
     '学猫叫 (Xue Miao Jiao)': 'Xue Miao Jiao (Learn To Meow)',
+    '炜WARD ROMANCE': 'WEIWARD ROMANCE',
 }
 
 ascii_character_replacement_mapping = {
     '’': '\'',
     '＊': '*',
+    '★': ' ',
+    '  ': ' ',
 }
+
+non_ascii_char_regex = r'[^a-zA-Z0-9\-\,\. ]'
 
 def replace_non_ascii_chars(s: str) -> str:
     # TODO why doesn't this work
@@ -468,7 +479,7 @@ def replace_non_ascii_chars(s: str) -> str:
 
     for key in ascii_character_replacement_mapping.keys():
         s = s.replace(key, ascii_character_replacement_mapping[key])
-    
+    s = re.sub(non_ascii_char_regex, '', s)
     return s
 
 def extract_english_title_translation(title: str) -> (str | None):
@@ -493,11 +504,44 @@ def extract_english_title_translation(title: str) -> (str | None):
 artist_ascii_special_cases_mapping = {
     "μ's": "muse",
     "DECO*27": "DECO 27",
+    "K/DA": "KDA",
 }
 
 def get_artist_ascii(artist: str) -> str:
-    if artist in artist_ascii_special_cases_mapping.keys():
-        return artist_ascii_special_cases_mapping[artist]
+    for key in artist_ascii_special_cases_mapping:
+        artist = artist.replace(key, artist_ascii_special_cases_mapping[key])
 
     return replace_non_ascii_chars(remove_accents(artist))
 
+def do_songs_match(s1: SongEntry, s2: SongEntry, ignore_date: bool = False) -> bool:
+    # print()
+    # print('do_songs_match')
+    # print()
+    # print(s1)
+    # print(s2)
+    # print()
+    
+    artists_match = get_song_artists_match_count(s1['Artist'], s2['Artist']) > 0 or get_song_artists_match_count(s2['Artist'], s1['Artist']) > 0
+    titles_match = do_song_titles_match(s1['Song'], s2['Song']) or do_song_titles_match(s2['Song'], s1['Song'])
+    dates_match = ('Date' not in s2.keys() or s1['Date'] == s2['Date']) or ignore_date
+    cover_artists_match = s1['Cover Artist'] == s2['Cover Artist']
+    final_result = artists_match and titles_match and dates_match and cover_artists_match
+
+    # print(f'artists match: {artists_match}')
+    # print(f'titles match: {titles_match}')
+    # print(f'dates match: {dates_match}')
+    # print(f'cover artists match: {cover_artists_match}')
+    # print(f'final result: {final_result}')
+
+    return final_result
+
+def does_matching_song_exist_in_list(song: SongEntry, lst: list[SongEntry]) -> int:
+    """returns count of matching songs in list"""
+    match_count = 0
+    for entry in lst:
+        # print(song)
+        # print(entry)
+        # print()
+        if do_songs_match(song, entry):
+            match_count += 1
+    return match_count

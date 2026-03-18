@@ -388,30 +388,30 @@ def generate_main() -> None:
     for stream in dates.iter_rows(named=True):
         check_stream(stream)
         date = stream["Date"]
-        who = stream["Singer"]
-        version = stream["Duet Format"]
+        for who in ['Neuro', 'Evil']: # TODO temp fix to generate cover images for both singers for each date
+            version = stream["Duet Format"]
 
-        year = int(date[:4])
-        date_idx = indices[year]
-        indices[year] += 1
+            year = int(date[:4])
+            date_idx = indices[year]
+            indices[year] += 1
 
-        # print(who)
+            # print(who)
 
-        i_solo, i_duet = singer_match(who, version)
+            i_solo, i_duet = singer_match(who, version)
 
-        # Doesn't generate solo covers for Twins streams
-        if i_solo != -1:
-            # Solo thumbnail generation
+            # Doesn't generate solo covers for Twins streams
+            if i_solo != -1:
+                # Solo thumbnail generation
+                month = digits.find(date[5]) * 10 + digits.find(date[6])
+                day = digits.find(date[8]) * 10 + digits.find(date[9])
+                apply_text_from_date_atlases(SOLO_BG[i_solo], year, month, day).convert("RGB").save(IMAGES_COVERS_DIR / f"{date}-{str(who).lower()}.jpg")
+            # Duet thumbnail generation
             month = digits.find(date[5]) * 10 + digits.find(date[6])
             day = digits.find(date[8]) * 10 + digits.find(date[9])
-            apply_text_from_date_atlases(SOLO_BG[i_solo], year, month, day).convert("RGB").save(IMAGES_COVERS_DIR / f"{date}-{str(who).lower()}.jpg")
-        # Duet thumbnail generation
-        month = digits.find(date[5]) * 10 + digits.find(date[6])
-        day = digits.find(date[8]) * 10 + digits.find(date[9])
-        apply_text_from_date_atlases(DUET_BG[i_duet], year, month, day).convert("RGB").save(IMAGES_COVERS_DIR / f"{date}-{str(who).lower()}-duet.jpg")
+            apply_text_from_date_atlases(DUET_BG[i_duet], year, month, day).convert("RGB").save(IMAGES_COVERS_DIR / f"{date}-{str(who).lower()}-duet.jpg")
 
-        # print(IMAGES_COVERS_DIR / f"{date}-{str(who).lower()}.jpg")
-        # print(IMAGES_COVERS_DIR / f"{date}-{str(who).lower()}-duet.jpg")
+            # print(IMAGES_COVERS_DIR / f"{date}-{str(who).lower()}.jpg")
+            # print(IMAGES_COVERS_DIR / f"{date}-{str(who).lower()}-duet.jpg")
 
         
 

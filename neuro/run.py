@@ -96,8 +96,8 @@ def generate_songs() -> None:
     # Easier data format to deal with
     dates_dict: DateDict = {k["Date"]: k for k in load_dates().iter_rows(named=True)}
 
-    # hash_dict = get_audio_hash_to_file_mapping(SONG_ROOT_DIR)
-    hash_dict = None
+    hash_dict = get_audio_hash_to_file_mapping(SONG_ROOT_DIR)
+
 
     for preset in config["Presets"]:
         logger.info(f"[GEN] Generating preset '{preset['name']}'")
@@ -105,6 +105,11 @@ def generate_songs() -> None:
         generate_from_preset(preset_obj, hash_dict, dates_dict)
 
     logger.success(f"[GEN] Generated all presets in {time_format(time() - t)} !")
+
+# TODO generate karaoke covers, generate placeholders, folder with text file of metadata and also cover art image 
+# TODO generate official releases
+# TODO use flags to filter
+# TODO add arguments to generate_songs and generate_albums for include/exclude flags and root-dir
 
 def generate_albums() -> None:
     """generates all songs sorted by album"""

@@ -77,8 +77,12 @@ class Song:
 
         # assert song_dict["File_IN"] is not None
         self.file: Path = ROOT_DIR / Path(song_dict["File_IN"])
-        # self.file: Path = hash_dict[self.hash_in]
-        file_check(self.file)
+        try:
+            file_check(self.file)
+        except:
+            self.file: Path = hash_dict[self.hash_in]
+            file_check(self.file)
+
 
         assert song_dict["Album_ID"] is not None
         self.track_n: str = song_dict["Album_ID"]
@@ -231,7 +235,10 @@ class Song:
             return f"{self.artist_ascii} - {self.title_ascii}"
         else:
             return f"{self.artist_ascii} - {self.title_ascii} [{self.name_tag}] [{self.date}]"
-
+        # TODO add {self.track_n} to start of file name
+        # TODO get total number of tracks for tag
+        # TODO if entire karaoke stream (only karaoke streams, not the subathon or other setlists from the non-karaoke folder)
+        #       if entire stream is duets, remove the 'neuro;' or 'evil;' flags
 
 class DriveSong(Song):
     """Metadata for a song from the drive."""

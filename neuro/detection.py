@@ -247,6 +247,7 @@ def extract_custom(files: list[Path], out: neutils.SongJSON = {}) -> neutils.Son
             "File_IN": str(file),
             "id": 999999,
             'Version': None,
+            'Hash_IN': neutils.get_audio_hash(Path(file)),
         }
 
         if data['Song_ASCII'] is None:
@@ -276,8 +277,12 @@ def extract_unofficialV3(files: list[Path], out: neutils.SongJSON = {}) -> neuti
         SongJSON: Dictionary with at least these files' information.
     """
 
+    songs_df = load_db()
+
     id = 1
     for file in files:
+        if neutils.get_audio_hash(file) in songs_df.get_column('Hash_IN'):
+            continue
         data = {}
         date = ""
         artist = ""
@@ -336,6 +341,7 @@ def extract_unofficialV3(files: list[Path], out: neutils.SongJSON = {}) -> neuti
             'Lead Singer': cover_artist,
             'additional flags': "",
             'Version': version,
+            'Hash_IN': neutils.get_audio_hash(Path(file)),
         }
         id += 1
         if date in out:
@@ -368,6 +374,7 @@ def extract_arg(files: list[Path], out: neutils.SongJSON = {}) -> neutils.SongJS
             'Lead Singer': artist,
             'additional flags': "",
             'Version': '66',
+            'Hash_IN': neutils.get_audio_hash(Path(file)),
         }
 
         if 'Neuro-sama ARG' in out.keys():
@@ -435,6 +442,7 @@ def extract_official(files: list[Path], out: neutils.SongJSON ={}) -> neutils.So
                     'Lead Singer': lead_singer,
                     'additional flags': "",
                     'Version': version,
+                    'Hash_IN': neutils.get_audio_hash(Path(file)),
                     }
                 if 'custom' in out.keys():
                     out['custom'].append(data)
@@ -467,6 +475,7 @@ def extract_official(files: list[Path], out: neutils.SongJSON ={}) -> neutils.So
                     'Lead Singer': artist,
                     'additional flags': "",
                     'Version': '1',
+                    'Hash_IN': neutils.get_audio_hash(Path(file)),
                     }
                 if 'custom' in out.keys():
                     out['custom'].append(data)
@@ -484,6 +493,8 @@ def extract_official(files: list[Path], out: neutils.SongJSON ={}) -> neutils.So
 def parse_setlist(p: Path) -> neutils.SongJSON:
     with open(p, 'r') as file:
         lines = file.readlines()
+
+    logger.info(f'parsing setlist {p.name}')
 
     songs: neutils.SongJSON = {}
     
@@ -642,6 +653,22 @@ def parse_setlist(p: Path) -> neutils.SongJSON:
             # print(album)
             songs[album].append(data)
 
+    non_karaoke_albums = neutils.get_non_karaoke_album_names()
+    if album not in non_karaoke_albums:
+        twin_duet_stream = True
+    else:
+        twin_duet_stream = False
+
+    if twin_duet_stream:
+        for song in songs[album]:
+            twin_duet_stream = twin_duet_stream and song['Cover Artist'] == 'Neuro & Evil'
+            if not twin_duet_stream:
+                break
+    
+    if twin_duet_stream:
+        twin_album_stream_title = album.replace('Neuro', 'Twins').replace('Evil', 'Twins')
+        songs[twin_album_stream_title] = songs.pop(album)
+
     # print(songs)
     return songs
 
@@ -715,6 +742,9 @@ def fill_in_setlists(out: neutils.SongJSON = {}) -> neutils.SongJSON:
         # print("File_IN")
         # print(file)
         albums = parse_setlist(file)
+
+        if albums is None:
+            continue
         
         for album, songs in albums.items():
             contains_new_songs: bool = False

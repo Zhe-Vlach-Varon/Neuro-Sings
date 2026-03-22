@@ -417,6 +417,7 @@ def generate_main() -> None:
 
         i_total = sum(indices.values()) - 1
         logger.debug(f"[THUMB] [{i_total + 1:2d}/{N_COVERS}] Cover Pictures for {date} done")
+        # TODO fix cover art count calculation
 
     logger.success(f"[THUMB] {N_COVERS} successfully generated in {time_format(time() - t)}")
 

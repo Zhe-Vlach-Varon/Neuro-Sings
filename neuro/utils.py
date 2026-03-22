@@ -23,7 +23,7 @@ import json
 import loguru
 from loguru import logger
 
-from neuro import LOG_DIR, OFFICIAL_RELEASE_DIR, UNOFFICIALV3_DIR, CUSTOM_DIR, DRIVE_DIR
+from neuro import LOG_DIR, OFFICIAL_RELEASE_DIR, UNOFFICIALV3_DIR, CUSTOM_DIR, DRIVE_DIR, SETLISTS_DIR
 
 SongEntry = dict[str, Optional[str]]
 """Dictionary representing a song in the JSON, containing fields like "Song", "Artist", etc..."""
@@ -545,3 +545,15 @@ def does_matching_song_exist_in_list(song: SongEntry, lst: list[SongEntry]) -> i
         if do_songs_match(song, entry):
             match_count += 1
     return match_count
+
+non_karaoke_albums = []
+
+def get_non_karaoke_album_names() -> list:
+    if not len(non_karaoke_albums):
+        setlists = list(SETLISTS_DIR.glob(f"**/*"))
+        for setlist in setlists:
+            if setlist.name == 'Setlists.md' or setlist.is_dir():
+                continue
+            if setlist.is_relative_to(SETLISTS_DIR / 'v3 voice' / 'non-karaoke'):
+                non_karaoke_albums.append(setlist.stem)
+    return non_karaoke_albums

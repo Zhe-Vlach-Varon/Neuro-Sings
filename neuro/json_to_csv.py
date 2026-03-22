@@ -6,7 +6,7 @@ from typing import Literal, Optional
 import polars as pl
 from loguru import logger
 
-from neuro import ROOT_DIR, DATES_CSV, LOG_DIR, SONGS_CSV, SONGS_DB, SONGS_JSON
+from neuro import ROOT_DIR, DATES_CSV, LOG_DIR, SETLISTS_DIR, SONGS_CSV, SONGS_DB, SONGS_JSON
 from neuro.polars_utils import load_dates, load_db, songs_schema, dates_schema
 import neuro.utils as neutils
 
@@ -170,10 +170,6 @@ def get_flags(song: neutils.SongEntry) -> str:
     elif ('Neuro ' in cover_artist and ' & ' in cover_artist and 'Evil' not in cover_artist) or 'Evil & ' in cover_artist or 'Neuro, Evil, ' in cover_artist:
         flags += 'collab;'
     
-    
-
-
-
     return flags
 
 
@@ -187,6 +183,8 @@ def update_db() -> None:
     # Absolutely doesn't work if the CSV is empty
     songs_df = load_db()
     dates_df = load_dates()
+
+    non_karaoke_albums = neutils.get_non_karaoke_album_names()
 
     if songs_df.height == 0:
         songs_df = pl.DataFrame({}, schema=songs_schema)
@@ -206,6 +204,17 @@ def update_db() -> None:
     for album, songs in json_data.items():
         # eliv = sum(map(is_eliv, songs)) > 0 # this assumed that only one twin would main in a karaoke stream, which is now false, as of 2025-12-25 Christmas Karaoke, where Neuro started the set, then swapped to Evil for second half
         # singer = "Evil" if eliv else "Neuro"
+
+        if album not in non_karaoke_albums:
+            twin_duet_stream = True
+        else:
+            twin_duet_stream = False
+        
+        if twin_duet_stream:
+            for song in songs:
+                twin_duet_stream = twin_duet_stream and song['Cover Artist'] == 'Neuro & Evil'
+                if not twin_duet_stream:
+                    break
 
         # get date from song JSON object
         for song in songs:
@@ -307,6 +316,14 @@ def update_db() -> None:
             assert flags is not None
             flags += song['additional flags']
 
+            if twin_duet_stream:
+                pre_replace_flags = flags
+                # print(f'twin stream: yes: pre-replace: {flags}')
+                flags = flags.replace('evil;', '').replace('neuro;', '')
+                # print(f'twin stream: yes: post-replace: {flags}')
+                assert pre_replace_flags != flags
+
+
             if song['encore']:
                 name += ' - Encore'
                 name_ascii += ' - Encore'
@@ -369,6 +386,8 @@ def update_db() -> None:
     sorted_songs_df = songs_df.sort(['Date', 'Album', 'Album_ID'])
     sorted_dates_df = dates_df.sort('Date')
 
+    sorted_songs_df = sorted_songs_df.with_columns(pl.int_range(0, pl.len(), dtype = pl.Int64).alias('id'))
+    
     # Write modifications if both CSVs
     sorted_songs_df.write_csv(SONGS_CSV)
     sorted_dates_df.write_csv(DATES_CSV)

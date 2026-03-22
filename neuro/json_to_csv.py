@@ -323,6 +323,9 @@ def update_db() -> None:
                 # print(f'twin stream: yes: post-replace: {flags}')
                 assert pre_replace_flags != flags
 
+            if song['Cover Artist'] == 'Neuro & Evil' and 'original' in flags:
+                flags = flags.replace('neuro;', '').replace('evil', '')
+
 
             if song['encore']:
                 name += ' - Encore'

@@ -324,7 +324,9 @@ def update_db() -> None:
                 assert pre_replace_flags != flags
 
             if song['Cover Artist'] == 'Neuro & Evil' and 'original' in flags:
-                flags = flags.replace('neuro;', '').replace('evil', '')
+                flags = flags.replace('neuro;', '').replace('evil;', '')
+                if 'duet;' not in flags:
+                    flags += 'duet;'
 
 
             if song['encore']:

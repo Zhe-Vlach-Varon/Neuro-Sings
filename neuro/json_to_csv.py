@@ -549,6 +549,12 @@ def get_most_recent_version(song: dict, json_data: neutils.SongJSON, encore: boo
     if lead_singer == 'Evil':
         flags = flags.replace('neuro', 'evil')
 
+    print(song)
+    entry_flags = song['Flags'].split(';')
+    for fl in entry_flags:
+        if fl not in flags:
+            flags += f'{fl};'
+
     if filtered_songs.height > 0 and latest_version == latest_db_version:
         new_duplicate_song = pl.DataFrame(
         {

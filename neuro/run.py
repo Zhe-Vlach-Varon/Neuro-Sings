@@ -2,6 +2,7 @@ import os
 import tomllib as toml
 from pathlib import Path
 from time import time
+import polars as pl
 
 from loguru import logger
 
@@ -60,8 +61,11 @@ def generate_from_preset(preset: Preset, hash_dict: dict, dates_dict: DateDict) 
     run_mp3gain(preset)
     logger.success(f"[GEN] Done converting {N_SONGS} songs in {time_format(time() - t)} !")
 
-
 def generate_songs() -> None:
+    generate_songs_filtered(Path('unofficial_releases'), exclude_flags=['originals', 'officials'])
+    generate_songs_filtered(Path('official_releases'), include_flags=['originals', 'officials'])
+
+def generate_songs_filtered(sub_dir: Path = None, include_flags: list[str] = [], exclude_flags: list[str] = []) -> None:
     """Generates all songs files. For each files it first copies the files into\
     its destination, then edits the metadata of the destination file. This is\
     just to avoid tempering the original files.\
@@ -98,10 +102,14 @@ def generate_songs() -> None:
 
     hash_dict = get_audio_hash_to_file_mapping(SONG_ROOT_DIR)
 
+    if sub_dir is None:
+        out_dir = Path(OUT_ROOT)
+    else:
+        out_dir = Path(OUT_ROOT / sub_dir)
 
     for preset in config["Presets"]:
         logger.info(f"[GEN] Generating preset '{preset['name']}'")
-        preset_obj = Preset(preset, mp3gain, OUT_ROOT)
+        preset_obj = Preset(preset, mp3gain, out_dir, include_flags, exclude_flags)
         generate_from_preset(preset_obj, hash_dict, dates_dict)
 
     logger.success(f"[GEN] Generated all presets in {time_format(time() - t)} !")
@@ -109,9 +117,13 @@ def generate_songs() -> None:
 # TODO generate karaoke covers, generate placeholders, folder with text file of metadata and also cover art image 
 # TODO generate official releases
 # TODO use flags to filter
-# TODO add arguments to generate_songs and generate_albums for include/exclude flags and root-dir
+# TODO add arguments to generate_songs and generate_albums for include/exclude flags and sub_dir path
 
 def generate_albums() -> None:
+    generate_albums_filtered(Path('unofficial_releases'), exclude_flags=['originals', 'officials'])
+    generate_albums_filtered(Path('official_releases'), include_flags=['originals', 'officials'])
+
+def generate_albums_filtered(sub_dir: Path, include_flags: list[str] = [], exclude_flags: list[str] = []) -> None:
     """generates all songs sorted by album"""
 
     format_logger(log_file=LOG_DIR / "generation.log")
@@ -141,7 +153,15 @@ def generate_albums() -> None:
     # Start time
     t = time()
 
-    songDB = load_db()
+    unfiltered_songDB = load_db()
+
+    if len(include_flags):
+        unfiltered_songDB = unfiltered_songDB.filter(pl.col('Flags').str.contains_any(include_flags))
+        
+    if len(exclude_flags):
+        unfiltered_songDB = unfiltered_songDB.filter(~pl.col('Flags').str.contains_any(exclude_flags))
+
+    songDB = unfiltered_songDB
 
     albums = songDB.get_column("Album").unique()
 
@@ -167,8 +187,13 @@ def generate_albums() -> None:
             s = CustomSong(song_dict, hash_dict)
 
         album = song_dict["Album"]
+
+        if sub_dir is None:
+            out_dir = Path(OUT_ROOT)
+        else:
+            out_dir = Path(OUT_ROOT / sub_dir)
         
-        created = s.create_out_file(create=False, out_dir=str(OUT_ROOT) + "/albums/" + album)
+        created = s.create_out_file(create=False, out_dir=out_dir + "/albums/" + album)
         if created:
             s.apply_tags()
         logger.debug(

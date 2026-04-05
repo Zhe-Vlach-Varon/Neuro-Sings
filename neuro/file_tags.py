@@ -39,6 +39,9 @@ class Song:
         """Use the same naming convention as custom files for filename"""
         arg: bool
         """Songs from the ARG channel"""
+        official: bool
+        originals: bool
+        """Songs that have been officially released on at least one streaming service (including youtube)"""
 
     def init_flags(self, flags: Optional[str]) -> None:
         """Detects song's flags by searching substrings in the flags column.\
@@ -60,7 +63,7 @@ class Song:
         # strings as the flags
         self.flags = self.Flags(**{flag: flag_check(flag, flags) for flag in self.Flags.__dataclass_fields__.keys()})
 
-    def __init__(self, song_dict: SongEntry, hash_dict: dict, karaoke_dict: dict = {}) -> None:
+    def __init__(self, song_dict: SongEntry, karaoke_dict: dict = {}) -> None:
         # Lots of asserts, mainly for type checking, but also detects irregular entries in database
         assert song_dict["Song"] is not None
         assert song_dict["Song_ASCII"] is not None
@@ -72,6 +75,9 @@ class Song:
         self.artist: str = song_dict["Artist"]
         self.artist_ascii: str = song_dict["Artist_ASCII"]
 
+        assert song_dict["Cover Artist"] is not None
+        self.cover_artist: str = song_dict["Cover Artist"]
+
         assert song_dict["Hash_IN"] is not None
         self.hash_in: str = song_dict["Hash_IN"]
 
@@ -80,9 +86,9 @@ class Song:
         try:
             file_check(self.file)
         except:
-            self.file: Path = hash_dict[self.hash_in]
-            file_check(self.file)
-
+            self.init_flags(song_dict['Flags'])
+            if not self.flags.originals and not self.flags.official:
+                exit(1)
 
         assert song_dict["Album_ID"] is not None
         self.track_n: str = song_dict["Album_ID"]
@@ -109,6 +115,14 @@ class Song:
     def create_out_file(self, *, out_dir: Path, create: bool = True) -> bool:
         """Virtual method"""
         raise NotImplementedError
+    
+    def create_placeholder_files(self, *, out_dir: Path, create: bool = True) -> bool:
+        """Virtual method"""
+        raise NotImplementedError
+    
+    def apply_tags(self, ascii_tags: bool = False) -> None:
+        """virrtual method"""
+        raise NotImplementedError
 
     def id3_pic(self, cover: Path) -> APIC:
         """Creates a Cover picture from a given image for files using ID3 tags.
@@ -128,7 +142,7 @@ class Song:
         )
         return img
 
-    def get_id3_frames(self) -> list[TextFrame]:
+    def get_id3_frames(self, ascii_tags: bool = False) -> list[TextFrame]:
         """Gets tags specific to ID3 tags.
 
         Returns:
@@ -136,9 +150,9 @@ class Song:
         """
         additional = [
             # Title
-            TIT2(text=self.title, encoding=3),
+            TIT2(text=(self.title if not ascii_tags else self.title_ascii), encoding=3),
             # Artist
-            TPE1(text=self.artist, encoding=3),
+            TPE1(text=(self.artist if not ascii_tags else self.artist_ascii), encoding=3),
             # Album
             TALB(text=self.album, encoding=3),
             # Year-Month-Day | Using all frames for different software compatibility
@@ -157,7 +171,7 @@ class Song:
             additional.append(TBPM(text=str(self.tempo), encoding=3))
         return additional
 
-    def get_vorbis_frames(self) -> dict[str, str]:
+    def get_vorbis_frames(self, ascii_tags: bool = False) -> dict[str, str]:
         """Gets tags specific to Vorbis comments.
 
         Returns:
@@ -165,9 +179,9 @@ class Song:
         """
         additional = {
             "ALBUM": self.album,
-            "ARTIST": self.artist,
+            "ARTIST": (self.artist if not ascii_tags else self.artist_ascii),
             "DATE": self.date,
-            "TITLE": self.title,
+            "TITLE": (self.title if not ascii_tags else self.title_ascii),
             "TRACKNUMBER": f"{self.track_n}",
             "PERFORMER": "Neuro-Sama/Evil Neuro",
         }
@@ -231,10 +245,12 @@ class Song:
         Returns:
             str: The filename without type extension.
         """
-        if custom:
-            return f"{self.artist_ascii} - {self.title_ascii}"
+        if custom and self.flags.originals:
+            return f"{self.track_n}. {self.artist_ascii} - {self.title_ascii}"
+        elif custom and not self.flags.originals:
+            return f"{self.track_n}. {self.artist_ascii} - {self.title_ascii} - {self.cover_artist}"
         else:
-            return f"{self.artist_ascii} - {self.title_ascii} [{self.name_tag}] [{self.date}]"
+            return f"{self.track_n}. {self.artist_ascii} - {self.title_ascii} [{self.name_tag}] [{self.date}]"
         # TODO add {self.track_n} to start of file name
         # TODO get total number of tracks for tag
         # TODO if entire karaoke stream (only karaoke streams, not the subathon or other setlists from the non-karaoke folder)
@@ -243,8 +259,8 @@ class Song:
 class DriveSong(Song):
     """Metadata for a song from the drive."""
 
-    def __init__(self, song_dict: dict, hash_dict: dict, karaoke_dict: dict) -> None:
-        super().__init__(song_dict, hash_dict, karaoke_dict)
+    def __init__(self, song_dict: dict, karaoke_dict: dict) -> None:
+        super().__init__(song_dict, karaoke_dict)
 
     def create_out_file(self, *, out_dir: Path = Path("out"), create: bool = True) -> bool:
         """Creates the output file on the filesystem by copying the original. The metadata are written later.
@@ -268,15 +284,25 @@ class DriveSong(Song):
             shutil.copy2(self.file, self.outfile)
             return True
         return False
+    
+    def create_placeholder_files(self, *, out_dir: Path, create: bool = True) -> bool:
+        name = self.file_name(self.flags.as_custom)
+        os.mkdir(out_dir / name)
+        metadata_file = ROOT_DIR / out_dir / name / "metadata.txt"
+        metadata = {}
+        # make metadata file
+        # write metadata to metadata file
+        # copy cover image to folder
+        return False
 
-    def apply_tags(self) -> None:
+    def apply_tags(self, ascii_tags: bool = False) -> None:
         """Applies ID3 tags on the file. First uses EasyID3 for text tags. Then ID3 to write the cover
         picture to the file.
         """
         # Text tags
         id3 = ID3(self.outfile)
 
-        common_props = self.get_id3_frames()
+        common_props = self.get_id3_frames(ascii_tags=ascii_tags)
         for frame in common_props:
             id3.add(frame)
 
@@ -314,8 +340,8 @@ class DriveSong(Song):
 class CustomSong(Song):
     """Metadata for a song added manually (not from the drive)."""
 
-    def __init__(self, song_dict: dict, hash_dict: dict, karaoke_dict: dict = {}) -> None:
-        super().__init__(song_dict, hash_dict, karaoke_dict)
+    def __init__(self, song_dict: dict, karaoke_dict: dict = {}) -> None:
+        super().__init__(song_dict, karaoke_dict)
 
     def create_out_file(self, *, out_dir: Path, create: bool = True) -> bool:
         """Creates the output file on the filesystem by copying the original. The metadata are written later.
@@ -338,8 +364,18 @@ class CustomSong(Song):
             shutil.copy2(file, self.outfile)
             return True
         return False
+    
+    def create_placeholder_files(self, *, out_dir: Path, create: bool = True) -> bool:
+        name = self.file_name(self.flags.as_custom)
+        os.mkdir(out_dir / name)
+        metadata_file = ROOT_DIR / out_dir / name / "metadata.txt"
+        metadata = {}
+        # make metadata file
+        # write metadata to metadata file
+        # copy cover image to folder
+        return False
 
-    def apply_tags(self) -> None:
+    def apply_tags(self, ascii_tags: bool = False) -> None:
         """Custom Song version of the tag management. Here it needs to check the file's format first\
             to apply the right type of tag.
 
@@ -382,19 +418,19 @@ class CustomSong(Song):
 
         match ext:
             case ".mp3":
-                self.apply_id3()
+                self.apply_id3(ascii_tags=ascii_tags)
             case ".flac":
                 self.apply_tags_vorbis()
             case _:
                 logger.error(f"Unimplemented file suffix for {self.file}")
                 raise ValueError(f"Unimplemented file suffix for {self.file}")
 
-    def apply_id3(self) -> None:
+    def apply_id3(self, ascii_tags: bool = False) -> None:
         """ID3 version of the metadata management. Similar to the one for Drive Songs."""
         id3 = ID3(self.outfile)
         id3.delete()
 
-        for frame in self.get_id3_frames():
+        for frame in self.get_id3_frames(ascii_tags=ascii_tags):
             id3.add(frame)
 
         if self.flags.as_drive or self.flags.arg:
@@ -439,7 +475,7 @@ class CustomSong(Song):
         image.data = image_file
         return image
 
-    def apply_tags_vorbis(self) -> None:
+    def apply_tags_vorbis(self, ascii_tags: bool = False) -> None:
         """FLAC specific tag handling (for 2 files atm...).
 
         Raises:
@@ -451,7 +487,7 @@ class CustomSong(Song):
             logger.error(f"File {self.file} has no tags header.")
             raise ValueError
 
-        common = self.get_vorbis_frames()
+        common = self.get_vorbis_frames(ascii_tags=ascii_tags)
         for k, v in common.items():
             # Uppercase totaly unneeded I think
             file.tags[k.upper()] = v  # type: ignore
@@ -463,61 +499,6 @@ class CustomSong(Song):
         file.add_picture(image)
         file.save()
 
-# TODO figure out if this is actually needed and if so finish
-class UnofficialV3Song(Song):
-    """Metadata for a song from the Unofficial Archive."""
-
-    def __init__(self, song_dict: dict, hash_dict: dict, karaoke_dict) -> None:
-        super().__init__(song_dict, hash_dict, karaoke_dict)
-
-    def create_out_file(self, *, out_dir: Path = Path("out"), create: bool = True) -> bool:
-        file = self.file
-        ext = file.suffix
-
-        name = self.file_name(not self.flags.as_drive)
-        self.outfile = ROOT_DIR / out_dir / f"{name}{ext}"
-
-        if create or (not self.outfile.exists()):
-            shutil.copy2(file, self.outfile)
-            return True
-        return False
-
-    def apply_tags(self) -> None:
-        """Applies ID3 tags on the file. First uses EasyID3 for text tags. Then ID3 to write the cover
-        picture to the file.
-        """
-        # Text tags
-        id3 = ID3(self.outfile)
-
-        common_props = self.get_id3_frames()
-        for frame in common_props:
-            id3.add(frame)
-
-        id3.add(TPE2(encoding=3, text=self.album_artist))
-        id3.add(TSO2(encoding=3, text=self.album_artist))
-
-        if self.flags.evil:
-            self.who = "evil"
-        elif self.flags.neuro:
-            self.who = "neuro"
-
-        # Cover Image
-        if self.image is None:
-            if self.flags.duet:
-                cover = IMAGES_COVERS_DIR / Path(f"{self.date}-{self.who}-duet.jpg")
-            else:
-                cover = IMAGES_COVERS_DIR / Path(f"{self.date}-{self.who}.jpg")
-        else:
-            cover = IMAGES_CUSTOM_DIR / f"{self.image}.jpg"
-
-        # print(self.file)
-        # print(self.flags)
-        file_check(cover)
-        id3.delall("APIC")
-        id3.add(self.id3_pic(cover))
-        id3.save()
-
-    # def apply_id3(self) -> None:
 
 
 if __name__ == "__main__":

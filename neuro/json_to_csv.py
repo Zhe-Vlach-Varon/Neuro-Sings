@@ -69,9 +69,6 @@ def field_ascii(song: neutils.SongEntry, field: Literal["Song", "Artist"]) -> tu
     ascii = song.get(f"{field}_ASCII", normal)
     assert ascii is not None
 
-    if normal == 'K/DA':
-        assert ascii == 'KDA'
-
     return normal, ascii
 
 
@@ -554,7 +551,7 @@ def get_most_recent_version(song: dict, json_data: neutils.SongJSON, encore: boo
     if lead_singer == 'Evil':
         flags = flags.replace('neuro', 'evil')
 
-    print(song)
+    # print(song)
     entry_flags = song['Flags'].split(';')
     for fl in entry_flags:
         if fl not in flags:
@@ -567,7 +564,7 @@ def get_most_recent_version(song: dict, json_data: neutils.SongJSON, encore: boo
                "Song": latest_version["Song"] if not encore else latest_version["Song"] + ' - Encore',
                "Artist": latest_version["Artist"],
                "Song_ASCII": latest_version["Song_ASCII"] if not encore else latest_version["Song_ASCII"] + ' - Encore',
-               "Artist_ASCII": song["Artist_ASCII"],
+               "Artist_ASCII": neutils.replace_non_ascii_chars(song["Artist_ASCII"]),
                "Cover Artist": latest_version["Cover Artist"],
                "Date": song["Date"],
                "Album": song["Album"],
@@ -590,7 +587,7 @@ def get_most_recent_version(song: dict, json_data: neutils.SongJSON, encore: boo
                "Song": latest_version["Song"] if not encore else latest_version["Song"] + ' - Encore',
                "Artist": latest_version["Artist"],
                "Song_ASCII": latest_version["Song_ASCII"] if not encore else latest_version["Song_ASCII"] + ' - Encore',
-               "Artist_ASCII": song["Artist_ASCII"],
+               "Artist_ASCII": neutils.replace_non_ascii_chars(song["Artist_ASCII"]),
                "Cover Artist": latest_version["Cover Artist"],
                "Date": song["Date"],
                "Album": song["Album"],

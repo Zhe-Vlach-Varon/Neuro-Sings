@@ -128,7 +128,7 @@ class Preset:
         else:
             return []
 
-    def __init__(self, preset_dict: PresetDict, mp3gain_config: MP3ModeTuple, root: Optional[Path] = None, include_flags: list[str] = [], exclude_flags: list[str] = []) -> None:
+    def __init__(self, preset_dict: PresetDict, mp3gain_config: MP3ModeTuple, root: Optional[Path] = None) -> None:
         """Preset constructor.
 
         Args:
@@ -158,13 +158,14 @@ class Preset:
         path = preset_dict["path"]
         assert type(path) is str
 
+        self.root = root
+        self.subdir = path
+
         if root is None:
             self.path = Path(path)
         else:
             self.path = root / path
-    
-        self.additional_include_flags = include_flags
-        self.additional_exclude_flags = exclude_flags
+
 
     def get_filtered_df(self) -> pl.DataFrame:
         """Applies filters defined in a preset to get a filtered version of the database.
@@ -172,15 +173,7 @@ class Preset:
         Returns:
             pl.DataFrame: Filtered DB that only has rows that check the conditions.
         """
-        unfiltered_songs_df = load_db()
-
-        if len(self.additional_include_flags):
-            unfiltered_songs_df = unfiltered_songs_df.filter(pl.col('Flags').str.contains_any(self.additional_include_flags))
-        
-        if len(self.additional_exclude_flags):
-            unfiltered_songs_df = unfiltered_songs_df.filter(~pl.col('Flags').str.contains_any(self.additional_exclude_flags))
-
-        songs_df = unfiltered_songs_df        
+        songs_df = load_db()
 
         assert (self.include_type == "and") | (self.include_type == "or")
 

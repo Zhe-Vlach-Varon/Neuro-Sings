@@ -320,14 +320,16 @@ def extract_unofficialV3(files: list[Path], out: neutils.SongJSON = {}) -> neuti
             title = trackJSon['Title']
         cover_artist = trackJSon['CoverArtist']
         version = trackJSon['Version']
-        if date <= '2023-05-17':
-            cover_artist = str.replace(cover_artist, 'Neuro', 'Neuro [v1]')
-        elif date <= '2023-06-21' and int(version) < 3:
-            cover_artist = str.replace(cover_artist, 'Neuro', 'Neuro [v2]')
+        if cover_artist.startswith('Neuro') and (not cover_artist.startswith('Neuro &')) and version.startswith('1'):
+            cover_artist = 'Neuro [v1]'
+        elif cover_artist.startswith('Neuro') and (not cover_artist.startswith('Neuro &')) and version.startswith('2'):
+            cover_artist = 'Neuro [v2]'
         artist_ascii = neutils.get_artist_ascii(artist)
         title_ascii = neutils.extract_english_title_translation(title)
         if title_ascii is None:
             title_ascii = title
+        if 'Neuro' in cover_artist and 'Annytf' in cover_artist and 'Seishun Complex' in title:
+            cover_artist = 'Neuro [v2] & Annytf'
         data = {
             'Cover Artist' : cover_artist,
             'Artist' : artist,
@@ -537,7 +539,7 @@ def parse_setlist(p: Path) -> neutils.SongJSON:
             is_album_info_line = False
 
 
-        if not is_album_info_line and (fields[0] == "Neuro" or fields[0] == "Evil"):
+        if not is_album_info_line and (fields[0].startswith("Neuro") or fields[0] == "Evil"):
             is_singer_change_line = True
             # print("singer change line")
         else:

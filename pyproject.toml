@@ -2,7 +2,8 @@
 name = "Neuro-Songs"
 version = "0.1.0"
 description = "Formatting Neuro songs to be better in media players"
-authors = [{ name = "Matthieu Basset", email = "bassetmatt@gmail.com" }]
+authors = [{ name = "Zhe_Vlach_Varon", email = "42blah6434@gmail.com" },
+           { name = "Matthieu Basset", email = "bassetmatt@gmail.com" }]
 dependencies = [
     "connectorx>=0.4.3",
     "loguru>=0.7.3",

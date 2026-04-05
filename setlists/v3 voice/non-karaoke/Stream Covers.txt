@@ -1,18 +1,18 @@
 !! Song Covers, mostly duets with collab partners, that were the only song sung during a stream
 2023-06-22 | Neuro | Stream Covers
 !! the vods say this stream was on the 22nd, not the 23rd as it was before
-1 | I See The Light | Mandy Moore, Zachary Levi | Neuro & Miyune | New | I see the light
+1 | I See The Light | Mandy Moore, Zachary Levi | Neuro & Miyune | New | I see the light | as_custom;
 2023-09-03
-2 | Baka Mitai | Mitsuharu Fukuyama, Ryosuke Horii | Neuro | New | aura
+2 | Baka Mitai | Mitsuharu Fukuyama, Ryosuke Horii | Neuro | New | aura | as_custom;
 2024-04-20
-3 | MOGU MOGU YUMMY | Nekomata Okayu | Neuro & Cerber | New | Mogu Mogu
+3 | MOGU MOGU YUMMY | Nekomata Okayu | Neuro & Cerber | New | Mogu Mogu | as_custom;
 2024-08-09
-4 | Everything Goes On | Porter Robinson | Neuro & MinikoMew | New | Everything goes on
+4 | Everything Goes On | Porter Robinson | Neuro & MinikoMew | New | Everything goes on | as_custom;
 2024-10-04
 Evil
-5 | Rises The Moon | Liana Flores | Evil & MinikoMew | New | Rises the moon
+5 | Rises The Moon | Liana Flores | Evil & MinikoMew | New | Rises the moon | as_custom;
 2024-10-27
-6 | Bring Me To Life | Evanescence | Evil & Cerber | New | Bring me to life
+6 | Bring Me To Life | Evanescence | Evil & Cerber | New | Bring me to life | as_custom;
 2025-03-25
 7 | Sweater Weather | The Neighbourhood | Evil | Duplicate
 !! 2025-03-26

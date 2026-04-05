@@ -5,7 +5,7 @@
 4 | Hacking to the Gate | Ito Kanako | Neuro | New
 5 | No Surprises | Radiohead | Neuro | New
 6 | Everybody's Changing | Keane | Neuro | New
-7 | Heat Abnormal | Iyowa | Neuro | New
+7 | Heat Abnormal | Iyowa | Neuro | New | Heat Abnormal
 8 | Here Comes The Sun | The Beatles | Neuro | New
 9 | Secret Base Kimi Ga Kureta Mono | Norihiko Machida | Neuro & Evil | New
 10 | Show Me How | Men I Trust | Neuro | New

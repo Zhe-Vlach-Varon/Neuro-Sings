@@ -33,7 +33,7 @@ include-flags = ["duet", "evil", "neuro", "mashup"]
 exclude-flags = ["arg", "duplicate", "v1", "v2", "encore", "unused"]
 # From root
 path = "original_sort/main"
-mp3gain = true
+mp3gain = false
 
 [[Presets]]
 name = "Old"
@@ -49,7 +49,7 @@ include-flags = ["duplicate"]
 exclude-flags = ["arg", "v1", "v2", "encore", "unused"]
 # From root
 path = "original_sort/duplicates/v3"
-mp3gain = true
+mp3gain = false
 
 [[Presets]]
 name = "Duplicates v1-v2"
@@ -72,14 +72,14 @@ name = "ENCORE"
 include-flags = ["encore"]
 exclude-flags = []
 path = "original_sort/encore"
-mp3gain = true
+mp3gain = false
 
 [[Presets]]
 name = "Unused"
 include-flags = ["unused"]
 exclude-flags = []
 path = "original_sort/unused"
-mp3gain = true
+mp3gain = false
 
 
 # Other examples of presets
@@ -88,14 +88,14 @@ mp3gain = true
 #include-flags = ["evil", "neuro"]
 #exclude-flags = ["encore"]
 #path = "all"
-#mp3gain = true
+#mp3gain = false
 
 #[[Presets]]
 #name = "All_encore" # Excluding ARG
 #include-flags = ["encore"]
 #exclude-flags = []
 #path = "all_encore"
-#mp3gain = true
+#mp3gain = false
 
 # Zhe_Vlach_Varon's Sort
 
@@ -104,12 +104,12 @@ name = "subathon mashups"
 include-flags = ["mashup"]
 exclude-flags = []
 path = "zvv_sort/subathon_mashups"
-mp3gain = true
+mp3gain = false
 
 [[Presets]]
 name = "v1 voice"
 include-flags = ["v1"]
-exclude-flags = ["duplicate", "collab", "quarantine", "zvv_quarantine", "unused"]
+exclude-flags = ["duplicate", "collab", "quarantine", "zvv_quarantine", "christmas", "halloween", "unused"]
 path = "zvv_sort/v1_voice"
 mp3gain = false
 
@@ -126,21 +126,21 @@ name = "Neuro"
 include-flags = ["neuro"]
 exclude-flags = ["duet", "evil", "v1", "v2", "duplicate", "collab", "christmas", "halloween", "original", "official", "quarantine", "zvv_quarantine", "unused"]
 path = "zvv_sort/Neuro"
-mp3gain = true
+mp3gain = false
 
 [[Presets]]
 name = "Evil"
 include-flags = ["evil"]
 exclude-flags = ["duet", "neuro", "v1", "v2", "duplicate", "collab", "christmas", "halloween", "original", "official", "quarantine", "zvv_quarantine", "unused"]
 path = "zvv_sort/Evil"
-mp3gain = true
+mp3gain = false
 
 [[Presets]]
 name = "Duets Neuro Lead"
 include-flags = ["duet", "neuro"]
 exclude-flags = ["duplicate", "collab", "christmas", "halloween", "original", "official", "quarantine", "zvv_quarantine", "unused", "mashup"]
 path = "zvv_sort/Duets_Neuro_Lead"
-mp3gain = true
+mp3gain = false
 include-type = "and"
 
 [[Presets]]
@@ -148,7 +148,7 @@ name = "Duets Neuro Lead"
 include-flags = ["duet", "evil"]
 exclude-flags = ["duplicate", "collab", "christmas", "halloween", "original", "official", "quarantine", "zvv_quarantine", "unused", "mashup"]
 path = "zvv_sort/Duets_Evil_Lead"
-mp3gain = true
+mp3gain = false
 include-type = "and"
 
 [[Presets]]
@@ -156,14 +156,14 @@ name = "Twin Duet Streams"
 include-flags = ["duet"]
 exclude-flags = ["neuro", "evil", "duplicate", "christmas", "halloween", "original", "official", "quarantine", "zvv_quarantine", "unused", "mashup"]
 path = "zvv_sort/Twin_Duets"
-mp3gain = true
+mp3gain = false
 
 [[Presets]]
 name = "Neuro Originals"
 include-flags = ["original", "neuro"]
 exclude-flags = ["duplicate"]
 path = "zvv_sort/Neuro_Originals"
-mp3gain = true
+mp3gain = false
 include-type = "and"
 
 [[Presets]]
@@ -171,7 +171,7 @@ name = "Evil Originals"
 include-flags = ["original", "evil"]
 exclude-flags = ["duplicate"]
 path = "zvv_sort/Evil_Originals"
-mp3gain = true
+mp3gain = false
 include-type = "and"
 
 [[Presets]]
@@ -179,29 +179,29 @@ name = "Duet Originals"
 include-flags = ["original", "duet"]
 exclude-flags = ["duplicate"]
 path = "zvv_sort/Duet_Originals"
-mp3gain = true
+mp3gain = false
 include-type = "and"
 
 [[Presets]]
 name = "Collab Covers"
 include-flags = ["collab"]
-exclude-flags = ["official", "quarantine", "zvv_quarantine"]
+exclude-flags = ["official", "quarantine", "zvv_quarantine", "christmas", "halloween"]
 path = "zvv_sort/Collab_Covers"
-mp3gain = true
+mp3gain = false
 
 [[Presets]]
 name = "Official Covers"
 include-flags = ["official"]
 exclude-flags = []
 path = "zvv_sort/Official_Covers"
-mp3gain = true
+mp3gain = false
 
 [[Presets]]
 name = "ZVV Duplicates v3 Neuro"
 include-flags = ["duplicate", "neuro", "v3"]
 exclude-flags = ["arg", "v1", "v2", "duet", "evil", "christmas", "halloween", "quarantine", "zvv_quarantine"]
 path = "zvv_sort/Duplicates_v3_Neuro"
-mp3gain = true
+mp3gain = false
 include-type = "and"
 
 [[Presets]]
@@ -209,7 +209,7 @@ name = "ZVV Duplicates v3 Evil"
 include-flags = ["duplicate", "evil", "v3"]
 exclude-flags = ["arg", "v1", "v2", "duet", "neuro", "christmas", "halloween", "quarantine", "zvv_quarantine"]
 path = "zvv_sort/Duplicates_v3_Evil"
-mp3gain = true
+mp3gain = false
 include-type = "and"
 
 [[Presets]]
@@ -217,17 +217,16 @@ name = "ZVV Duplicates v3 Duets"
 include-flags = ["duplicate", "duet", "v3"]
 exclude-flags = ["arg", "v1", "v2", "christmas", "halloween", "quarantine", "zvv_quarantine"]
 path = "zvv_sort/Duplicates_v3_Duets"
-mp3gain = true
+mp3gain = false
 include-type = "and"
 
-# there are no duplicates in v2
-#[[Presets]]
-#name = "ZVV Duplicates v2"
-#include-flags = ["v2", "duplicate"]
-#exclude-flags = ["arg", "v3", "v1", "christmas", "halloween", "quarantine", "zvv_quarantine"]
-#path = "zvv_sort/Duplicates_v2"
-#mp3gain = false
-#include-type = "and"
+[[Presets]]
+name = "ZVV Duplicates v2"
+include-flags = ["v2", "duplicate"]
+exclude-flags = ["arg", "v3", "v1", "christmas", "halloween", "quarantine", "zvv_quarantine"]
+path = "zvv_sort/Duplicates_v2"
+mp3gain = false
+include-type = "and"
 
 [[Presets]]
 name = "ZVV Duplicates v1"
@@ -246,29 +245,93 @@ path = "zvv_sort/arg"
 mp3gain = false
 
 [[Presets]]
-name = "ZVV Christmas"
-include-flags = ["christmas"]
-exclude-flags = ["quarantine", "zvv_quarantine", "v1", "v2"]
-path = "zvv_sort/Christmas"
-mp3gain = true
+name = "ZVV Christmas Neuro"
+include-flags = ["christmas", "neuro"]
+include-type = "and"
+exclude-flags = ["quarantine", "zvv_quarantine", "v1", "v2", "collab", "duet"]
+path = "zvv_sort/Christmas_Neuro"
+mp3gain = false
 
 [[Presets]]
-name = "ZVV Halloween"
-include-flags = ["halloween"]
+name = "ZVV Christmas Evil"
+include-flags = ["christmas", "evil"]
+include-type = "and"
+exclude-flags = ["quarantine", "zvv_quarantine", "v1", "v2", "collab", "duet"]
+path = "zvv_sort/Christmas_Evil"
+mp3gain = false
+
+[[Presets]]
+name = "ZVV Christmas Duets"
+include-flags = ["christmas", "duet"]
+include-type = "and"
+exclude-flags = ["quarantine", "zvv_quarantine", "v1", "v2", "collab"]
+path = "zvv_sort/Christmas_Duets"
+mp3gain = false
+
+[[Presets]]
+name = "ZVV Christmas Collabs"
+include-flags = ["christmas", "collab"]
+include-type = "and"
 exclude-flags = ["quarantine", "zvv_quarantine", "v1", "v2"]
-path = "zvv_sort/Halloween"
-mp3gain = true
+path = "zvv_sort/Christmas_Collab"
+mp3gain = false
+
+[[Presets]]
+name = "ZVV Halloween Neuro"
+include-flags = ["halloween", "neuro"]
+include-type = "and"
+exclude-flags = ["quarantine", "zvv_quarantine", "v1", "v2", "collab", "duet"]
+path = "zvv_sort/Halloween_Neuro"
+mp3gain = false
+
+[[Presets]]
+name = "ZVV Halloween Evil"
+include-flags = ["halloween", "evil"]
+include-type = "and"
+exclude-flags = ["quarantine", "zvv_quarantine", "v1", "v2", "collab", "duet"]
+path = "zvv_sort/Halloween_Evil"
+mp3gain = false
+
+[[Presets]]
+name = "ZVV Halloween Duets"
+include-flags = ["halloween", "duet"]
+include-type = "and"
+exclude-flags = ["quarantine", "zvv_quarantine", "v1", "v2", "collab"]
+path = "zvv_sort/Halloween_Duets"
+mp3gain = false
+
+[[Presets]]
+name = "ZVV Halloween Collabs"
+include-flags = ["halloween", "collab"]
+include-type = "and"
+exclude-flags = ["quarantine", "zvv_quarantine", "v1", "v2"]
+path = "zvv_sort/Halloween_Collab"
+mp3gain = false
+
+[[Presets]]
+name = "ZVV v1 Christmas"
+include-flags = ["christmas"]
+exclude-flags = ["quarantine", "zvv_quarantine", "v2", "v3"]
+path = "zvv_sort/Christmas_v1"
+mp3gain = false
+
+[[Presets]]
+name = "ZVV v1 Halloween"
+include-flags = ["halloween"]
+exclude-flags = ["quarantine", "zvv_quarantine", "v2", "v3"]
+path = "zvv_sort/Halloween_v1"
+mp3gain = false
 
 [[Presets]]
 name = "ZVV Quarantine"
 include-flags = ["quarantine", "zvv_quarantine"]
 exclude-flags = []
 path = "zvv_sort/Quarantine"
-mp3gain = true
+mp3gain = false
 
 [[Presets]]
 name = "ZVV Unused"
 include-flags = ["unused"]
 exclude-false = []
 path = "zvv_sort/Unused"
-mp3gain = true
+mp3gain = false

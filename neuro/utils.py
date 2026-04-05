@@ -239,20 +239,21 @@ def get_audio_hash(file_path: Path) -> (str | None):
             else:
                 end_index = int((file_size - footer_size)/2)
 
-            logger.info(f"End Index: {end_index}")
+            logger.info(f"{file_path} End Index: {end_index}")
 
             start_index = end_index - 987 ### reads a 987 bytes for the hash
 
             raw_audio = file_data[start_index:end_index]
 
         # 4. Hash the raw audio
+        logger.info(f'{xxhash.xxh64(raw_audio).hexdigest()}')
         return xxhash.xxh64(raw_audio).hexdigest()
 
     except Exception as e:
         logger.error(f"Error processing {file_path}: {e}")
         return None
 
-def get_audio_hash_to_file_mapping(p: Path, *, filetype: str = "mp3", slicer: slice = slice(None)) -> dict:
+def get_audio_hash_to_file_mapping(p: Path, *, filetype: str = "mp3") -> dict:
     # print(p)
     files = list(p.glob(f"**/*.{filetype}"))
     file_mapping = {}
@@ -267,8 +268,8 @@ def get_audio_hash_to_file_mapping(p: Path, *, filetype: str = "mp3", slicer: sl
 def get_old_to_new_file_mapping_by_audio_hash(old_dir: Path, new_dir: Path, filetype: str = "mp3") -> dict:
     old_to_new_mapping: dict = {}
 
-    old_file_map = get_audio_hash_to_file_mapping(old_dir, slicer=slice(-10000, None))
-    new_file_map = get_audio_hash_to_file_mapping(new_dir, slicer=slice(-10000, None))
+    old_file_map = get_audio_hash_to_file_mapping(old_dir)
+    new_file_map = get_audio_hash_to_file_mapping(new_dir)
 
     old_hashes = list(dict.fromkeys(old_file_map.keys()))
     new_hashes = list(dict.fromkeys(new_file_map.keys()))
@@ -453,7 +454,11 @@ title_ascii_special_negative_cases = [
     'don\'t fear',
     'out your eyes then drown you to death',
     'christmas version',
+    'I\'ve Had',
+    'Let\'s Lament',
 ]
+
+# TODO move special cases into separate files
 
 title_ascii_special_replace_cases = {
     '/ / // / /': 'Slash Slash Slash',
@@ -469,6 +474,7 @@ ascii_character_replacement_mapping = {
     '＊': '*',
     '★': ' ',
     '  ': ' ',
+    ';': '',
 }
 
 non_ascii_char_regex = r'[^a-zA-Z0-9\-\,\. ]'

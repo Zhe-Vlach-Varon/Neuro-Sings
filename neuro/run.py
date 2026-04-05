@@ -2,19 +2,19 @@ import os
 import tomllib as toml
 from pathlib import Path
 from time import time
-import polars as pl
 
 from loguru import logger
 
 from neuro import DRIVE_DIR, CUSTOM_DIR, UNOFFICIALV3_DIR, LOG_DIR, SONG_ROOT_DIR, UNOFFV3_DISC66
 from neuro.checks import check_are_dbs_identical
 from neuro.detection import export_json, extract_all
-from neuro.file_tags import CustomSong, DriveSong, UnofficialV3Song
+from neuro.file_tags import CustomSong, DriveSong
 from neuro.polars_utils import Preset, load_dates, load_db
 from neuro.utils import MP3GainMode, MP3ModeTuple, format_logger, time_format, get_audio_hash_to_file_mapping
 
 DateDict = dict[str, dict[str, str]]
 
+g_hash_to_file_dict: dict[str, str] = []
 
 def new_batch_detection() -> None:
     """Re-runs the song detection based on regex. Adds songs that aren't already in\
@@ -25,15 +25,20 @@ def new_batch_detection() -> None:
     out = extract_all()  # Extracts data
     export_json(out)  # Writing into JSON
 
+data_formats = ['ascii_data', 'utf8_data']
 
-def generate_from_preset(preset: Preset, hash_dict: dict, dates_dict: DateDict) -> None:
+def generate_from_preset(preset: Preset, dates_dict: DateDict) -> None:
     """Generates all songs from a preset, filters songs that respect filters.
 
     Args:
         preset (Preset): Preset configuration.
         dates_dict (DateDict): Date dict to pass to drive song constructor.
     """
-    os.makedirs(preset.path, exist_ok=True)
+
+    global g_hash_to_file_dict
+
+    if not len(g_hash_to_file_dict):
+        g_hash_to_file_dict = get_audio_hash_to_file_mapping(SONG_ROOT_DIR)
 
     t = time()
     songs_filtered = preset.get_filtered_df()
@@ -46,26 +51,49 @@ def generate_from_preset(preset: Preset, hash_dict: dict, dates_dict: DateDict) 
         # Subathon mixes are put in custom, so drive songs are only mp3
         if Path(song_dict["File_IN"]).is_relative_to(DRIVE_DIR) or ((Path(song_dict["File_IN"]).is_relative_to(UNOFFICIALV3_DIR)) and (not Path(song_dict['File_IN']).is_relative_to(UNOFFICIALV3_DIR / UNOFFV3_DISC66))):
             date_dict = dates_dict.get(song_dict["Date"], {})
-            s = DriveSong(song_dict, hash_dict, date_dict)
+            s = DriveSong(song_dict, date_dict)
         # elif Path(song_dict["File_IN"]).is_relative_to(UNOFFICIALV3_DIR):
         #     s = UnofficialV3Song(song_dict, date_dict)
         else:
-            s = CustomSong(song_dict, hash_dict)
+            s = CustomSong(song_dict)
 
-        created = s.create_out_file(create=False, out_dir=preset.path)
-        if created:
-            s.apply_tags()
-        logger.debug(
-            f"[GEN] [{preset.name}] [{i + 1:3d}/{N_SONGS}] {'Generated' if created else 'Skipped'} {song_dict['Song']}"
-        )
+        final_out_paths = {
+            'song_files': {},
+            'metadata_files': {},
+            }
+        if s.flags.originals or s.flags.official:
+            final_out_paths['song_files']['ascii_data'] = Path(preset.root / 'official_releases/ascii_data' if preset.root is not None else 'official_releases/ascii_data') / preset.subdir
+            final_out_paths['song_files']['utf8_data'] = Path(preset.root / 'official_releases/utf8_data' if preset.root is not None else 'official_releases/utf8_data') / preset.subdir
+
+            final_out_paths['metadata_files']['ascii_data'] = Path(preset.root / 'unofficial_releases/ascii_data' if preset.root is not None else 'unofficial_releases/ascii_data') / preset.subdir
+            final_out_paths['metadata_files']['utf8_data'] = Path(preset.root / 'unofficial_releases/utf8_data' if preset.root is not None else 'unofficial_releases/utf8_data') / preset.subdir
+        else:
+            final_out_paths['song_files']['ascii_data'] = Path(preset.root / 'unofficial_releases/ascii_data' if preset.root is not None else 'unofficial_releases/ascii_data') / preset.subdir
+            final_out_paths['song_files']['utf8_data'] = Path(preset.root / 'unofficial_releases/utf8_data' if preset.root is not None else 'unofficial_releases/utf8_data') / preset.subdir
+
+        for data_format in data_formats:
+            os.makedirs(final_out_paths['song_files'][data_format], exist_ok=True)
+            if s.hash_in in g_hash_to_file_dict.keys():
+                created = s.create_out_file(create=False, out_dir=final_out_paths['song_files'][data_format])
+                if created:
+                    s.apply_tags(data_format == 'ascii_data')
+                logger.debug(f"[GEN] [{preset.name}] [{i + 1:3d}/{N_SONGS}] {'Generated' if created else 'Skipped'} {song_dict['Song']}")
+                # if s.flags.official or s.flags.originals:
+                    # os.makedirs(final_out_paths['metadata_files'][data_format], exist_ok=True)
+                    # s.create_placeholder_files(out_dir=final_out_paths['metadata_files'][data_format])
+            elif s.flags.official or s.flags.originals:
+                logger.warning(f"[GEN] [{preset.name}] [{i + 1:3d}/{N_SONGS}] Skipped {song_dict['Song']} official song file not found: {song_dict['File_IN']}")
+                # s.create_placeholder_files(out_dir=final_out_paths['song_files'][data_format])
+                # s.create_placeholder_files(out_dir=final_out_paths['metadata_files'][data_format])
+                continue
+            else:
+                logger.error(f"[GEN] [{preset.name}] [{i + 1:3d}/{N_SONGS}] ERROR {song_dict['Song']} unofficial song file not found: {song_dict['File_IN']}")
+                exit(1)
     run_mp3gain(preset)
     logger.success(f"[GEN] Done converting {N_SONGS} songs in {time_format(time() - t)} !")
 
-def generate_songs() -> None:
-    generate_songs_filtered(Path('unofficial_releases'), exclude_flags=['originals', 'officials'])
-    generate_songs_filtered(Path('official_releases'), include_flags=['originals', 'officials'])
 
-def generate_songs_filtered(sub_dir: Path = None, include_flags: list[str] = [], exclude_flags: list[str] = []) -> None:
+def generate_songs() -> None:
     """Generates all songs files. For each files it first copies the files into\
     its destination, then edits the metadata of the destination file. This is\
     just to avoid tempering the original files.\
@@ -100,36 +128,24 @@ def generate_songs_filtered(sub_dir: Path = None, include_flags: list[str] = [],
     # Easier data format to deal with
     dates_dict: DateDict = {k["Date"]: k for k in load_dates().iter_rows(named=True)}
 
-    hash_dict = get_audio_hash_to_file_mapping(SONG_ROOT_DIR)
-
-    if sub_dir is None:
-        out_dir = Path(OUT_ROOT)
-    else:
-        out_dir = Path(OUT_ROOT / sub_dir)
-
     for preset in config["Presets"]:
         logger.info(f"[GEN] Generating preset '{preset['name']}'")
-        preset_obj = Preset(preset, mp3gain, out_dir, include_flags, exclude_flags)
-        generate_from_preset(preset_obj, hash_dict, dates_dict)
+        preset_obj = Preset(preset, mp3gain, OUT_ROOT)
+        generate_from_preset(preset_obj, dates_dict)
 
     logger.success(f"[GEN] Generated all presets in {time_format(time() - t)} !")
 
-# TODO generate karaoke covers, generate placeholders, folder with text file of metadata and also cover art image 
-# TODO generate official releases
-# TODO use flags to filter
-# TODO add arguments to generate_songs and generate_albums for include/exclude flags and sub_dir path
 
 def generate_albums() -> None:
-    generate_albums_filtered(Path('unofficial_releases'), exclude_flags=['originals', 'officials'])
-    generate_albums_filtered(Path('official_releases'), include_flags=['originals', 'officials'])
-
-def generate_albums_filtered(sub_dir: Path, include_flags: list[str] = [], exclude_flags: list[str] = []) -> None:
     """generates all songs sorted by album"""
+
+    global g_hash_to_file_dict
+
+    if not len(g_hash_to_file_dict):
+        g_hash_to_file_dict = get_audio_hash_to_file_mapping(SONG_ROOT_DIR)
 
     format_logger(log_file=LOG_DIR / "generation.log")
     logger.info("[GEN] Starting generation batch")
-
-    hash_dict = get_audio_hash_to_file_mapping(SONG_ROOT_DIR)
 
     # Avoids wrong generations due to inconsistent databases
     try:
@@ -153,53 +169,55 @@ def generate_albums_filtered(sub_dir: Path, include_flags: list[str] = [], exclu
     # Start time
     t = time()
 
-    unfiltered_songDB = load_db()
-
-    if len(include_flags):
-        unfiltered_songDB = unfiltered_songDB.filter(pl.col('Flags').str.contains_any(include_flags))
-        
-    if len(exclude_flags):
-        unfiltered_songDB = unfiltered_songDB.filter(~pl.col('Flags').str.contains_any(exclude_flags))
-
-    songDB = unfiltered_songDB
-
-    albums = songDB.get_column("Album").unique()
-
-    album_names = []
-    album_paths = []
+    songDB = load_db()
 
     dates_dict: DateDict = {k["Date"]: k for k in load_dates().iter_rows(named=True)}
-
-    for album in albums:
-        if album not in album_names:
-            album_names.append(album)
-            out_dir = str(OUT_ROOT) + "/albums/" + album
-            os.makedirs(out_dir, exist_ok=True)
-            album_paths.append(out_dir)
     
     for i, song_dict in enumerate(songDB.iter_rows(named=True)):
         N_SONGS = len(songDB)
 
         if Path(song_dict["File_IN"]).is_relative_to(DRIVE_DIR) or ((Path(song_dict["File_IN"]).is_relative_to(UNOFFICIALV3_DIR)) and (not Path(song_dict['File_IN']).is_relative_to(UNOFFICIALV3_DIR / UNOFFV3_DISC66))):
             date_dict = dates_dict.get(song_dict["Date"], {})
-            s = DriveSong(song_dict, hash_dict, date_dict)
+            s = DriveSong(song_dict, date_dict)
         else:
-            s = CustomSong(song_dict, hash_dict)
+            s = CustomSong(song_dict)
 
-        album = song_dict["Album"]
+        final_out_paths = {
+            'song_files': {},
+            'metadata_files': {},
+            }
 
-        if sub_dir is None:
-            out_dir = Path(OUT_ROOT)
+        album = s.album
+
+    
+        if s.flags.originals or s.flags.official:
+            final_out_paths['song_files']['ascii_data'] = Path(str(OUT_ROOT) + '/official_releases/ascii_data/albums/' + album)
+            final_out_paths['song_files']['utf8_data'] = Path(str(OUT_ROOT) + '/official_releases/utf8_data/albums/' + album)
+
+            final_out_paths['metadata_files']['ascii_data'] = Path(str(OUT_ROOT) + '/unofficial_releases/ascii_data/albums/' + album)
+            final_out_paths['metadata_files']['utf8_data'] = Path(str(OUT_ROOT) + '/unofficial_releases/utf8_data/albums/' + album)
         else:
-            out_dir = Path(OUT_ROOT / sub_dir)
-        
-        created = s.create_out_file(create=False, out_dir=out_dir + "/albums/" + album)
-        if created:
-            s.apply_tags()
-        logger.debug(
-            f"[GEN] [{i+1:4d}/{N_SONGS}] [{album}] {'Generated' if created else 'Skipped'} {song_dict['Song']}"
-        )
-    mp3gain_albums(album_paths)
+            final_out_paths['song_files']['ascii_data'] = Path(str(OUT_ROOT) + '/unofficial_releases/ascii_data/albums/' + album)
+            final_out_paths['song_files']['utf8_data'] = Path(str(OUT_ROOT) + '/unofficial_releases/utf8_data/albums/' + album)
+
+        for data_format in data_formats:
+            os.makedirs(final_out_paths['song_files'][data_format], exist_ok=True)
+            if s.hash_in in g_hash_to_file_dict.keys():
+                created = s.create_out_file(create=False, out_dir=final_out_paths['song_files'][data_format])
+                if created:
+                    s.apply_tags(data_format == 'ascii_data')
+                logger.debug(f"[GEN] [{i+1:4d}/{N_SONGS}] [{album}] {'Generated' if created else 'Skipped'} {song_dict['Song']}")
+                # if s.flags.official or s.flags.originals:
+                    # os.makedirs(final_out_paths['metadata_files'][data_format], exist_ok=True)
+                    # s.create_placeholder_files(out_dir=final_out_paths['metadata_files'][data_format])
+            elif s.flags.originals or s.flags.official:
+                logger.warning(f"[GEN] [{i+1:4d}/{N_SONGS}] [{album}] Skipped {song_dict['Song']} official song file not found: {song_dict['File_IN']}")
+                # s.create_placeholder_files(out_dir=final_out_paths['song_files'][data_format])
+                # s.create_placeholder_files(out_dir=final_out_paths['metadata_files'][data_format])
+                continue
+            else:
+                logger.error(f"[GEN] [{i+1:4d}/{N_SONGS}] [{album}] ERROR {song_dict['Song']} unofficial song file not found: {song_dict['File_IN']}")
+                exit(1)
 
     
 
@@ -281,17 +299,6 @@ def mp3gain_standalone() -> None:
         preset_obj = Preset(preset, mp3gain, OUT_ROOT)
         run_mp3gain(preset_obj)
 
-def mp3gain_albums(album_paths: list) -> None:
-    """Runs mp3gain on Albums"""
-    options = "-r -k"
-    OUT_LOG = Path(LOG_DIR / "mpgain.log")
-    with open("config.toml", "rb") as file:
-        config = toml.load(file)
-
-    cfg_out = config["output"]
-    OUT_ROOT = Path(cfg_out["out-root"])
-    logger.info(f"[GEN] Running mp3gain for albums") # {os.path.basename(path)}")
-    os.system(f"mp3gain {options} {str(OUT_ROOT) + "/albums"}/*/*.mp3 > {OUT_LOG}")
 
 if __name__ == "__main__":
     generate_songs()

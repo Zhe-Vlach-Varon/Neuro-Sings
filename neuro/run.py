@@ -203,17 +203,17 @@ def generate_albums() -> None:
         for data_format in data_formats:
             os.makedirs(final_out_paths['song_files'][data_format], exist_ok=True)
             if s.hash_in in g_hash_to_file_dict.keys():
-                created = s.create_out_file(create=False, out_dir=final_out_paths['song_files'][data_format])
+                created = s.create_out_file(create=False, out_dir=final_out_paths['song_files'][data_format], numberedFiles=True)
                 if created:
                     s.apply_tags(data_format == 'ascii_data')
                 logger.debug(f"[GEN] [{i+1:4d}/{N_SONGS}] [{album}] {'Generated' if created else 'Skipped'} {song_dict['Song']}")
                 # if s.flags.official or s.flags.originals:
                     # os.makedirs(final_out_paths['metadata_files'][data_format], exist_ok=True)
-                    # s.create_placeholder_files(out_dir=final_out_paths['metadata_files'][data_format])
+                    # s.create_placeholder_files(out_dir=final_out_paths['metadata_files'][data_format], numberedFiles=True)
             elif s.flags.originals or s.flags.official:
                 logger.warning(f"[GEN] [{i+1:4d}/{N_SONGS}] [{album}] Skipped {song_dict['Song']} official song file not found: {song_dict['File_IN']}")
-                # s.create_placeholder_files(out_dir=final_out_paths['song_files'][data_format])
-                # s.create_placeholder_files(out_dir=final_out_paths['metadata_files'][data_format])
+                # s.create_placeholder_files(out_dir=final_out_paths['song_files'][data_format], numberedFiles=True)
+                # s.create_placeholder_files(out_dir=final_out_paths['metadata_files'][data_format], numberedFiles=True)
                 continue
             else:
                 logger.error(f"[GEN] [{i+1:4d}/{N_SONGS}] [{album}] ERROR {song_dict['Song']} unofficial song file not found: {song_dict['File_IN']}")

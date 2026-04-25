@@ -219,9 +219,16 @@ MP3ModeTuple = tuple[MP3GainMode, MP3GainMode]
 def get_audio_hash(file_path: Path) -> (str | None):
     try:
 
+        try:
+            audio_tags = ID3(file_path)
+            header_size = audio_tags.size  # Mutagen provides the full tag size including header
+        except ID3NoHeaderError:
+            header_size = 0
+
+        print(file_path.stat().st_size)
         file_size = file_path.stat().st_size
         if file_size < 3000:
-            logger.error(f"{file_path.name} is too small!")
+            print(f"{file_path.name} is too small!")
             return None
 
         with open(file_path, 'rb') as f:
@@ -237,20 +244,19 @@ def get_audio_hash(file_path: Path) -> (str | None):
                 end_index = file_size - footer_size - 1_000_000 ### about a Mb offset for the audio
 
             else:
-                end_index = int((file_size - footer_size)/2)
+                end_index = int((file_size - footer_size - header_size) * 3 / 4 + header_size)
 
-            logger.info(f"{file_path} End Index: {end_index}")
+            print(f"End Index: {end_index}")
 
             start_index = end_index - 987 ### reads a 987 bytes for the hash
 
             raw_audio = file_data[start_index:end_index]
 
         # 4. Hash the raw audio
-        logger.info(f'{xxhash.xxh64(raw_audio).hexdigest()}')
         return xxhash.xxh64(raw_audio).hexdigest()
 
     except Exception as e:
-        logger.error(f"Error processing {file_path}: {e}")
+        print(f"Error processing {file_path}: {e}")
         return None
 
 def get_audio_hash_to_file_mapping(p: Path, *, filetype: str = "mp3") -> dict:
@@ -429,7 +435,7 @@ title_ascii_special_negative_cases = [
     'short',
     'da ba dee',
     'jp ver.',
-    'gotta catch \'em all!',
+    'gotta catch em all',
     'nightcore',
     'chipmunk ver.',
     'me',
@@ -443,19 +449,16 @@ title_ascii_special_negative_cases = [
     'karaoke ver.',
     'sad cat ver.',
     'what about us',
-    'let\'s lament',
+    'lets lament',
     'i believe in you',
     '500 miles',
     'o',
-    '99.999999999%',
     'acoustic',
     'number one victory royal',
-    'i\'ve had',
-    'don\'t fear',
+    'ive had',
+    'dont fear',
     'out your eyes then drown you to death',
     'christmas version',
-    'I\'ve Had',
-    'Let\'s Lament',
 ]
 
 # TODO move special cases into separate files
@@ -467,6 +470,8 @@ title_ascii_special_replace_cases = {
     '真夜中のドア〜Stay With Me': 'Stay With Me',
     '学猫叫 (Xue Miao Jiao)': 'Xue Miao Jiao (Learn To Meow)',
     '炜WARD ROMANCE': 'WEIWARD ROMANCE',
+    '4nim0sity(99.999999999%)': '4nim0sity',
+    'ニア (Near) (Birthday ver.)': 'Near (Birthday ver.)'
 }
 
 ascii_character_replacement_mapping = {

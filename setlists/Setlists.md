@@ -1,7 +1,7 @@
 # Karaoke Stream Setlist File Format
 Specifies the order of songs and other info for a karaoke stream
 ## Filename
-The filename should start with the date in YYYY-mm-dd format, optionally followed by a space and other text to help identify the stream. The file must be a .txt file
+The filename should start with the date in YYYY-mm-dd format, optionally followed by a space and other text to help identify the stream. The file may have any text file type, the files are similar to csv (pipe) files, but because of the inclusion of comments, and not having a fixed number of fields on all lines I chose to make them .txt files
 ## File Content
 There are three types of lines in a setlist file
 | Line | Notes |
@@ -27,6 +27,19 @@ If a Setlist spans multiple dates, an additional album info line with the new da
 ### Lead Singer Change
 Specifies the primary singer, the one on the left in duets, has changed.\
 Options are ```Neuro``` or ```Evil```
+
+#### Outit and Microphones TO BE IMPLEMENTED will probably replace Lead Singer Change
+
+| Field | Notes | required |
+|-------|-------|----------|
+| Right Singer | The singer on the right | Required |
+| Right Outfit | what outfit (v1, v2, v2 Pirate, v2 clown, v3, etc) | Required |
+| Right Microphone | what mic (None, Pink, Red, Evil's Custom, Neuro's Custom, etc) | Required |
+| Left Singer | second singer in duet | Optional |
+| Left Outfit | same as right outfit | Optional |
+| Left Microphone | same as right mic | Optional |
+
+
 ### Song Entry
 Lists info about a song, fields are separated by `|`
 | Field | Notes | Required |

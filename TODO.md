@@ -63,6 +63,8 @@
 - [ ] find better cover image for 2024-12-30 version of blinding lights
 - [ ] find glorp alien Neuro and Evil art for Alien Alien covers
 - [x] attempt to automatically get ASCII song titles by finding sets of characters inside parantheses and striping non-alphanumeric characters from that
+- [ ] update to use the new metadata format from Unofficial Archive that separates english and original language titles and artist names, and splits out the song version identifiers (Neuro Ver., Evil Ver., etc)
+- [ ] get list of all output files, and remove all files in out folder not in the list prior to generating
 
 ## later plans
 - [ ] figure out how to package as a graphical program that does everything except download/upload

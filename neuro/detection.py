@@ -333,7 +333,7 @@ def extract_unofficialV3(files: list[Path], out: neutils.SongJSON = {}) -> neuti
         data = {
             'Cover Artist' : cover_artist,
             'Artist' : artist,
-            'Artist_ASCII' : neutils.replace_non_ascii_chars(artist_ascii),
+            'Artist_ASCII' : neutils.get_artist_ascii(artist),
             'Song' : title,
             'Song_ASCII' : title_ascii,
             'File_IN' : str(file),
@@ -435,7 +435,7 @@ def extract_official(files: list[Path], out: neutils.SongJSON ={}) -> neutils.So
                 data = {
                     'Cover Artist' : cover_artist,
                     'Artist' : artist,
-                    'Artsist_ASCII' : neutils.replace_non_ascii_chars(artist_ascii),
+                    'Artist_ASCII' : neutils.get_artist_ascii(artist),
                     'Song' : title,
                     'Song_ASCII' : title_ascii,
                     'File_IN' : str(file),
@@ -468,7 +468,7 @@ def extract_official(files: list[Path], out: neutils.SongJSON ={}) -> neutils.So
                 data = {
                     'Cover Artist' : cover_artist,
                     'Artist' : artist,
-                    'Artsist_ASCII' : neutils.replace_non_ascii_chars(artist),
+                    'Artist_ASCII' : neutils.get_artist_ascii(artist),
                     'Song' : title,
                     'Song_ASCII' : title,
                     'File_IN' : str(file),
@@ -698,6 +698,7 @@ def fill_in_setlists(out: neutils.SongJSON = {}) -> neutils.SongJSON:
     files = list(SETLISTS_DIR.glob(f"**/*"))
     # print("files")
     # print(files)
+    files.sort()
 
     # TODO move to utils or somewhere else
     date_format = "%Y-%m-%d"

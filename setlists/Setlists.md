@@ -28,7 +28,7 @@ If a Setlist spans multiple dates, an additional album info line with the new da
 Specifies the primary singer, the one on the left in duets, has changed.\
 Options are ```Neuro``` or ```Evil```
 
-#### Outit and Microphones TO BE IMPLEMENTED will replace above
+#### Outit and Microphones TO BE IMPLEMENTED will probably replace Lead Singer Change
 
 | Field | Notes | required |
 |-------|-------|----------|

@@ -155,7 +155,7 @@ include-type = "and"
 name = "Twin Duet Streams"
 include-flags = ["duet"]
 exclude-flags = ["neuro", "evil", "duplicate", "christmas", "halloween", "original", "official", "quarantine", "zvv_quarantine", "unused", "mashup"]
-path = "zvv_sort/Twin_Duets"
+path = "zvv_sort/Duets_Twins"
 mp3gain = false
 
 [[Presets]]
@@ -330,8 +330,25 @@ path = "zvv_sort/Quarantine"
 mp3gain = false
 
 [[Presets]]
-name = "ZVV Unused"
-include-flags = ["unused"]
+name = "ZVV Unused v3"
+include-flags = ["unused", "v3"]
+include-type = "and"
 exclude-false = []
-path = "zvv_sort/Unused"
+path = "zvv_sort/Unused_v3"
+mp3gain = false
+
+[[Presets]]
+name = "ZVV Unused v2"
+include-flags = ["unused", "v2"]
+include-type = "and"
+exclude-false = []
+path = "zvv_sort/Unused_v2"
+mp3gain = false
+
+[[Presets]]
+name = "ZVV Unused v1"
+include-flags = ["unused", "v1"]
+include-type = "and"
+exclude-false = []
+path = "zvv_sort/Unused_v1"
 mp3gain = false

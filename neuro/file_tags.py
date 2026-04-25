@@ -235,7 +235,7 @@ class Song:
         logger.error(f"Song '{self.file}' has no flags to define its tag!")
         raise ValueError(f"Song '{self.file}' has no flags to define its tag!")
 
-    def file_name(self, custom: bool) -> str:
+    def file_name(self, custom: bool, numberedFiles: bool = False) -> str:
         """Returns the output filename using song properties.
 
         Args:
@@ -246,11 +246,11 @@ class Song:
             str: The filename without type extension.
         """
         if custom and self.flags.originals:
-            return f"{self.track_n}. {self.artist_ascii} - {self.title_ascii}"
+            return f"{f'{self.track_n}. ' if numberedFiles else ''}{self.artist_ascii} - {self.title_ascii}"
         elif custom and not self.flags.originals:
-            return f"{self.track_n}. {self.artist_ascii} - {self.title_ascii} - {self.cover_artist}"
+            return f"{f'{self.track_n}. ' if numberedFiles else ''}{self.artist_ascii} - {self.title_ascii} - {self.cover_artist}"
         else:
-            return f"{self.track_n}. {self.artist_ascii} - {self.title_ascii} [{self.name_tag}] [{self.date}]"
+            return f"{f'{self.track_n}. ' if numberedFiles else ''}{self.artist_ascii} - {self.title_ascii} [{self.name_tag}] [{self.date}]"
         # TODO add {self.track_n} to start of file name
         # TODO get total number of tracks for tag
         # TODO if entire karaoke stream (only karaoke streams, not the subathon or other setlists from the non-karaoke folder)
@@ -262,7 +262,7 @@ class DriveSong(Song):
     def __init__(self, song_dict: dict, karaoke_dict: dict) -> None:
         super().__init__(song_dict, karaoke_dict)
 
-    def create_out_file(self, *, out_dir: Path = Path("out"), create: bool = True) -> bool:
+    def create_out_file(self, *, out_dir: Path = Path("out"), create: bool = True, numberedFiles: bool = False) -> bool:
         """Creates the output file on the filesystem by copying the original. The metadata are written later.
 
         Args:
@@ -277,7 +277,7 @@ class DriveSong(Song):
         # Ensures the output directory exists
         os.makedirs(ROOT_DIR / out_dir, exist_ok=True)
         # If the song is flagged as custom, use the custom format
-        name = self.file_name(self.flags.as_custom)
+        name = self.file_name(self.flags.as_custom, numberedFiles=numberedFiles)
         self.outfile = ROOT_DIR / out_dir / f"{name}.mp3"
 
         if create or (not self.outfile.exists()):
@@ -285,8 +285,8 @@ class DriveSong(Song):
             return True
         return False
     
-    def create_placeholder_files(self, *, out_dir: Path, create: bool = True) -> bool:
-        name = self.file_name(self.flags.as_custom)
+    def create_placeholder_files(self, *, out_dir: Path, create: bool = True, numberedFiles: bool = False) -> bool:
+        name = self.file_name(self.flags.as_custom, numberedFiles=numberedFiles)
         os.mkdir(out_dir / name)
         metadata_file = ROOT_DIR / out_dir / name / "metadata.txt"
         metadata = {}
@@ -343,7 +343,7 @@ class CustomSong(Song):
     def __init__(self, song_dict: dict, karaoke_dict: dict = {}) -> None:
         super().__init__(song_dict, karaoke_dict)
 
-    def create_out_file(self, *, out_dir: Path, create: bool = True) -> bool:
+    def create_out_file(self, *, out_dir: Path, create: bool = True, numberedFiles: bool = False) -> bool:
         """Creates the output file on the filesystem by copying the original. The metadata are written later.
 
         Args:
@@ -357,7 +357,7 @@ class CustomSong(Song):
         file = self.file
         ext = file.suffix
 
-        name = self.file_name(not self.flags.as_drive)
+        name = self.file_name(not self.flags.as_drive, numberedFiles=numberedFiles)
         self.outfile = ROOT_DIR / out_dir / f"{name}{ext}"
 
         if create or (not self.outfile.exists()):
@@ -365,8 +365,8 @@ class CustomSong(Song):
             return True
         return False
     
-    def create_placeholder_files(self, *, out_dir: Path, create: bool = True) -> bool:
-        name = self.file_name(self.flags.as_custom)
+    def create_placeholder_files(self, *, out_dir: Path, create: bool = True, numberedFiles: bool = False) -> bool:
+        name = self.file_name(self.flags.as_custom, numberedFiles=numberedFiles)
         os.mkdir(out_dir / name)
         metadata_file = ROOT_DIR / out_dir / name / "metadata.txt"
         metadata = {}

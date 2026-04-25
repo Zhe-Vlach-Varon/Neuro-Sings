@@ -1679,7 +1679,7 @@ Put as special album: Collabs, list in order
 - [x] 7. Mesmerizer ft Bao 19-08-2025
 - [x] 8. Crazy Fuckin' Robot Body 03-12-2025
 - [x] 9. Chinatown Blues ft Vedal 06-12-2025
-- [ ] 10. Come Down Evil ft Numi 10-02-2026
+- [x] 10. Come Down Evil ft Numi 10-02-2026
 
 ### Stream Covers
 [I see the light](https://youtu.be/dIyByMwOaD8)

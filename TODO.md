@@ -66,6 +66,9 @@
 - [ ] update to use the new metadata format from Unofficial Archive that separates english and original language titles and artist names, and splits out the song version identifiers (Neuro Ver., Evil Ver., etc)
 - [ ] get list of all output files, and remove all files in out folder not in the list prior to generating
 
+- [ ] fix for duplicates getting processed before the first useage of the song
+
+
 ## later plans
 - [ ] figure out how to package as a graphical program that does everything except download/upload
 - [ ] catalog alternate titles and artist names

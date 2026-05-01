@@ -450,10 +450,10 @@ def get_most_recent_version(song: dict, json_data: neutils.SongJSON, encore: boo
     latest_version = None
 
     filtered_songs = songDB.filter(
-        (pl.col("Artist").map_elements(lambda x: neutils.get_song_artists_match_count(x, song['Artist'][0]) > 0, return_dtype=pl.Boolean)) &
-        (pl.col("Song").map_elements(lambda x: neutils.do_song_titles_match(x, song['Song'][0]), return_dtype=pl.Boolean)) &
-        (pl.col("Cover Artist") == song["Cover Artist"][0]) &
-        (pl.col("Date") <= song["Date"][0]) &
+        (pl.col("Artist").map_elements(lambda x: neutils.get_song_artists_match_count(x, song['Artist']) > 0, return_dtype=pl.Boolean)) &
+        (pl.col("Song").map_elements(lambda x: neutils.do_song_titles_match(x, song['Song']), return_dtype=pl.Boolean)) &
+        (pl.col("Cover Artist") == song["Cover Artist"]) &
+        (pl.col("Date") <= song["Date"]) &
         (~pl.col("Flags").str.contains("duplicate"))
     ).sort(pl.col("Date"), descending=True)
 

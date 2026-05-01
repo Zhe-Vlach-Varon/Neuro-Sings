@@ -421,7 +421,7 @@ def extract_official(files: list[Path], out: neutils.SongJSON ={}) -> neutils.So
                 elif 'Evil' in song['Cover Artist']:
                     lead_singer = 'Evil'
                 else:
-                    print('how did we get here: neuo/detection.py:434')
+                    print('how did we get here: neuro/detection.py:424')
                     print(song['Cover Artist'])
                     exit(1)
                 artist_ascii = neutils.get_artist_ascii(artist)

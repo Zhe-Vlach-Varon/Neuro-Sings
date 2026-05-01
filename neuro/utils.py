@@ -225,10 +225,10 @@ def get_audio_hash(file_path: Path) -> (str | None):
         except ID3NoHeaderError:
             header_size = 0
 
-        print(file_path.stat().st_size)
+        logger.info(file_path.stat().st_size)
         file_size = file_path.stat().st_size
         if file_size < 3000:
-            print(f"{file_path.name} is too small!")
+            logger.error(f"{file_path.name} is too small!")
             return None
 
         with open(file_path, 'rb') as f:
@@ -246,7 +246,7 @@ def get_audio_hash(file_path: Path) -> (str | None):
             else:
                 end_index = int((file_size - footer_size - header_size) * 3 / 4 + header_size)
 
-            print(f"End Index: {end_index}")
+            logger.info(f"End Index: {end_index}")
 
             start_index = end_index - 987 ### reads a 987 bytes for the hash
 
@@ -256,7 +256,7 @@ def get_audio_hash(file_path: Path) -> (str | None):
         return xxhash.xxh64(raw_audio).hexdigest()
 
     except Exception as e:
-        print(f"Error processing {file_path}: {e}")
+        logger.error(f"Error processing {file_path}: {e}")
         return None
 
 def get_audio_hash_to_file_mapping(p: Path, *, filetype: str = "mp3") -> dict:
@@ -397,7 +397,9 @@ def do_song_titles_match(existing_song_title: str, new_song_title: str) -> bool:
         existing_is_nightcore = True
         existing_title = re.sub(nightcore_regex, '', existing_title)
 
-    titles_match = (new_title in existing_title) and (new_is_nightcore == existing_is_nightcore)
+    titles_match = (str.lower(new_title) in str.lower(existing_title)) and (new_is_nightcore == existing_is_nightcore)
+
+    # print(titles_match)
 
     return titles_match
 
@@ -423,6 +425,8 @@ def get_song_artists_match_count(existing_song_artists: str, new_song_artists: s
         for new_artist in new_artists:
             if re.sub(' ', '', str(new_artist)) in re.sub(' ', '', str(existing_artist)):
                 artists_match_count += 1
+
+    # print(artists_match_count)
 
     return artists_match_count
 

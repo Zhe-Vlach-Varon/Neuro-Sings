@@ -71,23 +71,23 @@ def generate_from_preset(preset: Preset, dates_dict: DateDict) -> None:
             final_out_paths['song_files']['ascii_data'] = Path(preset.root / 'unofficial_releases/ascii_data' if preset.root is not None else 'unofficial_releases/ascii_data') / preset.subdir
             final_out_paths['song_files']['utf8_data'] = Path(preset.root / 'unofficial_releases/utf8_data' if preset.root is not None else 'unofficial_releases/utf8_data') / preset.subdir
 
-        for data_format in data_formats:
+        for data_format in data_formats[0:1]:
             os.makedirs(final_out_paths['song_files'][data_format], exist_ok=True)
             if s.hash_in in g_hash_to_file_dict.keys():
                 created = s.create_out_file(create=False, out_dir=final_out_paths['song_files'][data_format])
                 if created:
                     s.apply_tags(data_format == 'ascii_data')
-                logger.debug(f"[GEN] [{preset.name}] [{i + 1:3d}/{N_SONGS}] {'Generated' if created else 'Skipped'} {song_dict['Song']}")
+                logger.debug(f"[GEN] [{preset.name}] [{i + 1:3d}/{N_SONGS}] {'Generated' if created else 'Skipped'} {song_dict['Title']}")
                 # if s.flags.official or s.flags.originals:
                     # os.makedirs(final_out_paths['metadata_files'][data_format], exist_ok=True)
                     # s.create_placeholder_files(out_dir=final_out_paths['metadata_files'][data_format])
             elif s.flags.official or s.flags.originals:
-                logger.warning(f"[GEN] [{preset.name}] [{i + 1:3d}/{N_SONGS}] Skipped {song_dict['Song']} official song file not found: {song_dict['File_IN']}")
+                logger.warning(f"[GEN] [{preset.name}] [{i + 1:3d}/{N_SONGS}] Skipped {song_dict['Title']} official song file not found: {song_dict['File_IN']}")
                 # s.create_placeholder_files(out_dir=final_out_paths['song_files'][data_format])
                 # s.create_placeholder_files(out_dir=final_out_paths['metadata_files'][data_format])
                 continue
             else:
-                logger.error(f"[GEN] [{preset.name}] [{i + 1:3d}/{N_SONGS}] ERROR {song_dict['Song']} unofficial song file not found: {song_dict['File_IN']}")
+                logger.error(f"[GEN] [{preset.name}] [{i + 1:3d}/{N_SONGS}] ERROR {song_dict['Title']} unofficial song file not found: {song_dict['File_IN']}")
                 exit(1)
     run_mp3gain(preset)
     logger.success(f"[GEN] Done converting {N_SONGS} songs in {time_format(time() - t)} !")
@@ -200,23 +200,23 @@ def generate_albums() -> None:
             final_out_paths['song_files']['ascii_data'] = Path(str(OUT_ROOT) + '/unofficial_releases/ascii_data/albums/' + album)
             final_out_paths['song_files']['utf8_data'] = Path(str(OUT_ROOT) + '/unofficial_releases/utf8_data/albums/' + album)
 
-        for data_format in data_formats:
+        for data_format in data_formats[0:1]:
             os.makedirs(final_out_paths['song_files'][data_format], exist_ok=True)
             if s.hash_in in g_hash_to_file_dict.keys():
                 created = s.create_out_file(create=False, out_dir=final_out_paths['song_files'][data_format], numberedFiles=True)
                 if created:
                     s.apply_tags(data_format == 'ascii_data')
-                logger.debug(f"[GEN] [{i+1:4d}/{N_SONGS}] [{album}] {'Generated' if created else 'Skipped'} {song_dict['Song']}")
+                logger.debug(f"[GEN] [{i+1:4d}/{N_SONGS}] [{album}] {'Generated' if created else 'Skipped'} {song_dict['Title']}")
                 # if s.flags.official or s.flags.originals:
                     # os.makedirs(final_out_paths['metadata_files'][data_format], exist_ok=True)
                     # s.create_placeholder_files(out_dir=final_out_paths['metadata_files'][data_format], numberedFiles=True)
             elif s.flags.originals or s.flags.official:
-                logger.warning(f"[GEN] [{i+1:4d}/{N_SONGS}] [{album}] Skipped {song_dict['Song']} official song file not found: {song_dict['File_IN']}")
+                logger.warning(f"[GEN] [{i+1:4d}/{N_SONGS}] [{album}] Skipped {song_dict['Title']} official song file not found: {song_dict['File_IN']}")
                 # s.create_placeholder_files(out_dir=final_out_paths['song_files'][data_format], numberedFiles=True)
                 # s.create_placeholder_files(out_dir=final_out_paths['metadata_files'][data_format], numberedFiles=True)
                 continue
             else:
-                logger.error(f"[GEN] [{i+1:4d}/{N_SONGS}] [{album}] ERROR {song_dict['Song']} unofficial song file not found: {song_dict['File_IN']}")
+                logger.error(f"[GEN] [{i+1:4d}/{N_SONGS}] [{album}] ERROR {song_dict['Title']} unofficial song file not found: {song_dict['File_IN']}")
                 exit(1)
 
     

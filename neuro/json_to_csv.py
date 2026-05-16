@@ -53,12 +53,12 @@ def is_eliv_old(s: neutils.SongEntry) -> bool:
     return "/Evil" in s["File_IN"]
 
 
-def field_ascii(song: neutils.SongEntry, field: Literal["Song", "Artist"]) -> tuple[str, str]:
+def field_ascii(song: neutils.SongEntry, field: Literal["Title", "Artist"]) -> tuple[str, str]:
     """Gets the "normal" and "ASCII" versions of the 2 fields that have these variants.
 
     Args:
         song (SongEntry): A song Entry (dict from JSON file).
-        field (Literal["Song", "Artist"]): The field.
+        field (Literal["Title", "Artist"]): The field.
 
     Returns:
         tuple[str, str]: A tuple with (normal, ascci).
@@ -255,7 +255,7 @@ def update_db() -> None:
 
             date = song["Date"]
 
-            # print(f"{song["Song"]} - {song["Artist"]} - {song["Cover Artist"]} - {song['Date']}")
+            # print(f"{song["Title"]} - {song["Artist"]} - {song["Cover Artist"]} - {song['Date']}")
 
             if "duplicate" not in song.keys():
                 song["duplicate"] = False
@@ -283,8 +283,12 @@ def update_db() -> None:
 
             # Using helper function to avoid code duplication
             # print(song)
-            name, name_ascii = field_ascii(song, "Song")
-            artist, artist_ascii = field_ascii(song, "Artist")
+            # name, name_ascii = field_ascii(song, "Title")
+            name = song['Title']
+            name_og = song['TitleOG']
+            # artist, artist_ascii = field_ascii(song, "Artist")            
+            artist = song['Artist']
+            artist_og = song["ArtistOG"]
 
             # date is assumed to be a date used to form the album title, and if not a date is used as the album title
             # if str(date).startswith("20"):
@@ -325,18 +329,14 @@ def update_db() -> None:
                 if 'duet;' not in flags:
                     flags += 'duet;'
 
-
-            if song['encore']:
-                name += ' - Encore'
-                name_ascii += ' - Encore'
-
             df = pl.DataFrame(
                 {
                     "id": id,
-                    "Song": name,
-                    "Artist": artist,
-                    "Song_ASCII": name_ascii,
-                    "Artist_ASCII": artist_ascii,
+                    "Title": song["Title"],
+                    "TitleOG": song["TitleOG"],
+                    "Identify": song["Identify"],
+                    "Artist": song["Artist"],
+                    "ArtistOG": song["ArtistOG"],
                     "Cover Artist": song["Cover Artist"],
                     "Date": date,
                     "Album": album,
@@ -451,7 +451,7 @@ def get_most_recent_version(song: dict, json_data: neutils.SongJSON, encore: boo
 
     filtered_songs = songDB.filter(
         (pl.col("Artist").map_elements(lambda x: neutils.get_song_artists_match_count(x, song['Artist']) > 0, return_dtype=pl.Boolean)) &
-        (pl.col("Song").map_elements(lambda x: neutils.do_song_titles_match(x, song['Song']), return_dtype=pl.Boolean)) &
+        (pl.col("Title").map_elements(lambda x: neutils.do_song_titles_match(x, song['Title']), return_dtype=pl.Boolean)) &
         (pl.col("Cover Artist") == song["Cover Artist"]) &
         (pl.col("Date") <= song["Date"]) &
         (~pl.col("Flags").str.contains("duplicate"))
@@ -475,11 +475,11 @@ def get_most_recent_version(song: dict, json_data: neutils.SongJSON, encore: boo
             # print(json.dumps(json_song))
             # print(song)
             # print(json_song)
-            # print('new: ' + song['Song'][0] + " - " + song['Artist'][0] + " - " + song['Cover Artist'][0] + " - " + song['Date'][0] + " - " + str(song['Album_ID'][0]))
-            # print('old: ' + json_song['Song'] + " - " + json_song['Artist'] + " - " + json_song['Cover Artist'] + " - " + json_song['Date'] + " - " + str(json_song['id']))
-            # print((get_song_artists_match_count(json_song['Artist'], song['Artist'][0]) or get_song_artists_match_count(song['Artist'][0], json_song['Artist'])) and do_song_titles_match(json_song["Song"], song["Song"][0]) and (json_song["Cover Artist"] == song["Cover Artist"][0]) and ((song["Date"][0] >= json_song["Date"]) or (not json_song["id"] == song['Album_ID'][0])) and "File_IN" in json_song.keys())
+            # print('new: ' + song['Title'][0] + " - " + song['Artist'][0] + " - " + song['Cover Artist'][0] + " - " + song['Date'][0] + " - " + str(song['Album_ID'][0]))
+            # print('old: ' + json_song['Title'] + " - " + json_song['Artist'] + " - " + json_song['Cover Artist'] + " - " + json_song['Date'] + " - " + str(json_song['id']))
+            # print((get_song_artists_match_count(json_song['Artist'], song['Artist'][0]) or get_song_artists_match_count(song['Artist'][0], json_song['Artist'])) and do_song_titles_match(json_song["Title"], song["Title"][0]) and (json_song["Cover Artist"] == song["Cover Artist"][0]) and ((song["Date"][0] >= json_song["Date"]) or (not json_song["id"] == song['Album_ID'][0])) and "File_IN" in json_song.keys())
             # print((get_song_artists_match_count(json_song['Artist'], song['Artist'][0]) or get_song_artists_match_count(song['Artist'][0], json_song['Artist'])))
-            # print(do_song_titles_match(json_song["Song"], song["Song"][0]))
+            # print(do_song_titles_match(json_song["Title"], song["Title"][0]))
             # print((json_song["Cover Artist"] == song["Cover Artist"][0]))
             # print(((song["Date"][0] >= json_song["Date"]) or (not json_song["id"] == song['Album_ID'][0])) and "File_IN" in json_song.keys())
             # print()
@@ -561,10 +561,11 @@ def get_most_recent_version(song: dict, json_data: neutils.SongJSON, encore: boo
         new_duplicate_song = pl.DataFrame(
         {
                "id": song["id"],
-               "Song": latest_version["Song"] if not encore else latest_version["Song"] + ' - Encore',
+               "Title": latest_version["Title"],
+               "TitleOG": latest_version["TitleOG"],
+               "Identify": latest_version["Identify"],
                "Artist": latest_version["Artist"],
-               "Song_ASCII": latest_version["Song_ASCII"] if not encore else latest_version["Song_ASCII"] + ' - Encore',
-               "Artist_ASCII": neutils.get_artist_ascii(song["Artist_ASCII"]),
+               "ArtistOG": song["ArtistOG"],
                "Cover Artist": latest_version["Cover Artist"],
                "Date": song["Date"],
                "Album": song["Album"],
@@ -584,10 +585,11 @@ def get_most_recent_version(song: dict, json_data: neutils.SongJSON, encore: boo
         new_duplicate_song = pl.DataFrame(
         {
                "id": song["id"],
-               "Song": latest_version["Song"] if not encore else latest_version["Song"] + ' - Encore',
+               "Title": latest_version["Title"],
+               "TitleOG": latest_version["TitleOG"],
+               "Identify": latest_version["Identify"],
                "Artist": latest_version["Artist"],
-               "Song_ASCII": latest_version["Song_ASCII"] if not encore else latest_version["Song_ASCII"] + ' - Encore',
-               "Artist_ASCII": neutils.get_artist_ascii(song["Artist_ASCII"]),
+               "ArtistOG": song["ArtistOG"],
                "Cover Artist": latest_version["Cover Artist"],
                "Date": song["Date"],
                "Album": song["Album"],

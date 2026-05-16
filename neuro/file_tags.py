@@ -14,7 +14,7 @@ from mutagen.id3._frames import APIC, TALB, TBPM, TDRC, TDRL, TIT2, TKEY, TPE1, 
 from PIL import Image
 
 from neuro import IMAGES_COVERS_DIR, IMAGES_CUSTOM_DIR, LOG_DIR, ROOT_DIR
-from neuro.utils import file_check, format_logger, SongEntry
+from neuro.utils import file_check, format_logger, SongEntry, sanitize_filename
 
 
 class Song:
@@ -41,7 +41,9 @@ class Song:
         """Songs from the ARG channel"""
         official: bool
         originals: bool
-        """Songs that have been officially released on at least one streaming service (including youtube)"""
+        """Songs that have been officially released on at least one streaming service (excluding youtube, because appearently chinatown blues mv version is now included in unofficial archive)"""
+        encore: bool
+        """Songs that were re-run during the same stream"""
 
     def init_flags(self, flags: Optional[str]) -> None:
         """Detects song's flags by searching substrings in the flags column.\
@@ -65,15 +67,15 @@ class Song:
 
     def __init__(self, song_dict: SongEntry, karaoke_dict: dict = {}) -> None:
         # Lots of asserts, mainly for type checking, but also detects irregular entries in database
-        assert song_dict["Song"] is not None
-        assert song_dict["Song_ASCII"] is not None
-        self.title: str = song_dict["Song"]
-        self.title_ascii: str = song_dict["Song_ASCII"]
+        assert song_dict["Title"] is not None
+        self.title: str = song_dict["Title"]
+        self.title_og: str = song_dict["TitleOG"]
+
+        self.identify: str = song_dict["Identify"]
 
         assert song_dict["Artist"] is not None
-        assert song_dict["Artist_ASCII"] is not None
         self.artist: str = song_dict["Artist"]
-        self.artist_ascii: str = song_dict["Artist_ASCII"]
+        self.artist_og: str = song_dict["ArtistOG"]
 
         assert song_dict["Cover Artist"] is not None
         self.cover_artist: str = song_dict["Cover Artist"]
@@ -150,9 +152,9 @@ class Song:
         """
         additional = [
             # Title
-            TIT2(text=(self.title if not ascii_tags else self.title_ascii), encoding=3),
+            TIT2(text=(self.title if not ascii_tags else self.title_og), encoding=3),
             # Artist
-            TPE1(text=(self.artist if not ascii_tags else self.artist_ascii), encoding=3),
+            TPE1(text=((self.artist if not ascii_tags else self.artist_og) if not (self.flags.originals or self.flags.official) else self.cover_artist), encoding=3),
             # Album
             TALB(text=self.album, encoding=3),
             # Year-Month-Day | Using all frames for different software compatibility
@@ -179,9 +181,9 @@ class Song:
         """
         additional = {
             "ALBUM": self.album,
-            "ARTIST": (self.artist if not ascii_tags else self.artist_ascii),
+            "ARTIST": (self.artist if not ascii_tags else self.artist_og),
             "DATE": self.date,
-            "TITLE": (self.title if not ascii_tags else self.title_ascii),
+            "TITLE": (self.title if not ascii_tags else self.title_og),
             "TRACKNUMBER": f"{self.track_n}",
             "PERFORMER": "Neuro-Sama/Evil Neuro",
         }
@@ -246,15 +248,19 @@ class Song:
             str: The filename without type extension.
         """
         if custom and self.flags.originals:
-            return f"{f'{self.track_n}. ' if numberedFiles else ''}{self.artist_ascii} - {self.title_ascii}"
+            filename = f"{f'{self.track_n}. ' if numberedFiles else ''}{self.cover_artist} - {self.title}{" - Encore" if self.flags.encore else ""}"
+        elif custom and self.flags.official:
+            filename = f"{f'{self.track_n}. ' if numberedFiles else ''}{self.cover_artist} - {self.title}{" - Encore" if self.flags.encore else ""}"
         elif custom and not self.flags.originals:
-            return f"{f'{self.track_n}. ' if numberedFiles else ''}{self.artist_ascii} - {self.title_ascii} - {self.cover_artist}"
+            filename = f"{f'{self.track_n}. ' if numberedFiles else ''}{self.artist} - {self.title}{" - Encore" if self.flags.encore else ""} - {self.cover_artist}"
         else:
-            return f"{f'{self.track_n}. ' if numberedFiles else ''}{self.artist_ascii} - {self.title_ascii} [{self.name_tag}] [{self.date}]"
+            filename = f"{f'{self.track_n}. ' if numberedFiles else ''}{self.artist} - {self.title}{" - Encore" if self.flags.encore else ""} [{self.name_tag}] [{self.date}]"
         # TODO add {self.track_n} to start of file name
         # TODO get total number of tracks for tag
         # TODO if entire karaoke stream (only karaoke streams, not the subathon or other setlists from the non-karaoke folder)
         #       if entire stream is duets, remove the 'neuro;' or 'evil;' flags
+
+        return sanitize_filename(filename)
 
 class DriveSong(Song):
     """Metadata for a song from the drive."""
@@ -279,6 +285,9 @@ class DriveSong(Song):
         # If the song is flagged as custom, use the custom format
         name = self.file_name(self.flags.as_custom, numberedFiles=numberedFiles)
         self.outfile = ROOT_DIR / out_dir / f"{name}.mp3"
+
+        # print(self.file)
+        # print(self.outfile)
 
         if create or (not self.outfile.exists()):
             shutil.copy2(self.file, self.outfile)

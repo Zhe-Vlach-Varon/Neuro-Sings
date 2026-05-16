@@ -15,13 +15,13 @@ from neuro.utils import format_logger, get_sha256, get_audio_hash
 
 
 def check_ascii() -> None:
-    """Checks if the artists and songs are properly sanitized regarding
+    """Checks if the artists and titles are properly sanitized regarding
     characters by displaying them in the console."""
     ALPHANUM = set(ascii_letters + digits)
 
     songs = load_db()
-    no_ascii = songs.get_column("Song").to_list() + songs.get_column("Artist").to_list()
-    ascii = songs.get_column("Song_ASCII").to_list() + songs.get_column("Artist_ASCII").to_list()
+    no_ascii = songs.get_column("Title").to_list() + songs.get_column("Artist").to_list()
+    ascii = songs.get_column("Title_ASCII").to_list() + songs.get_column("Artist_ASCII").to_list()
 
     no_ascii_ok = set(chain.from_iterable(no_ascii)) - ALPHANUM
     ascii_ok = set(chain.from_iterable(ascii)) - ALPHANUM
@@ -52,7 +52,7 @@ def check_case(field: str) -> None:
     """Checks for any inconsistency in the database regarding casing and logs any found.
 
     Args:
-        field (str): The field to check, usually Song or Artist.
+        field (str): The field to check, usually Title or Artist.
     """
     songs = load_db()
     cased = set()
@@ -127,9 +127,9 @@ def check_are_dbs_identical():
 def all_tests() -> None:
     """Runs all checks defined in this file"""
     format_logger(log_file=LOG_DIR / "checks.log")
-    check_ascii()
+    # check_ascii()
     check_case("Artist")
-    check_case("Song")
+    check_case("Title")
     check_hash()
     check_mp3gain()
     check_are_dbs_identical()

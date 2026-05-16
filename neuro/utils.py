@@ -26,7 +26,7 @@ from loguru import logger
 from neuro import LOG_DIR, OFFICIAL_RELEASE_DIR, UNOFFICIALV3_DIR, CUSTOM_DIR, DRIVE_DIR, SETLISTS_DIR
 
 SongEntry = dict[str, Optional[str]]
-"""Dictionary representing a song in the JSON, containing fields like "Song", "Artist", etc..."""
+"""Dictionary representing a song in the JSON, containing fields like "Title", "Artist", etc..."""
 SongJSON = dict[str, list[SongEntry]]
 """Whole JSON file expected format. A list of date-indexed lists of songs."""
 
@@ -363,6 +363,11 @@ def get_cover_artist(file: Path) -> str:
 
 
 def do_song_titles_match(existing_song_title: str, new_song_title: str) -> bool:
+    if existing_song_title is None or new_song_title is None:
+        # print(existing_song_title)
+        # print(new_song_title)
+        return False
+
     # print("do_song_titles_match:existing: " + existing_song_title)
     # print("do_song_titles_match:new: " + new_song_title)
 
@@ -379,7 +384,9 @@ def do_song_titles_match(existing_song_title: str, new_song_title: str) -> bool:
     songTitleNonAlphaNumStripRegex = r'[^a-z0-9\/]'
 
     new_title = re.sub(songTitleNonAlphaNumStripRegex, '', str(remove_accents(new_song_title)).lower())
+    # new_title = new_song_title.lower()
     existing_title = re.sub(songTitleNonAlphaNumStripRegex, '', str(remove_accents(existing_song_title)).lower())
+    # existing_title = existing_song_title.lower()
 
     # print(new_title)
     # print(existing_title)
@@ -400,6 +407,9 @@ def do_song_titles_match(existing_song_title: str, new_song_title: str) -> bool:
     titles_match = (str.lower(new_title) in str.lower(existing_title)) and (new_is_nightcore == existing_is_nightcore)
 
     # print(titles_match)
+
+    # if "puru" in new_title and "puru" in existing_title:
+    #     exit(1)
 
     return titles_match
 
@@ -436,34 +446,61 @@ def remove_accents(s):
 english_title_translation_regex = r'\(.*?\)'
 # TODO load from file
 title_ascii_special_negative_cases = [
-    'short',
+    # 'short',
     'da ba dee',
-    'jp ver.',
+    # 'jp ver.',
     'gotta catch em all',
-    'nightcore',
-    'chipmunk ver.',
+    # 'nightcore',
+    # 'chipmunk ver.',
     'me',
     'you',
     'ski-ba-bop-ba-dop-bop',
-    'neuro ver.',
-    'evil ver.',
+    # 'neuro ver.',
+    # 'evil ver.',
     '2023', '2024', '2025',
-    'birthday ver.',
-    'bread',
-    'karaoke ver.',
-    'sad cat ver.',
+    # 'birthday ver.',
+    # 'bread',
+    # 'karaoke ver.',
+    # 'sad cat ver.',
     'what about us',
-    'lets lament',
+    # 'lets lament',
     'i believe in you',
     '500 miles',
     'o',
-    'acoustic',
-    'number one victory royal',
+    # 'acoustic',
+    'number one victory royale',
     'ive had',
     'dont fear',
     'out your eyes then drown you to death',
-    'christmas version',
+    # 'christmas version',
+    'what youve given me',
 ]
+
+def split_title_and_identify(title_and_identify: str):
+    # print("")
+    # print(title_and_identify)
+    title_identify_regex = r'^(?P<title>.*) \((?P<identify>.*)\)$'
+    matched = re.match(title_identify_regex, title_and_identify)
+    if matched is None:
+        # print("matched is None")
+        title = title_and_identify
+        identify = "None"
+    elif replace_non_ascii_chars(remove_accents(matched.group('identify'))).lower() not in title_ascii_special_negative_cases:
+        # print("not a false positive")
+        title = matched.group('title')
+        identify = matched.group('identify')
+    else:
+        # print("false positive")
+        title = title_and_identify
+        identify = "None"
+
+    # print(f"split_title_and_identify: input: {title_and_identify}")
+    # if matched is not None:
+        # print(f"title: {title}\nidentify: {identify}\n")
+    # else:
+        # print(f"title: {title}\n")
+
+    return title, identify
 
 # TODO move special cases into separate files
 
@@ -537,10 +574,11 @@ def do_songs_match(s1: SongEntry, s2: SongEntry, ignore_date: bool = False) -> b
     # print()
     
     artists_match = get_song_artists_match_count(s1['Artist'], s2['Artist']) > 0 or get_song_artists_match_count(s2['Artist'], s1['Artist']) > 0
-    titles_match = do_song_titles_match(s1['Song'], s2['Song']) or do_song_titles_match(s2['Song'], s1['Song'])
+    titles_match = do_song_titles_match(s1['Title'], s2['Title']) or do_song_titles_match(s2['Title'], s1['Title'])
+    identifys_match = do_song_titles_match(s1['Identify'], s2['Identify']) or do_song_titles_match(s2['Identify'], s1['Identify'])
     dates_match = ('Date' not in s2.keys() or s1['Date'] == s2['Date']) or ignore_date
     cover_artists_match = s1['Cover Artist'] == s2['Cover Artist']
-    final_result = artists_match and titles_match and dates_match and cover_artists_match
+    final_result = artists_match and titles_match and dates_match and cover_artists_match and identifys_match
 
     # print(f'artists match: {artists_match}')
     # print(f'titles match: {titles_match}')
@@ -572,3 +610,28 @@ def get_non_karaoke_album_names() -> list:
             if setlist.is_relative_to(SETLISTS_DIR / 'v3 voice' / 'non-karaoke'):
                 non_karaoke_albums.append(setlist.stem)
     return non_karaoke_albums
+
+
+def sanitize_filename(filename: str) -> str:
+    FORBIDDEN_CHARS = {
+        '\\': ' backslash ',
+        '/': ' slash ',
+        ':': ' ', 
+        '*': '_', 
+        '?': ' ',
+        '"': "'",
+        '<': '[',
+        '>': ']',
+        '|': '_'
+    }
+
+    for char in FORBIDDEN_CHARS:
+        filename = filename.replace(char, FORBIDDEN_CHARS[char])
+
+    while("  " in filename):
+        filename = filename.replace("  ", " ")
+
+    ## some kanji were getting divided into two symbols: ヴ -> ウ  ゙
+    filename = unicodedata.normalize('NFC', filename)
+
+    return filename

@@ -73,6 +73,9 @@
 - [ ] figure out how to package as a graphical program that does everything except download/upload
 - [ ] catalog alternate titles and artist names
 - [ ] automate updating Duplicates.md and Song List.md
+- [ ] switch to rewriting the embedded metadata in the same format as the unofficial archive and tell people to use the metadata customizer instead of making multiple copies with each format
+  - [ ] find out if they plan to update the metadata customizer, and if not do it myself
+- [ ] add support for metadata customizer presets
 
 
 # Old TODOS

@@ -11,16 +11,19 @@ from neuro.utils import MP3GainMode, MP3ModeTuple
 
 songs_schema = {
     'id': pl.Int64,
-    'Song': pl.String,
+    'Title': pl.String,
+    'TitleOG': pl.String,
+    'Identify': pl.String,
     'Artist': pl.String,
-    'Song_ASCII': pl.String,
-    'Artist_ASCII': pl.String,
+    'ArtistOG': pl.String,
     'Cover Artist': pl.String,
     'Date': pl.String,
     'Album': pl.String,
     'Album_ID': pl.Int64,
     'Image': pl.String,
     'File_IN': pl.String,
+    # 'Special': pl.Boolean,
+    # TODO add field for special
     'Hash_IN': pl.String,
     'Flags': pl.String,
     'Key': pl.String,

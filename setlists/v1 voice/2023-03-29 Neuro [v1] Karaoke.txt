@@ -18,5 +18,5 @@
 17 | Venom | Kairiki Bear | Neuro [v1] | Duplicate
 18 | Believer | Imagine Dragons | Neuro [v1] | Duplicate
 19 | After Dark | Mr.Kitty | Neuro [v1] | Duplicate
-20 | Baka Mitai | Mitsuharu Fukuyama, Ryosuke Horii | Neuro [v1] | Duplicate
+20 | Baka Mitai (full spec) | Mitsuharu Fukuyama, Ryosuke Horii | Neuro [v1] | Duplicate
 21 | Sad Machine | Porter Robinson | Neuro [v1] | New

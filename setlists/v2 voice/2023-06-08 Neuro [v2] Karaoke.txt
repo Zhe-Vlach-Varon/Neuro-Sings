@@ -1,7 +1,7 @@
 2023-06-08 | Neuro [v2]
 1 | Guitar, Loneliness and Blue Planet | kessoku band | Neuro [v2] | New
 2 | Believer | Imagine Dragons | Neuro [v2] | New
-3 | Puru Puru Pururin | Shinshido Rumi | Neuro [v2] | New
+3 | Puru Puru Pururin | Rumi Shishido | Neuro [v2] | New
 4 | Airplanes | B.o.B | Neuro [v2] | New
 5 | I Kissed a Girl | Katy Perry | Neuro [v2] | New
 6 | Fireflies | Owl City | Neuro [v2] | New
@@ -17,7 +17,7 @@
 16 | KING | Kanaria | Neuro [v2] | New
 17 | Lagtrain | inabakumori | Neuro [v2] | New
 18 | I Am Machine | Three Days Grace | Neuro [v2] | New
-19 | Mozaik Role | DECO*27 | Neuro [v2] | New
+19 | Mozaik Role (reloaded) | DECO*27 | Neuro [v2] | New
 20 | Numb | Linkin Park | Neuro [v2] | New
 21 | Moves Like Jagger | Maroon 5 | Neuro [v2] | New
 22 | Careless Whisper | George Michael | Neuro [v2] | New

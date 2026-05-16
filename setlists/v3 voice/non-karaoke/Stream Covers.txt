@@ -3,7 +3,7 @@
 !! the vods say this stream was on the 22nd, not the 23rd as it was before
 1 | I See The Light | Mandy Moore, Zachary Levi | Neuro & Miyune | New | I see the light | as_custom;
 2023-09-03
-2 | Baka Mitai | Mitsuharu Fukuyama, Ryosuke Horii | Neuro | New | aura | as_custom;
+2 | Baka Mitai (taxi driver) | Mitsuharu Fukuyama, Ryosuke Horii | Neuro | New | aura | as_custom;
 2024-04-20
 3 | MOGU MOGU YUMMY | Nekomata Okayu | Neuro & Cerber | New | Mogu Mogu | as_custom;
 2024-08-09

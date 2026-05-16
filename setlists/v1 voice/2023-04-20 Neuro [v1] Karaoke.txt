@@ -18,7 +18,7 @@
 17 | Somebody That I Used To Know | Gotye, Kimbra | Neuro [v1] | Duplicate
 18 | Behind Blue Eyes | Limp Bizkit | Neuro [v1] | Duplicate
 19 | A Thousand Years | Christina Perri | Neuro [v1] | Duplicate
-20 | Baka Mitai | Mitsuharu Fukuyama, Ryosuke Horii | Neuro [v1] | Duplicate
+20 | Baka Mitai (full spec) | Mitsuharu Fukuyama, Ryosuke Horii | Neuro [v1] | Duplicate
 21 | Still Alive | Jonathan Coulton, Ellen McLain | Neuro [v1] | Duplicate
 22 | Careless Whisper | George Michael | Neuro [v1] | Duplicate
 23 | Rockefeller Street (Nightcore) | Getter Jaani | Neuro [v1] | New

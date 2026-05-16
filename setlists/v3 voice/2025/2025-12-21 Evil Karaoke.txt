@@ -4,7 +4,7 @@
 3 | RuLe | Ado | Evil | Duplicate
 4 | Dial Tone | Catch Your Breath | Evil | New
 5 | Vice Versa | Nano | Evil | Duplicate
-6 | 第一話 (Q&A) | ぴーなた (Pinata) | Evil | New
+6 | Q&A | Pinata | Evil | New
 7 | Seven Nation Army | The White Stripes | Evil | Duplicate
 8 | Every Breath You Take | The Police | Evil | New
 9 | INTERGALACTIA | KIRA | Evil | Duplicate

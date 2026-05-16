@@ -5,7 +5,7 @@
 4 | kyu-kurarin | Iyowa | Neuro | New
 5 | My Way | SIAMES | Neuro | New
 6 | ODDS&ENDS | supercell | Neuro | New
-7 | Near | Natsushiro Takaaki | Neuro | New
+7 | Near | Takaaki Natsushiro | Neuro | New
 8 | Snow Drive | Omoi | Neuro | New
 9 | Nee Nee Nee | Pinocchio-P | Neuro & Evil | New
 10 | World is Mine | supercell | Neuro | New
@@ -13,7 +13,7 @@
 12 | Dubidubidu | Christell | Neuro | New
 13 | Hello, Again | CircusP | Neuro | New
 14 | Tabi no Tochuu | Natsumi Kiyoura | Neuro | New
-15 | Weight of the World | Keiichi Okabe | Neuro | New
+15 | Weight of the World (English) | Keiichi Okabe | Neuro | New
 16 | sustain++ | Mili | Neuro | New
 17 | Mogu Mogu Yummy! | Nekomata Okayu | Neuro | New
 18 | Where shall we go | Mellowcle | Neuro & Evil | New

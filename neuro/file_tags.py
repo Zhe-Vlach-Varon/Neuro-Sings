@@ -152,9 +152,9 @@ class Song:
         """
         additional = [
             # Title
-            TIT2(text=(self.title if not ascii_tags else self.title_og), encoding=3),
+            TIT2(text=(self.title if ascii_tags or self.title_og == "None" else self.title_og), encoding=3),
             # Artist
-            TPE1(text=((self.artist if not ascii_tags else self.artist_og) if not (self.flags.originals or self.flags.official) else self.cover_artist), encoding=3),
+            TPE1(text=((self.artist if ascii_tags or self.artist_og == "None" else self.artist_og) if not (self.flags.originals or self.flags.official) else self.cover_artist), encoding=3),
             # Album
             TALB(text=self.album, encoding=3),
             # Year-Month-Day | Using all frames for different software compatibility

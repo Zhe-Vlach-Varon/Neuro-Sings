@@ -93,6 +93,7 @@ class Song:
         except:
             self.init_flags(song_dict['Flags'])
             if not self.flags.originals and not self.flags.official:
+                logger.error(f"unable to find {self.file}")
                 exit(1)
 
         assert song_dict["Album_ID"] is not None

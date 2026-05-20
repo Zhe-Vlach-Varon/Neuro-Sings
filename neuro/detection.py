@@ -230,6 +230,7 @@ def extract_custom(files: list[Path], out: neutils.SongJSON = {}) -> neutils.Son
         cover_artist = fields[2]
         album = fields[3]
         
+        # TODO print reminder to check artist, title, identify for custom songs
         data = {
             "Artist": artist,
             "ArtistOG": "None",
@@ -419,7 +420,7 @@ def extract_official(files: list[Path], out: neutils.SongJSON ={}) -> neutils.So
                 elif 'Evil' in song['Cover Artist']:
                     lead_singer = 'Evil'
                 else:
-                    print('how did we get here: neuro/detection.py:424')
+                    print('how did we get here: neuro/detection.py:423')
                     print(song['Cover Artist'])
                     exit(1)
                 if title == 'Chinatown Blues':
@@ -446,6 +447,7 @@ def extract_official(files: list[Path], out: neutils.SongJSON ={}) -> neutils.So
                 else:
                     out['custom'] = [data]
                 id += 1
+        # TODO print reminder to check title, artist, identify for official songs
 
     for song in original_songs_csv:
         for file in files:
@@ -535,6 +537,7 @@ def parse_setlist(p: Path) -> neutils.SongJSON:
             is_album_info_line = False
 
 
+        # checking if starts with "Neuro" because 2026-04-01 April Fools karaoke included a song using v1 voice
         if not is_album_info_line and (fields[0].startswith("Neuro") or fields[0] == "Evil"):
             is_singer_change_line = True
             # print("singer change line")

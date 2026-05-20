@@ -196,11 +196,37 @@ def update_db() -> None:
 
     album_names: list[str] = []
 
-    # date is like 2025-04-02
-    # songs is a list of dict with song infos
+    # TODO fix for duplicates getting added before first run in another album is added
+    # first_run_songs = {}
+    # duplicate_songs = {}
+
+    # for album, songs in json_data:
+    #     for song in songs:
+    #         if song['duplicate']:
+    #             if album not in duplicate_songs.keys():
+    #                 duplicate_songs[album] = []
+    #             duplicate_songs[album].append(song)
+    #         else:
+    #             if album not in first_run_songs.keys():
+    #                 first_run_songs[album] = []
+    #             first_run_songs[album].append(song)
+
+    # new_albums = set(first_run_songs.keys()).union(set(duplicate_songs.keys()))
+
+    # for album in new_albums:
+
+    #     songs = first_run_songs[album] + duplicate_songs[album]
+
+    # albums_sorted_by_latest_song
+
+    # TODO add to readme
+    # try to avoid rebuilding the database, but if you absolutely must, then some manual massaging of the new_songs.json is needed in case of originals and subathons
+    # and could possibly need multiple steps in following case
+    # album 1 could have first_run song_A, duplicate song_B
+    # album 2 could have duplicate song_A, first_run song_B
+    # where at least one of the albums is a non-karaoke album (Theme Streams, Other Streams)
+
     for album, songs in json_data.items():
-        # eliv = sum(map(is_eliv, songs)) > 0 # this assumed that only one twin would main in a karaoke stream, which is now false, as of 2025-12-25 Christmas Karaoke, where Neuro started the set, then swapped to Evil for second half
-        # singer = "Evil" if eliv else "Neuro"
 
         if album not in non_karaoke_albums:
             twin_duet_stream = True

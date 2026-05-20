@@ -16,6 +16,9 @@ from PIL import Image
 from neuro import IMAGES_COVERS_DIR, IMAGES_CUSTOM_DIR, LOG_DIR, ROOT_DIR
 from neuro.utils import file_check, format_logger, SongEntry, sanitize_filename
 
+import polars as pl
+from neuro.polars_utils import load_db
+
 
 class Song:
     """Represents a Song's Metadata. Abstract class, used for common code between drive/custom songs."""
@@ -150,11 +153,14 @@ class Song:
         Returns:
             _ (list[TextFrame]): Dictionary with Album artist.
         """
+        songs_df = load_db()
+        filtered_songs = songs_df.filter(pl.col('Album') == self.album)
+
         additional = [
             # Title
-            TIT2(text=(self.title if ascii_tags or self.title_og == "None" else self.title_og), encoding=3),
+            TIT2(text=f"{(self.title if ascii_tags or self.title_og == "None" else self.title_og)}{f" ({self.identify})" if self.identify != "None" else ""}", encoding=3),
             # Artist
-            TPE1(text=((self.artist if ascii_tags or self.artist_og == "None" else self.artist_og) if not (self.flags.originals or self.flags.official) else self.cover_artist), encoding=3),
+            TPE1(text=(f"{self.cover_artist} - {(self.artist if ascii_tags or self.artist_og == "None" else self.artist_og)}" if not (self.flags.originals or self.flags.official) else self.cover_artist), encoding=3),
             # Album
             TALB(text=self.album, encoding=3),
             # Year-Month-Day | Using all frames for different software compatibility
@@ -162,7 +168,7 @@ class Song:
             TYER(text=self.date[:4], encoding=3),
             TDRC(text=self.date, encoding=3),
             # Track number
-            TRCK(text=f"{self.track_n}", encoding=3),
+            TRCK(text=f"{self.track_n}/{filtered_songs.height}", encoding=3),
         ]
 
         if self.key is not None:
@@ -196,18 +202,12 @@ class Song:
         Returns:
             str: The artist. Can be Neuro-Sama, Evil Neuro, or Neuro [v1]/[v2].
         """
-        # They are mutually exclusive so it's okay
-        if self.album in ["Extra", "Originals", "Subathons"]:
-            return "Neuro-Sama/Evil Neuro"
-        if self.flags.v1:
+        # removed the different cases so that all tracks in an album will have the same album_artist,
+        if self.flags.v1 and self.date < "2023-05-27":
             return "Neuro [v1]"
-        if self.flags.v2:
+        if self.flags.v2 and self.date <= "2023-06-08" and self.cover_artist == "Neuro [v2]":
             return "Neuro [v2]"
-        if self.flags.evil:
-            return "Evil Neuro"
-        if self.flags.arg:
-            return "Study-sama"
-        return "Neuro-Sama"
+        return "Neuro-Sama/Evil Neuro"
 
     @property
     def name_tag(self) -> str:
@@ -248,13 +248,13 @@ class Song:
             str: The filename without type extension.
         """
         if custom and self.flags.originals:
-            filename = f"{f'{self.track_n}. ' if numberedFiles else ''}{self.cover_artist} - {self.title}{" - Encore" if self.flags.encore else ""}"
+            filename = f"{f'{self.track_n}. ' if numberedFiles else ''}{self.cover_artist} - {self.title}{f" ({self.identify})" if self.identify != "None" else ""}{" - Encore" if self.flags.encore else ""}"
         elif custom and self.flags.official:
-            filename = f"{f'{self.track_n}. ' if numberedFiles else ''}{self.cover_artist} - {self.title}{" - Encore" if self.flags.encore else ""}"
+            filename = f"{f'{self.track_n}. ' if numberedFiles else ''}{self.cover_artist} - {self.title}{f" ({self.identify})" if self.identify != "None" else ""}{" - Encore" if self.flags.encore else ""}"
         elif custom and not self.flags.originals:
-            filename = f"{f'{self.track_n}. ' if numberedFiles else ''}{self.artist} - {self.title}{" - Encore" if self.flags.encore else ""} - {self.cover_artist}"
+            filename = f"{f'{self.track_n}. ' if numberedFiles else ''}{self.artist} - {self.title}{f" ({self.identify})" if self.identify != "None" else ""}{" - Encore" if self.flags.encore else ""} - {self.cover_artist}"
         else:
-            filename = f"{f'{self.track_n}. ' if numberedFiles else ''}{self.artist} - {self.title}{" - Encore" if self.flags.encore else ""} [{self.name_tag}] [{self.date}]"
+            filename = f"{f'{self.track_n}. ' if numberedFiles else ''}{self.artist} - {self.title}{f" ({self.identify})" if self.identify != "None" else ""}{" - Encore" if self.flags.encore else ""} [{self.name_tag}] [{self.date}]"
         # TODO add {self.track_n} to start of file name
         # TODO get total number of tracks for tag
         # TODO if entire karaoke stream (only karaoke streams, not the subathon or other setlists from the non-karaoke folder)

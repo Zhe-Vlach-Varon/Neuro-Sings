@@ -11,7 +11,7 @@ import polars as pl
 from loguru import logger
 
 # TODO are the different unoffV3 subdirs actually needed, or just the root unoffV3 dir
-from neuro import CUSTOM_DIR, ROOT_DIR, SONGS_JSON, UNOFFICIALV3_DIR, UNOFFV3_DISC1, UNOFFV3_DISC2, UNOFFV3_DISC3, UNOFFV3_DISC4, UNOFFV3_DISC5, UNOFFV3_DISC6, UNOFFV3_DISC7, UNOFFV3_DISC8, UNOFFV3_DISC66, OFFICIAL_RELEASE_DIR, SETLISTS_DIR, OFFICIAL_CSV, ORIGINAL_CSV
+from neuro import CUSTOM_DIR, ROOT_DIR, SONGS_JSON, UNOFFICIALV3_DIR, UNOFFV3_DISC1, UNOFFV3_DISC2, UNOFFV3_DISC3, UNOFFV3_DISC4, UNOFFV3_DISC5, UNOFFV3_DISC6, UNOFFV3_DISC7, UNOFFV3_DISC8, UNOFFV3_EXTRA, UNOFFV3_DISC66, OFFICIAL_RELEASE_DIR, SETLISTS_DIR, OFFICIAL_CSV, ORIGINAL_CSV
 from neuro.polars_utils import load_db, load_dates
 import neuro.utils as neutils
 
@@ -43,7 +43,7 @@ def get_files(songs: pl.DataFrame) -> dict[str, list[Path]]:
 
     custom_dir = CUSTOM_DIR
     unofficialV3_dir = [UNOFFICIALV3_DIR / UNOFFV3_DISC1, UNOFFICIALV3_DIR / UNOFFV3_DISC2, UNOFFICIALV3_DIR / UNOFFV3_DISC3, UNOFFICIALV3_DIR / UNOFFV3_DISC4, UNOFFICIALV3_DIR / UNOFFV3_DISC5, UNOFFICIALV3_DIR / UNOFFV3_DISC6, UNOFFICIALV3_DIR / UNOFFV3_DISC7, UNOFFICIALV3_DIR / UNOFFV3_DISC8]
-    arg_dir = UNOFFICIALV3_DIR / UNOFFV3_DISC66
+    arg_dir = UNOFFICIALV3_DIR / UNOFFV3_EXTRA / UNOFFV3_DISC66
     official_dir = OFFICIAL_RELEASE_DIR
 
     return {
@@ -227,8 +227,8 @@ def extract_custom(files: list[Path], out: neutils.SongJSON = {}) -> neutils.Son
         fields = filename.split(' - ')
         artist = fields[0]
         title = fields[1]
-        cover_artist = fields[2]
-        album = fields[3]
+        cover_artist = fields[2] if len(fields) > 2 else ""
+        album = fields[3] if len(fields) > 3 else ""
         
         # TODO print reminder to check artist, title, identify for custom songs
         data = {
@@ -241,7 +241,9 @@ def extract_custom(files: list[Path], out: neutils.SongJSON = {}) -> neutils.Son
             "File_IN": str(file),
             "id": 999999,
             # 'Date': "1970-01-01",
-            'Version': None,
+            'Version': "1",
+            'Special': "1",
+            'Comment': None,
             'Hash_IN': neutils.get_audio_hash(Path(file)),
         }
 
@@ -321,6 +323,7 @@ def extract_unofficialV3(files: list[Path], out: neutils.SongJSON = {}) -> neuti
             identify = trackJSon['Identify']
         cover_artist = trackJSon['CoverArtist']
         version = trackJSon['Version']
+        special = trackJSon['Special']
         if cover_artist.startswith('Neuro') and (not cover_artist.startswith('Neuro &')) and version.startswith('1'):
             cover_artist = 'Neuro [v1]'
         elif cover_artist.startswith('Neuro') and (not cover_artist.startswith('Neuro &')) and version.startswith('2'):
@@ -337,11 +340,14 @@ def extract_unofficialV3(files: list[Path], out: neutils.SongJSON = {}) -> neuti
             'File_IN' : str(file),
             'id' : id,
             'duplicate' : False,
+            'encore' : False,
             'Date' : date,
             'Lead Singer': cover_artist,
             'additional flags': "",
             'Version': version,
             'Hash_IN': neutils.get_audio_hash(Path(file)),
+            'Special': special,
+            'Comment': trackJSon['Comment'],
         }
         id += 1
         if date in out:
@@ -375,6 +381,7 @@ def extract_arg(files: list[Path], out: neutils.SongJSON = {}) -> neutils.SongJS
             'Lead Singer': artist,
             'additional flags': "",
             'Version': '66',
+            'Special': '1',
             'Hash_IN': neutils.get_audio_hash(Path(file)),
         }
 
@@ -440,6 +447,7 @@ def extract_official(files: list[Path], out: neutils.SongJSON ={}) -> neutils.So
                     'Lead Singer': lead_singer,
                     'additional flags': "",
                     'Version': version,
+                    'Special': '1',
                     'Hash_IN': neutils.get_audio_hash(Path(file)),
                     }
                 if 'custom' in out.keys():
@@ -475,6 +483,7 @@ def extract_official(files: list[Path], out: neutils.SongJSON ={}) -> neutils.So
                     'Lead Singer': artist,
                     'additional flags': "",
                     'Version': '1',
+                    'Special': '1',
                     'Hash_IN': neutils.get_audio_hash(Path(file)),
                     }
                 if 'custom' in out.keys():
@@ -656,6 +665,8 @@ def parse_setlist(p: Path) -> neutils.SongJSON:
                 'encore': encore,
                 'additional flags': additionalFlags,
                 'Version': None,
+                'Comment': None,
+                'Special': None,
             }
             # print(album)
             songs[album].append(data)

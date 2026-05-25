@@ -1,0 +1,53 @@
+{
+  "title": [
+    {
+      "logic": "AND",
+      "if_field": "Title",
+      "if_operator": "is not empty",
+      "if_value": "",
+      "then_template": "{Title}",
+      "is_first": true
+    }
+  ],
+  "artist": [
+    {
+      "logic": "AND",
+      "if_field": "Special",
+      "if_operator": "is",
+      "if_value": "1",
+      "then_template": "({CoverArtist}) {Artist}",
+      "is_first": true
+    },
+    {
+      "logic": "OR",
+      "if_field": "CoverArtist",
+      "if_operator": "is",
+      "if_value": "Neuro",
+      "then_template": "(Neuro.v{Version}) {Artist}"
+    },
+    {
+      "logic": "OR",
+      "if_field": "CoverArtist",
+      "if_operator": "is",
+      "if_value": "Evil",
+      "then_template": "(Evil.v{Version}) {Artist}"
+    },
+    {
+      "logic": "OR",
+      "if_field": "CoverArtist",
+      "if_operator": "is not empty",
+      "if_value": "",
+      "then_template": "(Duet.v{Version}) {Artist}"
+    }
+  ],
+  "album": [
+    {
+      "logic": "AND",
+      "if_field": "Discnumber",
+      "if_operator": "is not empty",
+      "if_value": "",
+      "then_template": "Disc {Discnumber}",
+      "is_first": true
+    }
+  ]
+}

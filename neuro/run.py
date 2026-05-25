@@ -5,7 +5,7 @@ from time import time
 
 from loguru import logger
 
-from neuro import DRIVE_DIR, CUSTOM_DIR, UNOFFICIALV3_DIR, LOG_DIR, SONG_ROOT_DIR, UNOFFV3_DISC66
+from neuro import DRIVE_DIR, CUSTOM_DIR, UNOFFICIALV3_DIR, LOG_DIR, SONG_ROOT_DIR, UNOFFV3_EXTRA, UNOFFV3_DISC66
 from neuro.checks import check_are_dbs_identical
 from neuro.detection import export_json, extract_all
 from neuro.file_tags import CustomSong, DriveSong
@@ -48,7 +48,7 @@ def generate_from_preset(preset: Preset, dates_dict: DateDict) -> None:
         # Differenciate songs from drive and custom songs. Mainly because they aren't
         # from the same contexts (streams vs collabs mainly). Their format is different.
         # Subathon mixes are put in custom, so drive songs are only mp3
-        if Path(song_dict["File_IN"]).is_relative_to(DRIVE_DIR) or ((Path(song_dict["File_IN"]).is_relative_to(UNOFFICIALV3_DIR)) and (not Path(song_dict['File_IN']).is_relative_to(UNOFFICIALV3_DIR / UNOFFV3_DISC66))):
+        if Path(song_dict["File_IN"]).is_relative_to(DRIVE_DIR) or ((Path(song_dict["File_IN"]).is_relative_to(UNOFFICIALV3_DIR)) and (not Path(song_dict['File_IN']).is_relative_to(UNOFFICIALV3_DIR / UNOFFV3_EXTRA / UNOFFV3_DISC66))):
             date_dict = dates_dict.get(song_dict["Date"], {})
             s = DriveSong(song_dict, date_dict)
         # elif Path(song_dict["File_IN"]).is_relative_to(UNOFFICIALV3_DIR):
@@ -170,7 +170,7 @@ def generate_albums() -> None:
     for i, song_dict in enumerate(songDB.iter_rows(named=True)):
         N_SONGS = len(songDB)
 
-        if Path(song_dict["File_IN"]).is_relative_to(DRIVE_DIR) or ((Path(song_dict["File_IN"]).is_relative_to(UNOFFICIALV3_DIR)) and (not Path(song_dict['File_IN']).is_relative_to(UNOFFICIALV3_DIR / UNOFFV3_DISC66))):
+        if Path(song_dict["File_IN"]).is_relative_to(DRIVE_DIR) or ((Path(song_dict["File_IN"]).is_relative_to(UNOFFICIALV3_DIR)) and (not Path(song_dict['File_IN']).is_relative_to(UNOFFICIALV3_DIR / UNOFFV3_EXTRA / UNOFFV3_DISC66))):
             date_dict = dates_dict.get(song_dict["Date"], {})
             s = DriveSong(song_dict, date_dict)
         else:

@@ -19,6 +19,9 @@ from neuro.utils import file_check, format_logger, SongEntry, sanitize_filename
 import polars as pl
 from neuro.polars_utils import load_db
 
+from metadata_utils import engraver as engraver
+
+songs_df = load_db()
 
 class Song:
     """Represents a Song's Metadata. Abstract class, used for common code between drive/custom songs."""
@@ -83,6 +86,13 @@ class Song:
         assert song_dict["Cover Artist"] is not None
         self.cover_artist: str = song_dict["Cover Artist"]
 
+        assert song_dict["Version"] is not None
+        self.version: str = song_dict['Version']
+
+        self.comment: str = song_dict['Comment']
+
+        self.special: str = song_dict['Special']
+
         assert song_dict["Hash_IN"] is not None
         self.hash_in: str = song_dict["Hash_IN"]
 
@@ -127,7 +137,7 @@ class Song:
         raise NotImplementedError
     
     def apply_tags(self, ascii_tags: bool = False) -> None:
-        """virrtual method"""
+        """virtual method"""
         raise NotImplementedError
 
     def id3_pic(self, cover: Path) -> APIC:
@@ -154,7 +164,6 @@ class Song:
         Returns:
             _ (list[TextFrame]): Dictionary with Album artist.
         """
-        songs_df = load_db()
         filtered_songs = songs_df.filter(pl.col('Album') == self.album)
 
         additional = [
@@ -316,6 +325,11 @@ class DriveSong(Song):
         for frame in common_props:
             id3.add(frame)
 
+        
+        filtered_songs = songs_df.filter(pl.col('Album') == self.album)
+
+        track_n = f"{self.track_n}/{filtered_songs.height}"
+
         id3.add(TPE2(encoding=3, text=self.album_artist))
         id3.add(TSO2(encoding=3, text=self.album_artist))
 
@@ -345,6 +359,12 @@ class DriveSong(Song):
         id3.delall("APIC")
         id3.add(self.id3_pic(cover))
         id3.save()
+
+        payload_data = engraver.build_payload(self.file, self.date, self.title, self.title_og,
+                               self.identify, self.artist, self.artist_og,
+                               self.cover_artist, self.version, self.album, "1", track_n,
+                               self.comment, self.special, self.hash_in)
+        engraver.engrave_payload(self.outfile, payload_data)
 
 
 class CustomSong(Song):
@@ -442,6 +462,11 @@ class CustomSong(Song):
 
         for frame in self.get_id3_frames(ascii_tags=ascii_tags):
             id3.add(frame)
+        track_n = id3.get(TRCK)
+        
+        filtered_songs = songs_df.filter(pl.col('Album') == self.album)
+
+        track_n = f"{self.track_n}/{filtered_songs.height}"
 
         if self.flags.as_drive or self.flags.arg:
             album_artist = self.album_artist
@@ -455,6 +480,12 @@ class CustomSong(Song):
         id3.delall("APIC")
         id3.add(self.id3_pic(self.cover))
         id3.save()
+
+        payload_data = engraver.build_payload(self.file, self.date, self.title, self.title_og,
+                               self.identify, self.artist, self.artist_og,
+                               self.cover_artist, self.version, self.album, "1", track_n,
+                               self.comment, self.special, self.hash_in)
+        engraver.engrave_payload(self.outfile, payload_data)
 
     def get_flac_pic(self) -> Picture:
         """Generates a picture for a FLAC file's cover. This very particular method works, so\

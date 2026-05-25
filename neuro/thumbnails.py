@@ -284,6 +284,7 @@ def generate_oldge() -> None:
 
         index = i_m + i_k - 1
         logger.debug(f"[THUMB] [{index + 1:2d}/{N_COVERS}] Cover Pictures for {date} done")
+        # TODO fix calculation of number of cover images to generate
 
     logger.success(f"[THUMB] {N_COVERS} successfully generated in {time_format(time() - t)}")
 

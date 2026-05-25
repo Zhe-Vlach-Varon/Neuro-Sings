@@ -1,0 +1,22 @@
+2026-01-01 | Neuro | New Years Day 2026 Karaoke
+1 | Cheerleader | Porter Robinson | Neuro | New
+2 | Fortress | ILLENIUM | Neuro | New
+3 | Self Control | Laura Branigan | Neuro | Duplicate
+4 | Meltdown | iroha(sasaki) | Neuro | New
+5 | I'm Still Standing | Elton John | Neuro | Duplicate
+6 | Hold the Line | Toto | Neuro | Duplicate
+7 | World's Smallest Violin | AJR | Neuro | New
+8 | My Favourite Game | The Cardigans | Neuro | New
+9 | BIRDS OF A FEATHER | Billie Eilish | Neuro & Evil | Duplicate
+10 | Rain of Stars | nelward | Neuro | New
+Evil
+11 | Control | Halsey | Evil | Duplicate
+12 | Come as You Are | Nirvana | Evil | New
+13 | I Can't Decide | Scissor Sisters | Evil | Duplicate
+14 | Just Pretend | BAD OMENS | Evil | New
+15 | Don't Look Down | Ellie Minibot | Evil | New
+16 | Sinners | Barns Courtney | Evil | New
+17 | I Knew You Were Trouble | Taylor Swift | Evil | New
+18 | Livin' La Vida Loca | Ricky Martin | Evil | Duplicate
+19 | Petals, and the Voices Which Trail Behind | avaraya | Evil | Duplicate
+20 | PONPON SHIT | Namakopuri, Us Cracks | Neuro & Evil | New

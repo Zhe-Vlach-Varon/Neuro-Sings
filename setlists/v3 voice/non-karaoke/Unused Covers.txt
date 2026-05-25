@@ -1,0 +1,21 @@
+!! using multiple album info lines in order to catch multiple tracks from
+!! different dates that belong to the same album
+2023-06-21 | Neuro [v2] | Unused Covers
+1 | Goddess | Cepheid, Nonon | Neuro [v2] | New || unused;
+!! NN release
+2023-08-01
+Neuro
+2 | It's Been So Long | The Living Tombstone | Neuro | New || unused;
+2023-08-21
+3 | world.execute(me); | Mili | Neuro | New || unused;
+2023-11-12
+4 | Money Machine | 100 gecs | Neuro | New || unused;
+2024-05-24
+5 | Never Gonna Give You Up | Rick Astley | Neuro | New || unused;as_drive;
+2024-06-26
+6 | Die For You | Grabbitz | Neuro & Evil | New || unused;
+!! NN release
+2024-09-04
+7 | Angel With A Shotgun | The Cab | Neuro | New || unused;
+2024-12-30
+8 | Blinding Lights | The Weeknd | Neuro | New || unused;

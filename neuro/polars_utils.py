@@ -22,13 +22,13 @@ songs_schema = {
     'Album_ID': pl.Int64,
     'Image': pl.String,
     'File_IN': pl.String,
-    # 'Special': pl.Boolean,
-    # TODO add field for special
     'Hash_IN': pl.String,
     'Flags': pl.String,
     'Key': pl.String,
     'Tempo (1/4 beat)': pl.String,
     'Version': pl.String,
+    'Special': pl.String,
+    'Comment': pl.String,
     }
 
 dates_schema = {

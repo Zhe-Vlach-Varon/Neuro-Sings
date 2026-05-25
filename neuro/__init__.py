@@ -34,7 +34,8 @@ UNOFFV3_DISC5 = "DISC 5 - Non-Stop Innovation (2024-07-10 - 2024-11-17)"
 UNOFFV3_DISC6 = "DISC 6 - Second Anniversary (2024-11-17 - 2025-05-15)"
 UNOFFV3_DISC7 = "DISC 7 - Background Running Process (2025-05-28 - 2025-12-06)"
 UNOFFV3_DISC8 = "DISC 8 - Third Anniversary (2025-12-19 - Present)"
-UNOFFV3_DISC66 = "Extra Content/DISC 66 - ARG"
+UNOFFV3_EXTRA = "Extra Content"
+UNOFFV3_DISC66 = "DISC 66 - ARG"
 
 OFFICIAL_RELEASE_DIR = SONG_ROOT_DIR / "officially released songs"
 

@@ -23,7 +23,7 @@ import json
 import loguru
 from loguru import logger
 
-from neuro import LOG_DIR, OFFICIAL_RELEASE_DIR, UNOFFICIALV3_DIR, CUSTOM_DIR, DRIVE_DIR, SETLISTS_DIR
+from neuro import LOG_DIR, OFFICIAL_RELEASE_DIR, UNOFFICIALV3_DIR, CUSTOM_DIR, DRIVE_DIR, SETLISTS_DIR, UNOFFV3_EXTRA, UNOFFV3_DISC66
 
 SongEntry = dict[str, Optional[str]]
 """Dictionary representing a song in the JSON, containing fields like "Title", "Artist", etc..."""
@@ -361,6 +361,41 @@ def get_cover_artist(file: Path) -> str:
         return None
     # These last few return None because the bulk of songs are covered by the other cases and there will be few enough songs left to manually update in a reasonable time
 
+def get_special(file: Path) -> str:
+    # print(file)
+    # print(file.is_relative_to(UNOFFICIALV3_DIR / UNOFFV3_EXTRA / UNOFFV3_DISC66))
+    if file.is_relative_to(UNOFFICIALV3_DIR / UNOFFV3_EXTRA / UNOFFV3_DISC66):
+        return "0"
+    if file.is_relative_to(UNOFFICIALV3_DIR):
+        trackInfo = tinytag.TinyTag.get(file)
+        if len(trackInfo.comment) > 0 and trackInfo.comment.startswith('{') and trackInfo.comment.endswith('}'):
+            trackJSon = json.loads(trackInfo.comment)
+            special = trackJSon['Special']
+        elif 'comment' in trackInfo.other.keys():
+            for comment in trackInfo.other['comment']:
+                if comment.startswith('{') and comment.endswith('}'):
+                    trackJSon = json.loads(comment)
+                    special = trackJSon['Special']
+        return special
+    return "0"
+
+def get_comment(file: Path) -> str:
+    # print(file)
+    # print(file.is_relative_to(UNOFFICIALV3_DIR / UNOFFV3_EXTRA / UNOFFV3_DISC66))
+    if file.is_relative_to(UNOFFICIALV3_DIR / UNOFFV3_EXTRA / UNOFFV3_DISC66):
+        return None
+    if file.is_relative_to(UNOFFICIALV3_DIR):
+        trackInfo = tinytag.TinyTag.get(file)
+        if len(trackInfo.comment) > 0 and trackInfo.comment.startswith('{') and trackInfo.comment.endswith('}'):
+            trackJSon = json.loads(trackInfo.comment)
+            comment_str = trackJSon['Comment']
+        elif 'comment' in trackInfo.other.keys():
+            for comment in trackInfo.other['comment']:
+                if comment.startswith('{') and comment.endswith('}'):
+                    trackJSon = json.loads(comment)
+                    comment_str = trackJSon['Comment']
+        return comment_str
+    return None
 
 def do_song_titles_match(existing_song_title: str, new_song_title: str) -> bool:
     if existing_song_title is None or new_song_title is None:

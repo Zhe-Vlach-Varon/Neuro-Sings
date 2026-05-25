@@ -6,7 +6,7 @@ from typing import Literal, Optional
 import polars as pl
 from loguru import logger
 
-from neuro import ROOT_DIR, DATES_CSV, LOG_DIR, SETLISTS_DIR, SONGS_CSV, SONGS_DB, SONGS_JSON
+from neuro import SONG_ROOT_DIR, ROOT_DIR, DATES_CSV, LOG_DIR, SETLISTS_DIR, SONGS_CSV, SONGS_DB, SONGS_JSON
 from neuro.polars_utils import load_dates, load_db, songs_schema, dates_schema
 import neuro.utils as neutils
 
@@ -373,7 +373,9 @@ def update_db() -> None:
                     "Flags": flags,
                     "Key": None,
                     "Tempo (1/4 beat)": None,
-                    'Version': song['Version'],
+                    "Version": song["Version"],
+                    "Special": song["Special"],
+                    "Comment": song["Comment"]
                 }
             )
             # with pl.Config(tbl_cols=-1):
@@ -444,8 +446,34 @@ def update_db_hashes() -> None:
     new_songs_df.write_csv(SONGS_CSV)
     new_songs_df.write_database("Songs", f"sqlite:///{SONGS_DB}", if_table_exists="replace")
 
-# def update_database_file_in_fields() -> None:
-#     # TODO
+def update_db_filenames() -> None:
+    songs = load_db()
+    schema = songs.schema
+
+    updated_songs = pl.DataFrame(schema=schema)
+
+    file_mapping = neutils.get_audio_hash_to_file_mapping(SONG_ROOT_DIR)
+
+    songs_updated = 0
+
+    for song in tqdm(songs.iter_rows(named=True), total=len(songs)):
+        # print()
+        # print(song)
+        file = Path(song["File_IN"])
+        new_file = Path(file_mapping[song['Hash_IN']]).relative_to(ROOT_DIR)
+        print(file)
+        print(new_file)
+        if not str(file) == str(new_file):
+            print(f"updating File_IN for {song['Title']}")
+            song['File_IN'] = str(new_file)
+            songs_updated += 1
+        updated_songs.extend(pl.DataFrame(song))
+
+    print(f"updated {songs_updated} songs")
+
+    updated_songs.write_csv(SONGS_CSV)
+    updated_songs.write_database("Songs", f"sqlite:///{SONGS_DB}", if_table_exists="replace")
+
 
 def add_cover_artist() -> None:
     songs = load_db()
@@ -460,6 +488,44 @@ def add_cover_artist() -> None:
         assert file.exists()
         singer = neutils.get_cover_artist(file)
         song["Cover Artist"] = singer
+        new_songs_df.extend(pl.DataFrame(song))
+            
+    new_songs_df.write_csv(SONGS_CSV)
+    new_songs_df.write_database("Songs", f"sqlite:///{SONGS_DB}", if_table_exists="replace")
+
+def add_special() -> None:
+    songs = load_db()
+    schema = songs.schema
+    # print(schema)
+
+    new_songs_df = pl.DataFrame(schema=schema)
+
+    for song in tqdm(songs.iter_rows(named=True), total=len(songs)):
+        file = ROOT_DIR / Path(song["File_IN"])
+        # print(file)
+        assert file.exists()
+        special = neutils.get_special(file)
+        song["Special"] = special
+        new_songs_df.extend(pl.DataFrame(song))
+            
+    new_songs_df.write_csv(SONGS_CSV)
+    new_songs_df.write_database("Songs", f"sqlite:///{SONGS_DB}", if_table_exists="replace")
+
+def add_comment() -> None:
+    songs = load_db()
+    schema = songs.schema
+    # print(schema)
+
+    new_songs_df = pl.DataFrame(schema=schema)
+
+    for song in tqdm(songs.iter_rows(named=True), total=len(songs)):
+        file = ROOT_DIR / Path(song["File_IN"])
+        # print(file)
+        assert file.exists()
+        comment = neutils.get_comment(file)
+        if comment == "None":
+            comment = None
+        song["Comment"] = comment
         new_songs_df.extend(pl.DataFrame(song))
             
     new_songs_df.write_csv(SONGS_CSV)
@@ -591,7 +657,7 @@ def get_most_recent_version(song: dict, json_data: neutils.SongJSON, encore: boo
                "TitleOG": latest_version["TitleOG"],
                "Identify": latest_version["Identify"],
                "Artist": latest_version["Artist"],
-               "ArtistOG": song["ArtistOG"],
+               "ArtistOG": latest_version["ArtistOG"],
                "Cover Artist": latest_version["Cover Artist"],
                "Date": song["Date"],
                "Album": song["Album"],
@@ -603,6 +669,8 @@ def get_most_recent_version(song: dict, json_data: neutils.SongJSON, encore: boo
                "Key": latest_version["Key"],
                "Tempo (1/4 beat)": latest_version["Tempo (1/4 beat)"],
                "Version": latest_version["Version"],
+               "Special": latest_version["Special"],
+               "Comment": latest_version["Comment"],
             }
         )
     elif len(filtered_json_songs) > 0 and latest_version == latest_json_version:
@@ -615,7 +683,7 @@ def get_most_recent_version(song: dict, json_data: neutils.SongJSON, encore: boo
                "TitleOG": latest_version["TitleOG"],
                "Identify": latest_version["Identify"],
                "Artist": latest_version["Artist"],
-               "ArtistOG": song["ArtistOG"],
+               "ArtistOG": latest_version["ArtistOG"],
                "Cover Artist": latest_version["Cover Artist"],
                "Date": song["Date"],
                "Album": song["Album"],
@@ -626,7 +694,9 @@ def get_most_recent_version(song: dict, json_data: neutils.SongJSON, encore: boo
                "Flags": flags,
                "Key": song["Key"],
                "Tempo (1/4 beat)": song["Tempo (1/4 beat)"],
-               "Version": song["Version"],
+               "Version": latest_version["Version"],
+               "Special": latest_version["Special"],
+               "Comment": latest_version["Comment"],
             }
         )
     else:

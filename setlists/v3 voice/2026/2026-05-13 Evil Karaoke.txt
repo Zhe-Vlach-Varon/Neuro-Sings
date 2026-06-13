@@ -1,19 +1,19 @@
 2026-05-13 | Evil
-1 | Cryogen | Muse | Evil | New
-2 | I Was Made For Lovin' You | KISS | Evil | New
-3 | Jitter Doll | niki | Evil | New
-4 | Talking In Your Sleep | The Romantic | Evil | New
-5 | W.I.T.C.H. | Devon Cole | Evil | New
-6 | Marigold | M2U | Evil | New
-7 | Aerials | System Of A Down | Evil | New
-8 | Blue Bird | Ikimonogakari | Evil | New
-9 | Propaganda | Crusher | Evil | New
-10 | No Surprises | Radiohead | Evil | New
-11 | TNT | CaptainSparklez | Evil | New
-12 | Kanashibari ni Attara | Avaraya | Neuro & Evil | New
-13 | Crazy | Patsy Cline | Evil |New
-14 | Propane Nightmares | Pendulum | Evil | New
-15 | Circus | Britney Spears | Evil | New
-16 | New Person, Same Old Mistakes | Tame Impala | Neuro & Evil | New
-17 | Antigravity | STARSET | Evil | New
-18 | Want You Gone | Jonathan Coulton, Ellen McClain | Evil | New
+1 | Cryogen | Muse | Evil
+2 | I Was Made For Lovin' You | KISS | Evil
+3 | Jitter Doll | niki | Evil
+4 | Talking In Your Sleep | The Romantic | Evil
+5 | W.I.T.C.H. | Devon Cole | Evil
+6 | Marigold | M2U | Evil
+7 | Aerials | System Of A Down | Evil
+8 | Blue Bird | Ikimonogakari | Evil
+9 | Propaganda | Crusher | Evil
+10 | No Surprises | Radiohead | Evil
+11 | TNT | CaptainSparklez | Evil
+12 | If You Were to be Paralyzed by Sleep | Avaraya | Neuro & Evil
+13 | Crazy | Patsy Cline | Evil |
+14 | Propane Nightmares | Pendulum | Evil
+15 | Circus | Britney Spears | Evil
+16 | New Person, Same Old Mistakes | Tame Impala | Neuro & Evil
+17 | Antigravity | STARSET | Evil
+18 | Want You Gone | Jonathan Coulton, Ellen McClain | Evil

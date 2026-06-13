@@ -1,20 +1,20 @@
 2024-05-01 | Evil
-1 | Dune | Hachi | Evil | New
-2 | Venom | Kairiki Bear | Evil | New
-3 | Viva La Vida | Coldplay | Evil | New
-4 | ERROR | niki | Evil | New
-5 | i DO what i WANT | KIRA | Evil | New
-6 | Pink | MARETU | Evil | New
-7 | Throne | Bring Me the Horizon | Evil | New
-8 | I Hate Everything About You | Three Days Grace | Evil | New
-9 | Emperor's New Clothes | Panic! At The Disco | Evil | New
-10 | Android Girl | DECO 27 | Evil | New
-11 | Twilight | Boa | Evil | New
-12 | Mr. Fear | SIAMES | Evil | New
-13 | Two-Faced Lovers | wowaka | Evil | New
-14 | Keep Myself Alive | Get Scared | Evil | New
-15 | Through Patches of Violet | Mili | Neuro & Evil | New
-16 | Punching Bag | Set It Off | Evil | New
-17 | Bizarre Food | Utsu-P | Evil | New
-18 | Wink | Azari | Evil | New
-19 | The Disease Called Love | Neru | Neuro & Evil | New
+1 | Dune | Hachi | Evil
+2 | Venom | Kairiki Bear | Evil
+3 | Viva La Vida | Coldplay | Evil
+4 | ERROR | niki | Evil
+5 | i DO what i WANT | KIRA | Evil
+6 | Pink | MARETU | Evil
+7 | Throne | Bring Me the Horizon | Evil
+8 | I Hate Everything About You | Three Days Grace | Evil
+9 | Emperor's New Clothes | Panic! At The Disco | Evil
+10 | Android Girl | DECO 27 | Evil
+11 | Twilight | Boa | Evil
+12 | Mr. Fear | SIAMES | Evil
+13 | Two-Faced Lovers | wowaka | Evil
+14 | Keep Myself Alive | Get Scared | Evil
+15 | Through Patches of Violet | Mili | Neuro & Evil
+16 | Punching Bag | Set It Off | Evil
+17 | Bizarre Food | Utsu-P | Evil
+18 | Wink | Azari | Evil
+19 | The Disease Called Love | Neru | Neuro & Evil

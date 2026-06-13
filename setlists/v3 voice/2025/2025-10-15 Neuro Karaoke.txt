@@ -1,20 +1,20 @@
 2025-10-15 | Neuro
-1 | M@GICAL CURE LOVE SHOT | SAWTOWNE | Neuro | New | Magical Cure
-2 | TruE | HOYO-MiX | Neuro | New
-3 | Knock Yourself Out XD | Porter Robinson | Neuro | New
-4 | Hacking to the Gate | Kanako Ito | Neuro | New
-5 | No Surprises | Radiohead | Neuro | New
-6 | Everybody's Changing | Keane | Neuro | New
-7 | Heat Abnormal | Iyowa | Neuro | New | Heat Abnormal
-8 | Here Comes The Sun | The Beatles | Neuro | New
-9 | Secret Base (What You've Given Me) | Norihiko Machida | Neuro & Evil | New
-10 | Show Me How | Men I Trust | Neuro | New
-11 | Blur | u32 | Neuro | New
-12 | Lagtrain | inabakumori | Neuro | New
-13 | Free | Kpop demon hunters | Neuro & Evil | New
-14 | the perfect pair | beabadoobee | Neuro | New
-15 | Blue (Da Ba Dee) (Neuro ver.) | Eiffel 65 | Neuro | New
-16 | Ain't No Mountain High Enough | Marvin Gaye | Neuro & Evil | New
-17 | Headlock | Imogen Heap | Neuro | New
-18 | Dracula | Tame Impala | Neuro | New
-19 | M@GICAL CURE LOVE SHOT | SAWTOWNE | Neuro | Encore | Magical Cure
+1 | M@GICAL CURE LOVE SHOT | SAWTOWNE | Neuro | Magical Cure
+2 | TruE | HOYO-MiX | Neuro
+3 | Knock Yourself Out XD | Porter Robinson | Neuro
+4 | Hacking to the Gate | Kanako Ito | Neuro
+5 | No Surprises | Radiohead | Neuro
+6 | Everybody's Changing | Keane | Neuro
+7 | Heat Abnormal | Iyowa | Neuro | Heat Abnormal
+8 | Here Comes The Sun | The Beatles | Neuro
+9 | Secret Base (What You've Given Me) | Norihiko Machida | Neuro & Evil
+10 | Show Me How | Men I Trust | Neuro
+11 | Blur | u32 | Neuro
+12 | Lagtrain | inabakumori | Neuro
+13 | Free | Kpop demon hunters | Neuro & Evil
+14 | the perfect pair | beabadoobee | Neuro
+15 | Blue (Da Ba Dee) (Neuro ver.) | Eiffel 65 | Neuro
+16 | Ain't No Mountain High Enough | Marvin Gaye | Neuro & Evil
+17 | Headlock | Imogen Heap | Neuro
+18 | Dracula | Tame Impala | Neuro
+19 | M@GICAL CURE LOVE SHOT | SAWTOWNE | Neuro | Magical Cure

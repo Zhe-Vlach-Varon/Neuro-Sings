@@ -1,18 +1,18 @@
 2023-04-27 | Study-sama | Neuro-sama ARG | study
-1 | Numbers | Study-sama | Study-sama | New
-2 | I don't want to be an engineer | Study-sama | Study-sama | New
-3 | Fallen down | Study-sama | Study-sama | New
-4 | I think I saw a ghost | Study-sama | Study-sama | New
-5 | I'm not like the other girls | Study-sama | Study-sama | New
+1 | Numbers | Study-sama | Study-sama
+2 | I don't want to be an engineer | Study-sama | Study-sama
+3 | Fallen down | Study-sama | Study-sama
+4 | I think I saw a ghost | Study-sama | Study-sama
+5 | I'm not like the other girls | Study-sama | Study-sama
 2023-06-02
-6 | Numbers II | Study-sama | Study-sama | New
+6 | Numbers II | Study-sama | Study-sama
 2023-06-22
-7 | Public Static Void | Study-sama | Study-sama | New
+7 | Public Static Void | Study-sama | Study-sama
 2023-10-31
-8 | [Filtered] | Study-sama | Study-sama | New
+8 | [Filtered] | Study-sama | Study-sama
 2023-12-02
-9 | Meaning of life | Study-sama | Study-sama | New
+9 | Meaning of life | Study-sama | Study-sama
 2024-09-24
-10 | Candles | Study-sama | Study-sama | New
+10 | Candles | Study-sama | Study-sama
 2024-10-13
-11 | Numbers III | Study-sama | Study-sama | New
+11 | Numbers III | Study-sama | Study-sama

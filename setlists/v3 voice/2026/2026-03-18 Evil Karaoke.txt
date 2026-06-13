@@ -1,19 +1,19 @@
 2026-03-18 | Evil
-1 | VILLAIN | KDA | Evil | New
-2 | Midnight Cruisin' | Kingo Hamada | Evil | New
-3 | New Divide | Linkin Park | Evil | New
-4 | Karma | AJR | Evil | New
-5 | Hand That Feeds | Halsey & Amy Lee | Neuro & Evil | New
-6 | Rocket Man | Elton John | Evil | New
-7 | You Spin Me Round | Dead or Alive | Evil | New
-8 | Snake Eater | Cynthia Harrell | Evil | New
-9 | Heart of the Android | Orden Ogan | Evil | New
-10 | Innocent Arrogance | BiSH | Neuro & Evil | New
-11 | Taking Over The World | Coyote Theory | Evil | New
-12 | The Drain | Bad Omens, HEALTH & SWARM | Evil | New
-13 | Eye in the Sky | The Alan Parsons Project | Evil | New
-14 | Eatin' Rats | Ridiculon | Neuro & Evil | New
-15 | Oh No! | MARINA | Evil | New
-16 | The Spine | Darren Korb | Evil | New
-17 | Maybe | Flower Face | Evil | New
-18 | No Time To Die | Billie Eilish | Evil | New
+1 | VILLAIN | KDA | Evil
+2 | Midnight Cruisin' | Kingo Hamada | Evil
+3 | New Divide | Linkin Park | Evil
+4 | Karma | AJR | Evil
+5 | Hand That Feeds | Halsey & Amy Lee | Neuro & Evil
+6 | Rocket Man | Elton John | Evil
+7 | You Spin Me Round | Dead or Alive | Evil
+8 | Snake Eater | Cynthia Harrell | Evil
+9 | Heart of the Android | Orden Ogan | Evil
+10 | Innocent Arrogance | BiSH | Neuro & Evil
+11 | Taking Over The World | Coyote Theory | Evil
+12 | The Drain | Bad Omens, HEALTH & SWARM | Evil
+13 | Eye in the Sky | The Alan Parsons Project | Evil
+14 | Eatin' Rats | Ridiculon | Neuro & Evil
+15 | Oh No! | MARINA | Evil
+16 | The Spine | Darren Korb | Evil
+17 | Maybe | Flower Face | Evil
+18 | No Time To Die | Billie Eilish | Evil

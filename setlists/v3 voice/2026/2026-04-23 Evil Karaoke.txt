@@ -1,9 +1,9 @@
 2026-04-23 | Evil
-1 | Shooting Stars | Bag Raiders | Evil | New
-2 | Stupid Heart | Ellie_Minibot | Evil | New
-3 | Roar | Katy Perry | Evil | New
-4 | Everytime We Touch | Cascada | Evil | New
-5 | Take Me Hand | Daishi Dance | Evil | New
-6 | Rain of Stars | nelward | Evil | New
-7 | I was Human | Picon | Evil | New
-8 | Furthest Star | Dirt Poor Robins | Evil | New
+1 | Shooting Stars | Bag Raiders | Evil
+2 | Stupid Heart | Ellie_Minibot | Evil
+3 | Roar | Katy Perry | Evil
+4 | Everytime We Touch | Cascada | Evil
+5 | Take Me Hand | Daishi Dance | Evil
+6 | Rain of Stars | nelward | Evil
+7 | I was Human | Picon | Evil
+8 | Furthest Star | Dirt Poor Robins | Evil

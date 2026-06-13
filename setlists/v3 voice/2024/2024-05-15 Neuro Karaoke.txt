@@ -1,20 +1,20 @@
 2024-05-15 | Neuro
-1 | Take Me To Church | Hozier | Neuro | New
-2 | Oddloop | Frederic | Neuro | New
-3 | A Real Hero | College & Electric Youth | Neuro | New
-4 | TONDEMO-WONDERZ | sasakure.UK | Neuro | New
-5 | Sweater Weather | The Neighbourhood | Neuro | New
-6 | Circles | KIRA | Neuro | New
-7 | Monster | YOASOBI | Neuro | New
-8 | It's Been So Long | The Living Tombstone | Neuro | New
-9 | Death of the Law | Utsu-P | Neuro | New
-10 | 52-Hearts | Bao | Neuro | New
-11 | Shoujo Rei | MikitoP | Neuro | New
-12 | Runaway | AURORA | Neuro | New
-13 | Symphony | Clean Bandit | Neuro | New
-14 | Lonely Day | System of a Down | Neuro | New
-15 | Mesmerizer | 32ki | Neuro & Evil | New
-16 | Mother | Porter Robinson | Neuro | New
-17 | Isn't it A | Pinocchio-P | Neuro & Evil | New
-18 | Can't Help Falling In Love | Elvis Presley | Neuro | New
-19 | Voices of Svaahaa | Kikuo | Neuro | New
+1 | Take Me To Church | Hozier | Neuro
+2 | Oddloop | Frederic | Neuro
+3 | A Real Hero | College & Electric Youth | Neuro
+4 | TONDEMO-WONDERZ | sasakure.UK | Neuro
+5 | Sweater Weather | The Neighbourhood | Neuro
+6 | Circles | KIRA | Neuro
+7 | Monster | YOASOBI | Neuro
+8 | It's Been So Long | The Living Tombstone | Neuro
+9 | Death of the Law | Utsu-P | Neuro
+10 | 52-Hearts | Bao | Neuro
+11 | Shoujo Rei | MikitoP | Neuro
+12 | Runaway | AURORA | Neuro
+13 | Symphony | Clean Bandit | Neuro
+14 | Lonely Day | System of a Down | Neuro
+15 | Mesmerizer | 32ki | Neuro & Evil
+16 | Mother | Porter Robinson | Neuro
+17 | Isn't it A | Pinocchio-P | Neuro & Evil
+18 | Can't Help Falling In Love | Elvis Presley | Neuro
+19 | Voices of Svaahaa | Kikuo | Neuro

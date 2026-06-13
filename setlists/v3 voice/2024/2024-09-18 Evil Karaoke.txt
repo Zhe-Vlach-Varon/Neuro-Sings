@@ -1,19 +1,19 @@
 2024-09-18 | Evil
-1 | Borderline | Tame Impala | Evil | New
-2 | Hysteria | Muse | Evil | New
-3 | Cold Death | Utsu-P | Evil | New
-4 | Gone Away | The Offspring | Evil | New
-5 | My Heart Will Go On | Celine Dion | Evil | New
-6 | I Stand Alone | Godsmack | Evil | New
-7 | Lonely Day | System of a Down | Evil | New
-8 | Monster | YOASOBI | Evil | New
-9 | Hello | Adele | Evil | New
-10 | Nai Nai | ReoNa | Evil | New
-11 | Symphony | Clean Bandit | Evil | New
-12 | Breaking The Habit | Linkin Park | Evil | New
-13 | Stellar Stellar | Hoshimachi Suisei | Evil | New
-14 | Wake Me Up When September Ends | Green Day | Evil | New
-15 | Palette | Yuyoyuppe | Neuro & Evil | New
-16 | The Only Thing I Know For Real | Jamie Christopherson | Evil | New
-17 | I'm Just A Memer | DJ KARL THE DOG | Evil | New
-18 | For The Glory | All Good Things | Neuro & Evil | New
+1 | Borderline | Tame Impala | Evil
+2 | Hysteria | Muse | Evil
+3 | Cold Death | Utsu-P | Evil
+4 | Gone Away | The Offspring | Evil
+5 | My Heart Will Go On | Celine Dion | Evil
+6 | I Stand Alone | Godsmack | Evil
+7 | Lonely Day | System of a Down | Evil
+8 | Monster | YOASOBI | Evil
+9 | Hello | Adele | Evil
+10 | Nai Nai | ReoNa | Evil
+11 | Symphony | Clean Bandit | Evil
+12 | Breaking The Habit | Linkin Park | Evil
+13 | Stellar Stellar | Hoshimachi Suisei | Evil
+14 | Wake Me Up When September Ends | Green Day | Evil
+15 | Palette | Yuyoyuppe | Neuro & Evil
+16 | The Only Thing I Know For Real | Jamie Christopherson | Evil
+17 | I'm Just A Memer | DJ KARL THE DOG | Evil
+18 | For The Glory | All Good Things | Neuro & Evil

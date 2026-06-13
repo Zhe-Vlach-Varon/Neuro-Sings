@@ -1,19 +1,19 @@
 2026-01-06 | Neuro | Neuro Subathon 3 VRChat Karaoke Concert | neuro 3d 2026-01-06
-1 | world.execute(me); | Mili | Neuro | New
-2 | Pretty Little Baby | Connie Francis | Neuro | Duplicate
-3 | Good Luck, Babe! | Chappell Roan | Neuro | New
-4 | Everytime We Touch | Cascada | Neuro | Duplicate
-5 | Take On Me | A-ha | Neuro | New
-6 | ...Baby One More Time | Britney Spears | Neuro | New
-7 | M@GICAL☆CURE! LOVE SHOT! | SAWTOWNE | Neuro | Duplicate
-8 | Don't Stop Believin' | Journey | Neuro | New
-9 | Chug Jug With You (Number One Victory Royale) | Leviathan | Neuro | Duplicate
-10 | Shatter Me | Lindsey Stirling | Neuro | Duplicate
-11 | Fallen Angel | LiSA, Mitsunori Ikeda, Aimee B | Neuro | New
-12 | The Mechanical Girl | Aurelio Voltaire | Neuro | Duplicate
-13 | Shrimp Fried Rice! | Jamie Paige | Neuro | Duplicate
-14 | Dancing Queen | ABBA | Neuro | New
-15 | Dracula | Tame Impala | Neuro | Duplicate
-16 | Everybody's Changing | Keane | Neuro | Duplicate
-17 | Duvet | Bôa | Neuro | Duplicate
-18 | Tek It | CAFUNÉ | Neuro | New
+1 | world.execute(me); | Mili | Neuro
+2 | Pretty Little Baby | Connie Francis | Neuro
+3 | Good Luck, Babe! | Chappell Roan | Neuro
+4 | Everytime We Touch | Cascada | Neuro
+5 | Take On Me | A-ha | Neuro
+6 | ...Baby One More Time | Britney Spears | Neuro
+7 | M@GICAL☆CURE! LOVE SHOT! | SAWTOWNE | Neuro
+8 | Don't Stop Believin' | Journey | Neuro
+9 | Chug Jug With You (Number One Victory Royale) | Leviathan | Neuro
+10 | Shatter Me | Lindsey Stirling | Neuro
+11 | Fallen Angel | LiSA, Mitsunori Ikeda, Aimee B | Neuro
+12 | The Mechanical Girl | Aurelio Voltaire | Neuro
+13 | Shrimp Fried Rice! | Jamie Paige | Neuro
+14 | Dancing Queen | ABBA | Neuro
+15 | Dracula | Tame Impala | Neuro
+16 | Everybody's Changing | Keane | Neuro
+17 | Duvet | Bôa | Neuro
+18 | Tek It | CAFUNÉ | Neuro

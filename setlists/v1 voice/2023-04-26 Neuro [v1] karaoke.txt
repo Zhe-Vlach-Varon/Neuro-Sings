@@ -1,25 +1,25 @@
 2023-04-26 | Neuro [v1]
-1 | Brain Power | NOMA | Neuro [v1] | Duplicate
-2 | Rockefeller Street (Nightcore) | Getter Jaani | Neuro [v1] | Duplicate
-3 | Thnks Fr Th Mmrs | Fall Out Boy | Neuro [v1] | Duplicate
-4 | Idol | YOASOBI | Neuro [v1] | New
-5 | Running in the 90's | Max Coveri | Neuro [v1] | Duplicate
-6 | Legends Never Die | Against The Current | Neuro [v1] | New
-7 | oddloop | Frederic | Neuro [v1] | Duplicate
-8 | Gotta Catch 'Em All | John Siegler, Jason Paige | Neuro [v1] | Duplicate
-9 | Nyan Cat | daniwell | Neuro [v1] | New
-10 | After Dark | Mr.Kitty | Neuro [v1] | Duplicate
-11 | I Kissed a Girl | Katy Perry | Neuro [v1] | Duplicate
-12 | Reincarnation Apple | PinocchioP | Neuro [v1] | New
-13 | KARMANATIONS | Akatsuki Records | Neuro [v1] | Duplicate
-14 | Blue (Da Ba Dee) | Eiffel 65 | Neuro [v1] | Duplicate
-15 | The Phoenix | Fall Out Boy | Neuro [v1] | New
-16 | Enemy | Imagine Dragons, JID | Neuro [v1] | Duplicate
-17 | Believer | Imagine Dragons | Neuro [v1] | Duplicate
-18 | High Hopes | Panic! At The Disco | Neuro [v1] | Duplicate
-19 | Fly Me To The Moon | Frank Sinatra | Neuro [v1] | Duplicate
-20 | Careless Whisper | George Michael | Neuro [v1] | Duplicate
-21 | Shelter | Porter Robinson | Neuro [v1] | Duplicate
-22 | A Thousand Years | Christina Perri | Neuro [v1] | Duplicate
-23 | The Sound of Silence | Disturbed | Neuro [v1] | New
-24 | Rap God | Eminem | Neuro [v1] | New
+1 | Brain Power | NOMA | Neuro [v1]
+2 | Rockefeller Street (Nightcore) | Getter Jaani | Neuro [v1]
+3 | Thnks Fr Th Mmrs | Fall Out Boy | Neuro [v1]
+4 | Idol | YOASOBI | Neuro [v1]
+5 | Running in the 90's | Max Coveri | Neuro [v1]
+6 | Legends Never Die | Against The Current | Neuro [v1]
+7 | oddloop | Frederic | Neuro [v1]
+8 | Gotta Catch 'Em All | John Siegler, Jason Paige | Neuro [v1]
+9 | Nyan Cat | daniwell | Neuro [v1]
+10 | After Dark | Mr.Kitty | Neuro [v1]
+11 | I Kissed a Girl | Katy Perry | Neuro [v1]
+12 | Reincarnation Apple | PinocchioP | Neuro [v1]
+13 | KARMANATIONS | Akatsuki Records | Neuro [v1]
+14 | Blue (Da Ba Dee) | Eiffel 65 | Neuro [v1]
+15 | The Phoenix | Fall Out Boy | Neuro [v1]
+16 | Enemy | Imagine Dragons, JID | Neuro [v1]
+17 | Believer | Imagine Dragons | Neuro [v1]
+18 | High Hopes | Panic! At The Disco | Neuro [v1]
+19 | Fly Me To The Moon | Frank Sinatra | Neuro [v1]
+20 | Careless Whisper | George Michael | Neuro [v1]
+21 | Shelter | Porter Robinson | Neuro [v1]
+22 | A Thousand Years | Christina Perri | Neuro [v1]
+23 | The Sound of Silence | Disturbed | Neuro [v1]
+24 | Rap God | Eminem | Neuro [v1]

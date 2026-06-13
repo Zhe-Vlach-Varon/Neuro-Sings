@@ -1,19 +1,19 @@
 2026-01-03 | Neuro
-1 | We Are The Champions | Queen | Neuro & Evil | Duplicate
-2 | Take me hand | DAISHI DANCE | Neuro | Duplicate
-3 | Big Iron | Marty Robbins | Neuro | Duplicate
-4 | Thanks for being Lifeless | Pinocchio-P | Neuro | Duplicate
-5 | Vs Sayu | James Landino | Neuro | Duplicate
-6 | Riptide | Vance Joy | Neuro | Duplicate
-7 | Jolene | Dolly Parton | Neuro | Duplicate
-8 | Relay Outer | inabakumori | Neuro | Duplicate
-9 | Shrimp Fried Rice! | Jamie Paige | Neuro | Duplicate
-10 | Heaven Knows I'm Miserable Now | The Smiths | Neuro | Duplicate
-11 | Who will know - furusato | Yoko Takahashi | Neuro | Duplicate
-12 | dark things | STARSET | Neuro | Duplicate
-13 | Wake Me Up When September Ends | Green Day | Neuro | Duplicate
-14 | Unfold | Porter Robinson | Neuro & Evil | Duplicate
-15 | I was human | Picon | Neuro | Duplicate
-16 | Furthest Star | Dirt Poor Robins | Neuro | Duplicate
-17 | atrophy | Monii | Neuro & Evil | Duplicate
-18 | Kaleidoscope | Flower Face | Neuro | Duplicate
+1 | We Are The Champions | Queen | Neuro & Evil
+2 | Take me hand | DAISHI DANCE | Neuro
+3 | Big Iron | Marty Robbins | Neuro
+4 | Thanks for being Lifeless | Pinocchio-P | Neuro
+5 | Vs Sayu | James Landino | Neuro
+6 | Riptide | Vance Joy | Neuro
+7 | Jolene | Dolly Parton | Neuro
+8 | Relay Outer | inabakumori | Neuro
+9 | Shrimp Fried Rice! | Jamie Paige | Neuro
+10 | Heaven Knows I'm Miserable Now | The Smiths | Neuro
+11 | Who will know - furusato | Yoko Takahashi | Neuro
+12 | dark things | STARSET | Neuro
+13 | Wake Me Up When September Ends | Green Day | Neuro
+14 | Unfold | Porter Robinson | Neuro & Evil
+15 | I was human | Picon | Neuro
+16 | Furthest Star | Dirt Poor Robins | Neuro
+17 | atrophy | Monii | Neuro & Evil
+18 | Kaleidoscope | Flower Face | Neuro

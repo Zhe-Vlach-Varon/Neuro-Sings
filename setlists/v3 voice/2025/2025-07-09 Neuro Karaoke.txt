@@ -1,23 +1,23 @@
 2025-07-09 | Neuro
-1 | Africa | Toto | Neuro | New
-2 | Bullet With Butterfly Wings | The Smashing Pumpkins | Neuro | New
-3 | Living Millennium | Iyowa | Neuro | New
-4 | Somebody Told Me | The Killers | Neuro | New
-5 | Whatever whatever whatever | Neru | Neuro & Evil | New
-6 | Bits n' Bytes | Kiramomo | Neuro | New
-7 | Die For You | Joji | Neuro | New
-8 | Somewhere Only We Know | Keane | Neuro | New
-9 | Non-Reflection | Aiobahn | Neuro | New
-10 | Do It All the Time | I Don't Know How But They Found Me | Neuro | New
-11 | Destiny | Harumaki Gohan | Neuro & Evil | New
-12 | Though I fear, I still walk | Ippo.tsk | Neuro | New
-13 | Bye Bye Bye | NSYNC | Neuro & Evil | New
-14 | Song of the Eared Robot | MimiroboP | Neuro | New
-15 | Sofia | Clairo | Neuro | New
-16 | The Spine | Darren Korb | Neuro | New
-17 | The Fresh Princess of Bel-Air | DJ Jazzy Jeff & Neuro-sama | Neuro | New
+1 | Africa | Toto | Neuro
+2 | Bullet With Butterfly Wings | The Smashing Pumpkins | Neuro
+3 | Living Millennium | Iyowa | Neuro
+4 | Somebody Told Me | The Killers | Neuro
+5 | Whatever whatever whatever | Neru | Neuro & Evil
+6 | Bits n' Bytes | Kiramomo | Neuro
+7 | Die For You | Joji | Neuro
+8 | Somewhere Only We Know | Keane | Neuro
+9 | Non-Reflection | Aiobahn | Neuro
+10 | Do It All the Time | I Don't Know How But They Found Me | Neuro
+11 | Destiny | Harumaki Gohan | Neuro & Evil
+12 | Though I fear, I still walk | Ippo.tsk | Neuro
+13 | Bye Bye Bye | NSYNC | Neuro & Evil
+14 | Song of the Eared Robot | MimiroboP | Neuro
+15 | Sofia | Clairo | Neuro
+16 | The Spine | Darren Korb | Neuro
+17 | The Fresh Princess of Bel-Air | DJ Jazzy Jeff & Neuro-sama | Neuro
 !! Yes Neuro is on the artists list, she came up with her own version of the lyrics
 !! PB cooked this one fast, Neuro came up with this on dev stream, and it was in the
 !! karaoke stream two days later
-18 | LIFE (Acoustic) | Monii | Neuro | New
+18 | LIFE (Acoustic) | Monii | Neuro
 !! Monii's Acoustic Version of LIFE

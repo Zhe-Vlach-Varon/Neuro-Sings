@@ -1,8 +1,8 @@
 2026-02-10 | Neuro
-1 | Boys Don't Cry (Neuro Ver) | The Cure | Neuro | New
-2 | Heaven | Shihoko Hirata | Neuro | Duplicate
-3 | String Theocracy | Mili | Neuro | New
-4 | Spot Late | Inabakumori | Neuro | New
-5 | the perfect pair | beabadoobee | Neuro | Duplicate
-6 | Trouble Is a Friend | Lenka | Neuro | New
-7 | Tip Toe | HYBS | Neuro | New
+1 | Boys Don't Cry (Neuro Ver) | The Cure | Neuro
+2 | Heaven | Shihoko Hirata | Neuro
+3 | String Theocracy | Mili | Neuro
+4 | Spot Late | Inabakumori | Neuro
+5 | the perfect pair | beabadoobee | Neuro
+6 | Trouble Is a Friend | Lenka | Neuro
+7 | Tip Toe | HYBS | Neuro

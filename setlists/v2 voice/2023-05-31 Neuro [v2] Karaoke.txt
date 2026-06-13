@@ -1,23 +1,23 @@
 2023-05-31 | Neuro [v2]
-1 | Bad Guy | Billie Eilish | Neuro [v2] | new
-2 | Witch Doctor | Cartoons | Neuro [v2] | new
-3 | oddloop | Frederic | Neuro [v2] | new
-4 | God-ish | PinocchioP, DECO*27 | Neuro [v2] | new
-5 | Perfect Machine | Starset | Neuro [v2] | new
-6 | Idol | YOASOBI | Neuro [v2] | new
-7 | Call Me Maybe | Carly Rae Jepsen | Neuro [v2] | new
-8 | The Wolf | SIAMÉS | Neuro [v2] | new
-9 | KARMANATIONS | Akatsuki Records | Neuro [v2] | new
-10 | My Time | bo en | Neuro [v2] | new
-11 | Take Me Home, Country Roads | John Denver | Neuro [v2] | new
-12 | phony | Tsumiki | Neuro [v2] | new
-13 | Pompeii | Bastille | Neuro [v2] | new
-14 | chiki chiki ban ban | QUEENDOM | Neuro [v2] | new
-15 | Blinding Lights | The Weeknd | Neuro [v2] | Duplicate
-16 | All The Things She Said | t.A.T.u | Neuro [v2] | new
-17 | Toxic | Britney Spears | Neuro [v2] | new
-18 | Baka Mitai (taxi driver) | Mitsuharu Fukuyama, Ryosuke Horii | Neuro [v2] | new
-19 | Cupid | FIFTY FIFTY | Neuro [v2] | new
-20 | Super Nuko World | Mafumafu | Neuro [v2] | new
-21 | Usseewa | Ado | Neuro [v2] | new
-22 | A Thousand Years | Christina Perri | Neuro [v2] | new
+1 | Bad Guy | Billie Eilish | Neuro [v2]
+2 | Witch Doctor | Cartoons | Neuro [v2]
+3 | oddloop | Frederic | Neuro [v2]
+4 | God-ish | PinocchioP, DECO*27 | Neuro [v2]
+5 | Perfect Machine | Starset | Neuro [v2]
+6 | Idol | YOASOBI | Neuro [v2]
+7 | Call Me Maybe | Carly Rae Jepsen | Neuro [v2]
+8 | The Wolf | SIAMÉS | Neuro [v2]
+9 | KARMANATIONS | Akatsuki Records | Neuro [v2]
+10 | My Time | bo en | Neuro [v2]
+11 | Take Me Home, Country Roads | John Denver | Neuro [v2]
+12 | phony | Tsumiki | Neuro [v2]
+13 | Pompeii | Bastille | Neuro [v2]
+14 | chiki chiki ban ban | QUEENDOM | Neuro [v2]
+15 | Blinding Lights | The Weeknd | Neuro [v2]
+16 | All The Things She Said | t.A.T.u | Neuro [v2]
+17 | Toxic | Britney Spears | Neuro [v2]
+18 | Baka Mitai (taxi driver) | Mitsuharu Fukuyama, Ryosuke Horii | Neuro [v2]
+19 | Cupid | FIFTY FIFTY | Neuro [v2]
+20 | Super Nuko World | Mafumafu | Neuro [v2]
+21 | Usseewa | Ado | Neuro [v2]
+22 | A Thousand Years | Christina Perri | Neuro [v2]

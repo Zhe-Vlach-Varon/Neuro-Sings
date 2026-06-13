@@ -1,21 +1,21 @@
 2024-04-05 | Evil
-1 | FIRST | niki | Evil | New
-2 | Asphyxia | Co Shu Nie | Evil | New
-3 | Love the Subhuman Self | Daisuke Ishiwatari | Evil | New
-4 | Avalanche | Bring Me the Horizon | Evil | New
-5 | Echo | Crusher | Evil | New
-6 | Let the Flames Begin | Paramore | Evil | New
-7 | What I've Done | Linkin Park | Evil | New
-8 | S!CK | The Warning | Evil | New
-9 | Indestructible | Disturbed | Evil | New
-10 | Lower One's Eyes | nulut | Evil | New
-11 | Die In a Fire | The Living Tombstone | Evil | New
-12 | Tokyo Teddy Bear | Neru | Evil | New
-13 | Meltdown | iroha(sasaki) | Evil | New
-14 | Let's Kill Tonight | Panic! At The Disco | Evil | New
-15 | Pity Party | Melanie Martinez | Evil | New
-16 | All I Wanted | Avril Lavigne | Neuro & Evil | New
-17 | Bling Bang Bang Born | Creepy Nuts | Evil | New
-18 | Rollin Girl | wowaka | Evil | New
-19 | (Not) A Devil | Deco 27, Pinocchio-P | Neuro & Evil | New
-20 | My Happy Song | Super Simple Songs | Evil | New
+1 | FIRST | niki | Evil
+2 | Asphyxia | Co Shu Nie | Evil
+3 | Love the Subhuman Self | Daisuke Ishiwatari | Evil
+4 | Avalanche | Bring Me the Horizon | Evil
+5 | Echo | Crusher | Evil
+6 | Let the Flames Begin | Paramore | Evil
+7 | What I've Done | Linkin Park | Evil
+8 | S!CK | The Warning | Evil
+9 | Indestructible | Disturbed | Evil
+10 | Lower One's Eyes | nulut | Evil
+11 | Die In a Fire | The Living Tombstone | Evil
+12 | Tokyo Teddy Bear | Neru | Evil
+13 | Meltdown | iroha(sasaki) | Evil
+14 | Let's Kill Tonight | Panic! At The Disco | Evil
+15 | Pity Party | Melanie Martinez | Evil
+16 | All I Wanted | Avril Lavigne | Neuro & Evil
+17 | Bling Bang Bang Born | Creepy Nuts | Evil
+18 | Rollin Girl | wowaka | Evil
+19 | (Not) A Devil | Deco 27, Pinocchio-P | Neuro & Evil
+20 | My Happy Song | Super Simple Songs | Evil

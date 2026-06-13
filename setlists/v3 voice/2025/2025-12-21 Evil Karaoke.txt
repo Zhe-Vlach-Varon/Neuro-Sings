@@ -1,11 +1,11 @@
 2025-12-21 | Evil
-1 | I Am Gonna Claw (Out Your Eyes then Drown You to Death) | Darren Korb, Ashley Barrett, Erin Yvette, Judy Alice Lee | Evil | New
-2 | Sk8er Boi | Avril Lavigne | Evil | Duplicate
-3 | RuLe | Ado | Evil | Duplicate
-4 | Dial Tone | Catch Your Breath | Evil | New
-5 | Vice Versa | Nano | Evil | Duplicate
-6 | Q&A | Pinata | Evil | New
-7 | Seven Nation Army | The White Stripes | Evil | Duplicate
-8 | Every Breath You Take | The Police | Evil | New
-9 | INTERGALACTIA | KIRA | Evil | Duplicate
-10 | She Used To Be Mine | Sara Bareilles | Evil | New
+1 | I Am Gonna Claw (Out Your Eyes then Drown You to Death) | Darren Korb, Ashley Barrett, Erin Yvette, Judy Alice Lee | Evil
+2 | Sk8er Boi | Avril Lavigne | Evil
+3 | RuLe | Ado | Evil
+4 | Dial Tone | Catch Your Breath | Evil
+5 | Vice Versa | Nano | Evil
+6 | Q&A | Pinata | Evil
+7 | Seven Nation Army | The White Stripes | Evil
+8 | Every Breath You Take | The Police | Evil
+9 | INTERGALACTIA | KIRA | Evil
+10 | She Used To Be Mine | Sara Bareilles | Evil

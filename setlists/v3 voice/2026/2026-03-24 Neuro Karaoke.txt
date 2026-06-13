@@ -1,11 +1,11 @@
 2026-03-24 | Neuro
-1 | Baby One More Time | Britney Spears | Neuro | Duplicate
-2 | Do I Wanna Know? | Arctic Monkeys | Neuro | New
-3 | Jolene | Dolly Parton | Neuro | Duplicate
-4 | I love Rock 'n Roll | Joan Jett & the Blackhearts | Neuro | New
-5 | All the Small things | blink-182 | Neuro | New
-6 | Sk8er Boi | Avril Lavigne | Neuro | New
-7 | Dracula | Tame Impala | Neuro | Duplicate
-8 | Bits N' Bytes | Kirāmomo | Neuro | Duplicate
-9 | Pray To Me | Mizu | Neuro | New
-10 | Is It Really You? | Loathe | Neuro | New
+1 | Baby One More Time | Britney Spears | Neuro
+2 | Do I Wanna Know? | Arctic Monkeys | Neuro
+3 | Jolene | Dolly Parton | Neuro
+4 | I love Rock 'n Roll | Joan Jett & the Blackhearts | Neuro
+5 | All the Small things | blink-182 | Neuro
+6 | Sk8er Boi | Avril Lavigne | Neuro
+7 | Dracula | Tame Impala | Neuro
+8 | Bits N' Bytes | Kirāmomo | Neuro
+9 | Pray To Me | Mizu | Neuro
+10 | Is It Really You? | Loathe | Neuro

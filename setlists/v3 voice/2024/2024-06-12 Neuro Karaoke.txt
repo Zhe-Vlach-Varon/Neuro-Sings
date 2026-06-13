@@ -1,19 +1,19 @@
 2024-06-12 | Neuro
-1 | Centuries | Fall Out Boy | Neuro | New
-2 | Complicated | Avril Lavigne | Neuro | New
-3 | Deep Sea Girl | Yuuyu | Neuro | New
-4 | Deja Vu | Dave Rodgers | Neuro | New
-5 | Diggy Diggy Hole | Yogscast | Neuro | New
-6 | Don't Stop Believin' | Journey | Neuro | New
-7 | Dream On | Aerosmith | Neuro | New
-8 | My Favourite Game | The Cardigans | Neuro | New
-9 | Melty Land Nightmare | Harumaki Gohan | Neuro | New
-10 | Human (Neuro ver.) | Rag'n'Bone Man | Neuro | New
-11 | LEO | Eve | Neuro | New
-12 | Hello | Adele | Neuro | New
-13 | Ikanaide | Sohta | Neuro | New
-14 | Voices in My Head | Falling in Reverse | Neuro | New
-15 | THERE IS A REASON | Konomi Suzuki | Neuro | New
-16 | Ameno | ERA | Neuro & Evil | New
-17 | What Was I Made For | Billie Eilish | Neuro | New
-18 | Fireworks | DAOKO & Kenshi Yonezu | Neuro & Evil | New
+1 | Centuries | Fall Out Boy | Neuro
+2 | Complicated | Avril Lavigne | Neuro
+3 | Deep Sea Girl | Yuuyu | Neuro
+4 | Deja Vu | Dave Rodgers | Neuro
+5 | Diggy Diggy Hole | Yogscast | Neuro
+6 | Don't Stop Believin' | Journey | Neuro
+7 | Dream On | Aerosmith | Neuro
+8 | My Favourite Game | The Cardigans | Neuro
+9 | Melty Land Nightmare | Harumaki Gohan | Neuro
+10 | Human (Neuro ver.) | Rag'n'Bone Man | Neuro
+11 | LEO | Eve | Neuro
+12 | Hello | Adele | Neuro
+13 | Ikanaide | Sohta | Neuro
+14 | Voices in My Head | Falling in Reverse | Neuro
+15 | THERE IS A REASON | Konomi Suzuki | Neuro
+16 | Ameno | ERA | Neuro & Evil
+17 | What Was I Made For | Billie Eilish | Neuro
+18 | Fireworks | DAOKO & Kenshi Yonezu | Neuro & Evil

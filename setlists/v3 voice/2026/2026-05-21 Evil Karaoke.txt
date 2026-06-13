@@ -1,9 +1,9 @@
 2026-05-21 | Evil
-1 | FUEL | Utsu-P | Evil | Duplicate
-2 | I Hate Everything About You | Three Days Grace | Evil | New
-3 | Do I Wanna Know | Arctic Monkeys | Evil | Duplicate 
-4 | Sugar Pills | I DON'T KNOW HOW BUT THEY FOUND ME | Evil | Duplicate
-5 | Dial Tone | Catch Your Breath | Evil | Duplicate
-6 | Numb | Linkin Park | Evil | New 
-7 | Evil Eye | Franz Ferdinand | Evil | Duplicate
-8 | My Immortal | Evanescence | Evil | New
+1 | FUEL | Utsu-P | Evil
+2 | I Hate Everything About You | Three Days Grace | Evil
+3 | Do I Wanna Know | Arctic Monkeys | Evil 
+4 | Sugar Pills | I DON'T KNOW HOW BUT THEY FOUND ME | Evil
+5 | Dial Tone | Catch Your Breath | Evil
+6 | Numb | Linkin Park | Evil 
+7 | Evil Eye | Franz Ferdinand | Evil
+8 | My Immortal | Evanescence | Evil

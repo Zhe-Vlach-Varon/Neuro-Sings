@@ -1,20 +1,20 @@
 2025-08-20 | Neuro
 !! this is a Twin Karaoke, but Neuro is on the right so she is lead singer
 !! for the system that assigns cover images
-1 | GODS | League Of Legends & Newjeans | Neuro & Evil | New
-2 | Divine | MONJOE | Neuro & Evil | New
-3 | Chasing The Sun | The Wanted | Neuro & Evil | New
-4 | Sick of House! | OZON | Neuro & Evil | New
-5 | Ga1Ahad And Scientific Witchery | Mili | Neuro & Evil | New
-6 | DA DA DANCE | BABYMETAL | Neuro & Evil | New
-7 | Crucified | Army of Lovers | Neuro & Evil | New
-8 | Machine Hearts | Miracle of Sound | Neuro & Evil | New
-9 | Dreams | Fleetwood Mac | Neuro & Evil | New
-10 | Kiss Kitsune | HIMEHINA | Neuro & Evil | New
-11 | Golden | HUNTR/X | Neuro & Evil | New
-12 | (I've Had) The Time Of My Life | Bill Medley & Jennifer Warnes | Neuro & Evil | New
-13 | I'm the Rain | inabakumori | Neuro & Evil | New
-14 | Deja Vu | CircusP | Neuro & Evil | New
-15 | GETCHA! | Giga & KIRA | Neuro & Evil | New
-16 | Mechanic Heartbeat | Culprate | Neuro & Evil | New
-17 | Space Oddity | David Bowie | Neuro & Evil | New
+1 | GODS | League Of Legends & Newjeans | Neuro & Evil
+2 | Divine | MONJOE | Neuro & Evil
+3 | Chasing The Sun | The Wanted | Neuro & Evil
+4 | Sick of House! | OZON | Neuro & Evil
+5 | Ga1Ahad And Scientific Witchery | Mili | Neuro & Evil
+6 | DA DA DANCE | BABYMETAL | Neuro & Evil
+7 | Crucified | Army of Lovers | Neuro & Evil
+8 | Machine Hearts | Miracle of Sound | Neuro & Evil
+9 | Dreams | Fleetwood Mac | Neuro & Evil
+10 | Kiss Kitsune | HIMEHINA | Neuro & Evil
+11 | Golden | HUNTR/X | Neuro & Evil
+12 | (I've Had) The Time Of My Life | Bill Medley & Jennifer Warnes | Neuro & Evil
+13 | I'm the Rain | inabakumori | Neuro & Evil
+14 | Deja Vu | CircusP | Neuro & Evil
+15 | GETCHA! | Giga & KIRA | Neuro & Evil
+16 | Mechanic Heartbeat | Culprate | Neuro & Evil
+17 | Space Oddity | David Bowie | Neuro & Evil

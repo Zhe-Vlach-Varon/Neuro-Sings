@@ -1,19 +1,19 @@
 2024-04-17 | Neuro
-1 | Mayday | TheFatRat | Neuro | New
-2 | Together | Ellie_Minibot | Neuro | New
-3 | Everything Goes On | Porter Robinson | Neuro | New
-4 | kyu-kurarin | Iyowa | Neuro | New
-5 | My Way | SIAMES | Neuro | New
-6 | ODDS&ENDS | supercell | Neuro | New
-7 | Near | Takaaki Natsushiro | Neuro | New
-8 | Snow Drive | Omoi | Neuro | New
-9 | Nee Nee Nee | Pinocchio-P | Neuro & Evil | New
-10 | World is Mine | supercell | Neuro | New
-11 | Komm, susser Tod | Arianne Schreiber | Neuro | New
-12 | Dubidubidu | Christell | Neuro | New
-13 | Hello, Again | CircusP | Neuro | New
-14 | Tabi no Tochuu | Natsumi Kiyoura | Neuro | New
-15 | Weight of the World (English) | Keiichi Okabe | Neuro | New
-16 | sustain++ | Mili | Neuro | New
-17 | Mogu Mogu Yummy! | Nekomata Okayu | Neuro | New
-18 | Where shall we go | Mellowcle | Neuro & Evil | New
+1 | Mayday | TheFatRat | Neuro
+2 | Together | Ellie_Minibot | Neuro
+3 | Everything Goes On | Porter Robinson | Neuro
+4 | kyu-kurarin | Iyowa | Neuro
+5 | My Way | SIAMES | Neuro
+6 | ODDS&ENDS | supercell | Neuro
+7 | Near | Takaaki Natsushiro | Neuro
+8 | Snow Drive | Omoi | Neuro
+9 | Nee Nee Nee | Pinocchio-P | Neuro & Evil
+10 | World is Mine | supercell | Neuro
+11 | Komm, susser Tod | Arianne Schreiber | Neuro
+12 | Dubidubidu | Christell | Neuro
+13 | Hello, Again | CircusP | Neuro
+14 | Tabi no Tochuu | Natsumi Kiyoura | Neuro
+15 | Weight of the World (English) | Keiichi Okabe | Neuro
+16 | sustain++ | Mili | Neuro
+17 | Mogu Mogu Yummy! | Nekomata Okayu | Neuro
+18 | Where shall we go | Mellowcle | Neuro & Evil

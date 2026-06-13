@@ -1,11 +1,11 @@
 2026-01-07 | Evil
-01 | Back In Black | AC/DC | Evil | New
-02 | Kill Everyone | Hollywood Undead | Evil | Duplicate
-03 | Since U Been Gone | Kelly Clarkson | Evil | Duplicate
-04 | Maneater | Hall & Oates | Evil | New
-05 | Iris | Goo Goo Dolls | Evil | Duplicate 
-06 | Jitter Doll | niki | Evil | Duplicate
-07 | Evil Eye | Franz Ferdinand | Evil | Duplicate
-08 | Turn The Lights Off | Tally Hall | Evil | Duplicate
-09 | Your Face | Wisp | Evil | New
-10 | Broken Pieces | Apocalyptica | Evil | New
+01 | Back In Black | AC/DC | Evil
+02 | Kill Everyone | Hollywood Undead | Evil
+03 | Since U Been Gone | Kelly Clarkson | Evil
+04 | Maneater | Hall & Oates | Evil
+05 | Iris | Goo Goo Dolls | Evil 
+06 | Jitter Doll | niki | Evil
+07 | Evil Eye | Franz Ferdinand | Evil
+08 | Turn The Lights Off | Tally Hall | Evil
+09 | Your Face | Wisp | Evil
+10 | Broken Pieces | Apocalyptica | Evil

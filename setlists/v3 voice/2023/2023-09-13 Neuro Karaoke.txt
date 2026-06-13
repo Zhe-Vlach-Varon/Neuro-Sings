@@ -1,22 +1,22 @@
 2023-09-13 | Neuro
-1 | Living Millennium | Iyowa | Neuro | New
-2 | Deja Vu | Dave Rodgers | Neuro | New
-3 | Moves Like Jagger | Maroon 5, Christina Aguilera | Neuro | New
-4 | Happy | Pharrell Williams | Neuro | New
-5 | Legends Never Die | Against The Current | Neuro | New
-6 | STYX HELIX | MYTH & ROID | Neuro | New
-7 | Faded | Alan Walker | Neuro | New
-8 | Ai Kotoba | DECO*27 | Neuro | New
-9 | Scatman (Ski-Ba-Bop-Ba-Dop-Bop) | Scatman John | Neuro | New
-10 | I Kissed a Girl | Katy Perry | Neuro | New
-11 | String Theocracy | Mili | Neuro | New
-12 | Nyan Cat | daniwell | Neuro | New
-13 | Snake Eater | Norihiko Hibino, Cynthia Harrell | Neuro | New
-14 | ROKI | mikitoP | Neuro & Evil | New
-15 | Mozaik Role (reloaded) | DECO*27 | Neuro | New
-16 | Viva La Vida | Coldplay | Neuro | New
-17 | Mixed Nuts | Official HIGE DANdism | Neuro | New
-18 | Fukashigi no Karte | Hidehiro Kawai | Neuro | New
-19 | Devil Town | Cavetown | Neuro | New
-20 | Miku (Neuro ver.) | Anamanaguchi | Neuro | New
-21 | Bohemian Rhapsody | Queen | Neuro & Evil | New
+1 | Living Millennium | Iyowa | Neuro
+2 | Deja Vu | Dave Rodgers | Neuro
+3 | Moves Like Jagger | Maroon 5, Christina Aguilera | Neuro
+4 | Happy | Pharrell Williams | Neuro
+5 | Legends Never Die | Against The Current | Neuro
+6 | STYX HELIX | MYTH & ROID | Neuro
+7 | Faded | Alan Walker | Neuro
+8 | Ai Kotoba | DECO*27 | Neuro
+9 | Scatman (Ski-Ba-Bop-Ba-Dop-Bop) | Scatman John | Neuro
+10 | I Kissed a Girl | Katy Perry | Neuro
+11 | String Theocracy | Mili | Neuro
+12 | Nyan Cat | daniwell | Neuro
+13 | Snake Eater | Norihiko Hibino, Cynthia Harrell | Neuro
+14 | ROKI | mikitoP | Neuro & Evil
+15 | Mozaik Role (reloaded) | DECO*27 | Neuro
+16 | Viva La Vida | Coldplay | Neuro
+17 | Mixed Nuts | Official HIGE DANdism | Neuro
+18 | Fukashigi no Karte | Hidehiro Kawai | Neuro
+19 | Devil Town | Cavetown | Neuro
+20 | Miku (Neuro ver.) | Anamanaguchi | Neuro
+21 | Bohemian Rhapsody | Queen | Neuro & Evil

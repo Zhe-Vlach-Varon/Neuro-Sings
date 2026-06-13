@@ -526,6 +526,8 @@ def parse_setlist(p: Path) -> neutils.SongJSON:
 
     album_song_count = 0
 
+    seen_songs = []
+
     for line in lines:
         if re.match(song_line_regex, line) is not None:
             album_song_count += 1
@@ -629,23 +631,14 @@ def parse_setlist(p: Path) -> neutils.SongJSON:
                 cover_artist = lead_singer
             dupe = False
             encore = False
-            # print("fields[4]: " + fields[4])
             
-            if fields[4].lower() == "new":
-                dupe = False
-            elif fields[4].lower() == "encore":
-                dupe = True
-                encore = True
-            else:
-                dupe = True
-            
-            if len(fields) >= 6 and not fields[5] == '':
-                song_art = fields[5]
+            if len(fields) >= 5 and not fields[4] == '':
+                song_art = fields[4]
             else:
                 song_art = album_art
 
-            if len(fields) >= 7:
-                additionalFlags = fields[6]
+            if len(fields) >= 6:
+                additionalFlags = fields[5]
             else:
                 additionalFlags = ''
 
@@ -668,8 +661,14 @@ def parse_setlist(p: Path) -> neutils.SongJSON:
                 'Comment': None,
                 'Special': None,
             }
+
+            if neutils.does_matching_song_exist_in_list(data, seen_songs):
+                data['encore'] = True
+                data['duplicate'] = True
+
             # print(album)
             songs[album].append(data)
+            seen_songs.append(data)
 
     non_karaoke_albums = neutils.get_non_karaoke_album_names()
     if album not in non_karaoke_albums:
@@ -895,6 +894,11 @@ def fill_in_setlists(out: neutils.SongJSON = {}) -> neutils.SongJSON:
                     # print("print(out[album][entry['id'] - 1 ])")
                     # print(out[album][entry['id'] - 1 ])
 
+    for album in out:
+        for song in out[album]:
+            if 'File_IN' not in song.keys():
+                song['duplicate'] = True
+
     return out
 
 def extract_all() -> neutils.SongJSON:
@@ -905,6 +909,9 @@ def extract_all() -> neutils.SongJSON:
             They are grouped by date, or category if no date was provided in filename.
     """
     songs_db = load_db()
+    dates_df = load_dates()
+    assert (songs_db.height == 0) == (dates_df.height == 0)
+
     files = get_files(songs_db)
     regex = get_regexes()
 
@@ -944,6 +951,11 @@ def export_json(all_songs: neutils.SongJSON) -> None:
     Args:
         all_songs (SongJSON): Dictionary with lists of files grouped by date.
     """
+
+    # with open(Path(ROOT_DIR / "data" / "unsorted.json"), "w") as f:
+    #     # print(sorted_songs)
+    #     json.dump(all_songs, f, indent=2, ensure_ascii=False)
+    #     f.write("\n")
 
     # print("")
     # print(all_songs)

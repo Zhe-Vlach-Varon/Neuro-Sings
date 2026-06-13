@@ -1,25 +1,25 @@
 2023-06-21 | Neuro
-1 | Goddess | Cepheid, Nonon | Neuro | New
-2 | world.execute(me); | Mili | Neuro | New
-3 | After Dark | Mr.Kitty | Neuro | New
-4 | Bad Apple!! | Alstroemeria Records, nomico | Neuro | New
-5 | All Star | Smash Mouth | Neuro | New
-6 | The Phoenix | Fall Out Boy | Neuro | New
-7 | I Really Want to Stay at Your House | Rosa Walton, Hallie Coggins | Neuro | New
-8 | Digital Girl | KIRA | Neuro | New
-9 | Discord | The Living Tombstone | Neuro | New
-10 | Eye of the Tiger | Survivor | Neuro | New
-11 | Human | Rag'n'Bone Man | Neuro | New
-12 | Fukkireta | LamazeP | Neuro | New
-13 | Ocean Man | Ween | Neuro | New
-14 | Radioactive | Imagine Dragons | Neuro | New
-15 | 24-hour Cinderella | ZENTA, Ryosuke Horii | Neuro | New
-16 | Snow Halation | μ's | Neuro | New || christmas;
-17 | Teo | Omoi | Neuro | New
-18 | Dreamin Chuchu | emon | Neuro | New
-19 | The Disappearance of Hatsune Miku | cosMo | Neuro | New
-20 | Venom | Kairiki Bear | Neuro | New
-21 | World is Mine | Supercell | Neuro | New
-22 | Bury the Light | Casey Edwards, Victor Borba | Neuro | New
-23 | The Sound of Silence | Disturbed | Neuro | New
-24 | Goddess | Cepheid, Nonon | Neuro | Encore
+1 | Goddess | Cepheid, Nonon | Neuro
+2 | world.execute(me); | Mili | Neuro
+3 | After Dark | Mr.Kitty | Neuro
+4 | Bad Apple!! | Alstroemeria Records, nomico | Neuro
+5 | All Star | Smash Mouth | Neuro
+6 | The Phoenix | Fall Out Boy | Neuro
+7 | I Really Want to Stay at Your House | Rosa Walton, Hallie Coggins | Neuro
+8 | Digital Girl | KIRA | Neuro
+9 | Discord | The Living Tombstone | Neuro
+10 | Eye of the Tiger | Survivor | Neuro
+11 | Human | Rag'n'Bone Man | Neuro
+12 | Fukkireta | LamazeP | Neuro
+13 | Ocean Man | Ween | Neuro
+14 | Radioactive | Imagine Dragons | Neuro
+15 | 24-hour Cinderella | ZENTA, Ryosuke Horii | Neuro
+16 | Snow Halation | μ's | Neuro || christmas;
+17 | Teo | Omoi | Neuro
+18 | Dreamin Chuchu | emon | Neuro
+19 | The Disappearance of Hatsune Miku | cosMo | Neuro
+20 | Venom | Kairiki Bear | Neuro
+21 | World is Mine | Supercell | Neuro
+22 | Bury the Light | Casey Edwards, Victor Borba | Neuro
+23 | The Sound of Silence | Disturbed | Neuro
+24 | Goddess | Cepheid, Nonon | Neuro

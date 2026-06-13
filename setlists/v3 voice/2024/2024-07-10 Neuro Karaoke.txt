@@ -1,19 +1,19 @@
 2024-07-10 | Neuro
-1 | What Is Love | Haddaway | Neuro | New
-2 | Brick By Boring Brick | Paramore | Neuro | New
-3 | Fluorite Eye's Song | Kairi Yagi | Neuro | New
-4 | Camelia | Mili | Neuro | New
-5 | Hello Planet | sasakure.UK | Neuro | New
-6 | Roundabout | Yes | Neuro & Evil | New
-7 | Writing on the Wall | Will Stetson | Neuro | New
-8 | Don't Stop Me Now | Queen | Neuro | New
-9 | heart111 | Yuri | Neuro | New
-10 | Still Alive | Jonathan Coulton | Neuro | New
-11 | The Final Countdown | Europe | Neuro | New
-12 | A Cruel Angel's Thesis | Yoko Takahashi | Neuro | New
-13 | Rolling In The Deep | Adele | Neuro | New
-14 | HAO | DECO 27 | Neuro | New
-15 | Borderline | Tame Impala | Neuro | New
-16 | Haruka Kanata | Nyarons | Neuro | New
-17 | Wicked Game | Chris Isaak | Neuro | New
-18 | We Don't Talk Anymore | Charlie Puth | Neuro & Evil | New
+1 | What Is Love | Haddaway | Neuro
+2 | Brick By Boring Brick | Paramore | Neuro
+3 | Fluorite Eye's Song | Kairi Yagi | Neuro
+4 | Camelia | Mili | Neuro
+5 | Hello Planet | sasakure.UK | Neuro
+6 | Roundabout | Yes | Neuro & Evil
+7 | Writing on the Wall | Will Stetson | Neuro
+8 | Don't Stop Me Now | Queen | Neuro
+9 | heart111 | Yuri | Neuro
+10 | Still Alive | Jonathan Coulton | Neuro
+11 | The Final Countdown | Europe | Neuro
+12 | A Cruel Angel's Thesis | Yoko Takahashi | Neuro
+13 | Rolling In The Deep | Adele | Neuro
+14 | HAO | DECO 27 | Neuro
+15 | Borderline | Tame Impala | Neuro
+16 | Haruka Kanata | Nyarons | Neuro
+17 | Wicked Game | Chris Isaak | Neuro
+18 | We Don't Talk Anymore | Charlie Puth | Neuro & Evil

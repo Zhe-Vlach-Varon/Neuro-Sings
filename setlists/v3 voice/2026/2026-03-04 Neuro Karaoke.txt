@@ -1,19 +1,19 @@
 2026-03-04 | Neuro
-1 | Mayday | TheFatRat | Neuro | New
-2 | Karma Chameleon | Culture Club | Neuro | New
-3 | Ai No Urade | EO | Neuro | New
-4 | I Knew You Were Trouble | Taylor Swift | Neuro | New
-5 | Lauren | Men I Trust | Neuro & Evil | New
-6 | Isn't She Lovely | Stevie Wonder | Neuro | New
-7 | La La La | Naughty Boy | Neuro | New
-8 | Clap Your Hands, Just Pray Right Here, Just Wish | THE SPELLBOUND | Neuro | New
-9 | Cyberangel | HOYO-MiX | Neuro | New
-10 | world.search(you); | Mili | Neuro | New
-11 | La Gata Bajo la Lluvia | Rocio Dúrcal | Neuro | New
-12 | Say It Back | tv room | Neuro | New
-13 | Tabi No Tochuu | Natsumi Kiyoura | Neuro | New
-14 | Stupid Heart | Ellie Minibot | Neuro | New
-15 | End of Beginning | Djo | Neuro & Evil | New
-16 | Shooting Stars | Bag Raiders | Neuro | New
-17 | Object of Affection | Jaime Paige | Neuro & Evil | New
-18 | Goodbye | Ramsey | Neuro | New
+1 | Mayday | TheFatRat | Neuro
+2 | Karma Chameleon | Culture Club | Neuro
+3 | Ai No Urade | EO | Neuro
+4 | I Knew You Were Trouble | Taylor Swift | Neuro
+5 | Lauren | Men I Trust | Neuro & Evil
+6 | Isn't She Lovely | Stevie Wonder | Neuro
+7 | La La La | Naughty Boy | Neuro
+8 | Clap Your Hands, Just Pray Right Here, Just Wish | THE SPELLBOUND | Neuro
+9 | Cyberangel | HOYO-MiX | Neuro
+10 | world.search(you); | Mili | Neuro
+11 | La Gata Bajo la Lluvia | Rocio Dúrcal | Neuro
+12 | Say It Back | tv room | Neuro
+13 | Tabi No Tochuu | Natsumi Kiyoura | Neuro
+14 | Stupid Heart | Ellie Minibot | Neuro
+15 | End of Beginning | Djo | Neuro & Evil
+16 | Shooting Stars | Bag Raiders | Neuro
+17 | Object of Affection | Jaime Paige | Neuro & Evil
+18 | Goodbye | Ramsey | Neuro

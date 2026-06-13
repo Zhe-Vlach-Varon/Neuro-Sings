@@ -1,20 +1,20 @@
 2024-10-30 | Neuro | Halloween Karaoke 2024 | Halloween
-1 | Thriller | Michael Jackson | Neuro | New
-2 | Five Nights At Freddy's | The Living Tombstone | Neuro | New | | halloween;
-3 | Happy Halloween | Junky | Neuro | New || halloween;
-4 | Hide and Seek | Ho-ong-i | Neuro | New || halloween;
-5 | Doll's Fall | LadyMonsters | Neuro | New || halloween;
-6 | How To Pretend | CircusP | Neuro & Evil | New | Halloween Duet
-7 | Somebody's Watching Me | Rockwell | Neuro | New
-8 | Unconscious Requiem | ShinRa-Bansho | Neuro | New
-9 | 4BLOOD | KIRA | Neuro | New
-10 | trick and treat | OSTER project | Neuro & Evil | New | Halloween Duet | halloween;
-11 | Wicked | Crusher | Neuro | New
-12 | Once Upon A Dream | Lana Del Rey | Neuro & Evil | New | Halloween Duet
-13 | Running Up That Hill | Kate Bush | Neuro | New
-14 | Nai Nai | ReoNa | Neuro | New
-15 | Spooky Scary Skeletons | Andrew Gold | Neuro | New || halloween;
-16 | Panic Room | AuRa | Neuro | New
-17 | Maneater | Hall & Oates | Neuro | New
-18 | This Is Halloween | Citizens of Halloween Town | Neuro & Evil | New | Halloween Duet | halloween;
-19 | Thriller | Michael Jackson | Neuro | Encore
+1 | Thriller | Michael Jackson | Neuro
+2 | Five Nights At Freddy's | The Living Tombstone | Neuro | | halloween;
+3 | Happy Halloween | Junky | Neuro || halloween;
+4 | Hide and Seek | Ho-ong-i | Neuro || halloween;
+5 | Doll's Fall | LadyMonsters | Neuro || halloween;
+6 | How To Pretend | CircusP | Neuro & Evil | Halloween Duet
+7 | Somebody's Watching Me | Rockwell | Neuro
+8 | Unconscious Requiem | ShinRa-Bansho | Neuro
+9 | 4BLOOD | KIRA | Neuro
+10 | trick and treat | OSTER project | Neuro & Evil | Halloween Duet | halloween;
+11 | Wicked | Crusher | Neuro
+12 | Once Upon A Dream | Lana Del Rey | Neuro & Evil | Halloween Duet
+13 | Running Up That Hill | Kate Bush | Neuro
+14 | Nai Nai | ReoNa | Neuro
+15 | Spooky Scary Skeletons | Andrew Gold | Neuro || halloween;
+16 | Panic Room | AuRa | Neuro
+17 | Maneater | Hall & Oates | Neuro
+18 | This Is Halloween | Citizens of Halloween Town | Neuro & Evil | Halloween Duet | halloween;
+19 | Thriller | Michael Jackson | Neuro

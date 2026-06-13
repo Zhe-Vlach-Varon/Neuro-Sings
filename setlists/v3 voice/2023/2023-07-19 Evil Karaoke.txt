@@ -1,23 +1,23 @@
 2023-07-19 | Evil
-1 | Great War | Sabaton | Evil | New
-2 | Aishite Aishite Aishite | Kikuo | Evil | New
-3 | The Kill | Thirty Seconds to Mars | Evil | New
-4 | Death of the Law | Utsu-P | Evil | New
-5 | Do It All The Time | I DONT KNOW HOW BUT THEY FOUND ME | Evil | New
-6 | World's End Dancehall | wowaka | Neuro & Evil | New
-7 | You're Gonna Go Far, Kid | The Offspring | Evil | New
-8 | The Phoenix | Fall Out Boy | Evil | New
-9 | The Rumbling | SiM | Evil | New
-10 | Crawling | Linkin Park | Evil | New
-11 | Can You Feel My Heart | Bring Me The Horizon | Evil | New
-12 | Bad Apple!! | Alstroemeria Records, nomico | Evil | New
-13 | Behind Blue Eyes | Limp Bizkit | Evil | New
-14 | The Pretender | Foo Fighters | Evil | New
-15 | Make a Move | Icon For Hire | Evil | New
-16 | Monster | Skillet | Evil | New
-17 | Pain | Three Days Grace | Evil | New
-18 | Thnks Fr Th Mmrs | Fall Out Boy | Evil | New
-19 | Unravel | TK from Ling tosite sigure | Evil | New
-20 | Uprising | Muse | Evil | New
-21 | Waiting on the Sky to Change | Starset, Breaking Benjamin | Neuro & Evil | New
-22 | Partners in Crime | Set It Off | Neuro & Evil | New
+1 | Great War | Sabaton | Evil
+2 | Aishite Aishite Aishite | Kikuo | Evil
+3 | The Kill | Thirty Seconds to Mars | Evil
+4 | Death of the Law | Utsu-P | Evil
+5 | Do It All The Time | I DONT KNOW HOW BUT THEY FOUND ME | Evil
+6 | World's End Dancehall | wowaka | Neuro & Evil
+7 | You're Gonna Go Far, Kid | The Offspring | Evil
+8 | The Phoenix | Fall Out Boy | Evil
+9 | The Rumbling | SiM | Evil
+10 | Crawling | Linkin Park | Evil
+11 | Can You Feel My Heart | Bring Me The Horizon | Evil
+12 | Bad Apple!! | Alstroemeria Records, nomico | Evil
+13 | Behind Blue Eyes | Limp Bizkit | Evil
+14 | The Pretender | Foo Fighters | Evil
+15 | Make a Move | Icon For Hire | Evil
+16 | Monster | Skillet | Evil
+17 | Pain | Three Days Grace | Evil
+18 | Thnks Fr Th Mmrs | Fall Out Boy | Evil
+19 | Unravel | TK from Ling tosite sigure | Evil
+20 | Uprising | Muse | Evil
+21 | Waiting on the Sky to Change | Starset, Breaking Benjamin | Neuro & Evil
+22 | Partners in Crime | Set It Off | Neuro & Evil

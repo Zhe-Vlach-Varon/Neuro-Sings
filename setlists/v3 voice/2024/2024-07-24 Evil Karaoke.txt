@@ -1,19 +1,19 @@
 2024-07-24 | Evil
-1 | Just Pretend | Bad Omens | Evil | New
-2 | Welcome To The Black Parade | My Chemical Romance | Evil | New
-3 | Weight of the World (English) | Keiichi Okabe | Evil | New
-4 | Human | Anavae | Evil | New
-5 | Whisper Whisper Whisper | Azari | Evil | New
-6 | Titanium | David Guetta | Evil | New
-7 | Hayloft | Mother Mother | Evil | New
-8 | RTRT | Mili | Evil | New
-9 | Outer Science | Jin | Evil | New
-10 | Monster | Skillet | Evil | New
-11 | Faded | Alan Walker | Evil | New
-12 | Meant to Live | Switchfoot | Evil | New
-13 | Hero | YOASOBI | Evil | New
-14 | Great Days | Karen Aoki | Neuro & Evil | New
-15 | Pregnant Sonic | Omri | Evil | New | sonic | quarantine;
-16 | Misery Business | Paramore | Evil | New
-17 | Big Iron | Marty Robbins | Evil | New
-18 | 1x1 | Bring Me the Horizon | Neuro & Evil | New 
+1 | Just Pretend | Bad Omens | Evil
+2 | Welcome To The Black Parade | My Chemical Romance | Evil
+3 | Weight of the World (English) | Keiichi Okabe | Evil
+4 | Human | Anavae | Evil
+5 | Whisper Whisper Whisper | Azari | Evil
+6 | Titanium | David Guetta | Evil
+7 | Hayloft | Mother Mother | Evil
+8 | RTRT | Mili | Evil
+9 | Outer Science | Jin | Evil
+10 | Monster | Skillet | Evil
+11 | Faded | Alan Walker | Evil
+12 | Meant to Live | Switchfoot | Evil
+13 | Hero | YOASOBI | Evil
+14 | Great Days | Karen Aoki | Neuro & Evil
+15 | Pregnant Sonic | Omri | Evil | sonic | quarantine;
+16 | Misery Business | Paramore | Evil
+17 | Big Iron | Marty Robbins | Evil
+18 | 1x1 | Bring Me the Horizon | Neuro & Evil 

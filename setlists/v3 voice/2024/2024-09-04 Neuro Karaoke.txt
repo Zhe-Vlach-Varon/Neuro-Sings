@@ -1,20 +1,20 @@
 2024-09-04 | Neuro
-1 | CH4NGE | Giga | Neuro | New
-2 | The Man Who Sold The World | Midge Ure | Neuro | New
-3 | Aishite Aishite Aishite | Kikuo | Neuro | New
-4 | My Way | Frank Sinatra | Neuro | New
-5 | Brave Song | Aoi Tada | Neuro | New
-6 | Pretty Girl | Clairo | Neuro | New
-7 | Connect | ClariS | Neuro | New
-8 | Angel With A Shotgun (Nightcore) | The Cab | Neuro | New
-9 | Playground | Bea Miller | Neuro | New
-10 | QUEEN | Kanaria | Neuro | New
-11 | Happy | Pharrell Williams | Neuro | New
-12 | Tip Toe | HYBS | Neuro | New
-13 | A Thousand Years | Christina Perri | Neuro | New
-14 | Lover Is a Day | CUCO | Neuro | New
-15 | Milk | Mili | Neuro & Evil | New
-16 | Waiting For Love | Avicii | Neuro | New
-17 | Video Killed The Radio Star | The Buggles | Neuro & Evil | New
-18 | Hello Marina | inabakumori | Neuro & Evil | New
-19 | My Way (Nightcore) | Frank Sinatra | Neuro | New
+1 | CH4NGE | Giga | Neuro
+2 | The Man Who Sold The World | Midge Ure | Neuro
+3 | Aishite Aishite Aishite | Kikuo | Neuro
+4 | My Way | Frank Sinatra | Neuro
+5 | Brave Song | Aoi Tada | Neuro
+6 | Pretty Girl | Clairo | Neuro
+7 | Connect | ClariS | Neuro
+8 | Angel With A Shotgun (Nightcore) | The Cab | Neuro
+9 | Playground | Bea Miller | Neuro
+10 | QUEEN | Kanaria | Neuro
+11 | Happy | Pharrell Williams | Neuro
+12 | Tip Toe | HYBS | Neuro
+13 | A Thousand Years | Christina Perri | Neuro
+14 | Lover Is a Day | CUCO | Neuro
+15 | Milk | Mili | Neuro & Evil
+16 | Waiting For Love | Avicii | Neuro
+17 | Video Killed The Radio Star | The Buggles | Neuro & Evil
+18 | Hello Marina | inabakumori | Neuro & Evil
+19 | My Way (Nightcore) | Frank Sinatra | Neuro

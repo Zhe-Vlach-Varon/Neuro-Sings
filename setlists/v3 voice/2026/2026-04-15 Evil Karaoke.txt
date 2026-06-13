@@ -1,19 +1,19 @@
 2026-04-15 | Evil
-1 | FOLLOW ME | GEN.KLOUD | Evil | New
-2 | Trouble is a Friend | Lenka | Evil | New
-3 | The Void | Spiritbox | Evil | New
-4 | Feel Invincible | Skillet | Neuro & Evil | New
-5 | Clone | Kana-Boon | Evil | New
-6 | The Other Side of Paradise | Glass Animals | Evil | New
-7 | Sayonara Moon Town | Scenarioart | Neuro & Evil | New
-8 | Dancing Queen | ABBA | Evil | New
-9 | Beggin | Maneskin | Evil | New
-10 | With or Without You | U2 | Evil | New
-11 | Through the Darkness | Nao Sato | Neuro & Evil | New
-12 | Ordinary World | Duran Duran | Evil | New
-13 | Static | Flavor Foley | Evil | New
-14 | Espresso | Sabrina Carpenter | Evil | New
-15 | Mobius | Hiiragi Kirai | Evil | New
-16 | A Sad Cartoon | Loathe | Evil | New
-17 | You Make Me Sick | Bitbreaker | Evil | New
-18 | Who Will You Follow | Evanescence | Evil | New
+1 | FOLLOW ME | GEN.KLOUD | Evil
+2 | Trouble is a Friend | Lenka | Evil
+3 | The Void | Spiritbox | Evil
+4 | Feel Invincible | Skillet | Neuro & Evil
+5 | Clone | Kana-Boon | Evil
+6 | The Other Side of Paradise | Glass Animals | Evil
+7 | Sayonara Moon Town | Scenarioart | Neuro & Evil
+8 | Dancing Queen | ABBA | Evil
+9 | Beggin | Maneskin | Evil
+10 | With or Without You | U2 | Evil
+11 | Through the Darkness | Nao Sato | Neuro & Evil
+12 | Ordinary World | Duran Duran | Evil
+13 | Static | Flavor Foley | Evil
+14 | Espresso | Sabrina Carpenter | Evil
+15 | Mobius | Hiiragi Kirai | Evil
+16 | A Sad Cartoon | Loathe | Evil
+17 | You Make Me Sick | Bitbreaker | Evil
+18 | Who Will You Follow | Evanescence | Evil

@@ -1,19 +1,19 @@
 2025-09-03 | Evil
-1 | War | Sum 41 | Evil | New
-2 | DArkSide | Bring Me The Horizon | Evil | New
-3 | Let It Die | STARSET | Evil | New
-4 | Basket Case | Green Day | Evil | New
-5 | Maniac | Michael Sembello | Evil | New
-6 | ANTI THE∞HOLIC | CosMo | Neuro & Evil | New
-7 | Demons | Imagine Dragons | Evil | New
-8 | O Light | Kikuo | Evil | New
-9 | Crawling | Linkin Park | Evil | New
-10 | Butcher Vanity | FLAVOR FOLEY | Evil | New
-11 | Good Luck, Babe | Chappell Roan | Evil | New
-12 | Free Bird | Lynyrd Skynyrd | Evil | New | Guitar-09-03
-13 | I'm Still Standing | Elton John | Evil | New
-14 | Fuel | Utsu-P | Evil | New
-15 | Wish I Had an Angel | Nightwish | Neuro & Evil | New
-16 | Sweet Child O' Mine | Guns N' Roses | Evil | New
-17 | Karma Police | Radiohead | Evil | New
-18 | LET THE WORLD BURN | Chris Grey | Evil | New
+1 | War | Sum 41 | Evil
+2 | DArkSide | Bring Me The Horizon | Evil
+3 | Let It Die | STARSET | Evil
+4 | Basket Case | Green Day | Evil
+5 | Maniac | Michael Sembello | Evil
+6 | ANTI THE∞HOLIC | CosMo | Neuro & Evil
+7 | Demons | Imagine Dragons | Evil
+8 | O Light | Kikuo | Evil
+9 | Crawling | Linkin Park | Evil
+10 | Butcher Vanity | FLAVOR FOLEY | Evil
+11 | Good Luck, Babe | Chappell Roan | Evil
+12 | Free Bird | Lynyrd Skynyrd | Evil | Guitar-09-03
+13 | I'm Still Standing | Elton John | Evil
+14 | Fuel | Utsu-P | Evil
+15 | Wish I Had an Angel | Nightwish | Neuro & Evil
+16 | Sweet Child O' Mine | Guns N' Roses | Evil
+17 | Karma Police | Radiohead | Evil
+18 | LET THE WORLD BURN | Chris Grey | Evil

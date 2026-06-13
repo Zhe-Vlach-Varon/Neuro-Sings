@@ -1,19 +1,19 @@
 2025-10-01 | Evil
-1 | I Love Rock 'n Roll | Joan Jett & the Blackhearts | Evil | New
-2 | House of Memories | Panic! At The Disco | Evil | New
-3 | Necromantic | Akatsuki Records | Evil | New
-4 | Paper Bouquet | Mili | Evil | New
-5 | Big Time Rush | Big Time Rush | Neuro & Evil | New
-6 | God Only Knows | bitbreaker | Evil | New
-7 | Digital Girl | KIRA | Evil | New
-8 | Hunting High and Low | A-Ha | Evil | New
-9 | Watercolour | Pendulum | Evil | New
-10 | After Dark | Mr. Kitty | Evil | New
-11 | Girl on Fire | Alicia Keys | Evil | New
-12 | Still Here | Digital Daggers | Evil | New
-13 | Jane Doe | Kenshi Yonezu & Hikaru Utada | Neuro & Evil | New
-14 | Let It Go | Idina Menzel | Evil | New
-15 | Emergence | Sleep Token | Evil | New
-16 | Clap Your Hands, Just Pray Right Here, Just Wish | THE SPELLBOUND | Evil | New
-17 | In The End | Linkin Park | Neuro & Evil | New
-18 | The Pretender | Infected Mushroom | Evil | New
+1 | I Love Rock 'n Roll | Joan Jett & the Blackhearts | Evil
+2 | House of Memories | Panic! At The Disco | Evil
+3 | Necromantic | Akatsuki Records | Evil
+4 | Paper Bouquet | Mili | Evil
+5 | Big Time Rush | Big Time Rush | Neuro & Evil
+6 | God Only Knows | bitbreaker | Evil
+7 | Digital Girl | KIRA | Evil
+8 | Hunting High and Low | A-Ha | Evil
+9 | Watercolour | Pendulum | Evil
+10 | After Dark | Mr. Kitty | Evil
+11 | Girl on Fire | Alicia Keys | Evil
+12 | Still Here | Digital Daggers | Evil
+13 | Jane Doe | Kenshi Yonezu & Hikaru Utada | Neuro & Evil
+14 | Let It Go | Idina Menzel | Evil
+15 | Emergence | Sleep Token | Evil
+16 | Clap Your Hands, Just Pray Right Here, Just Wish | THE SPELLBOUND | Evil
+17 | In The End | Linkin Park | Neuro & Evil
+18 | The Pretender | Infected Mushroom | Evil

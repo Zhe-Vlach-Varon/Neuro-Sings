@@ -1,19 +1,19 @@
 2025-07-23 | Evil
-1 | Do I Wanna Know | Arctic Monkeys | Evil | New
-2 | Subways of Your Mind | FEX | Evil | New
-3 | Aoi, Koi, Daidaiiro No Hi | MASS OF THE FERMENTING DREGS | Evil | New
-4 | Livin' La Vida Loca | Ricky Martin | Evil | New
-5 | Linger | The Cranberries | Evil | New
-6 | Encore Dance | MIMI | Evil | New
-7 | Kill Everyone | Hollywood Undead | Evil | New
-8 | Universe On Fire | GLORYHAMMER | Evil | New
-9 | Year 3000 | Busted | Neuro & Evil | New
-10 | Bitter Sweet Symphony | The Verve | Evil | New
-11 | Leave Out All The Rest | Linkin Park | Evil | New
-12 | Petals, and the Voices Which Trail Behind | avaraya | Evil | New
-13 | Monster | KIRA | Evil | New
-14 | Partners In Crime | Set It Off | Neuro & Evil | New
-15 | Mr Brightside | The Killers | Evil | New
-16 | As Alive As You Need Me To Be | Nine Inch Nails | Evil | New
-17 | BIRDBRAIN | Jamie Paige | Evil | New
-18 | Song of the Ancients | Keiichi Okabe | Neuro & Evil | New
+1 | Do I Wanna Know | Arctic Monkeys | Evil
+2 | Subways of Your Mind | FEX | Evil
+3 | Aoi, Koi, Daidaiiro No Hi | MASS OF THE FERMENTING DREGS | Evil
+4 | Livin' La Vida Loca | Ricky Martin | Evil
+5 | Linger | The Cranberries | Evil
+6 | Encore Dance | MIMI | Evil
+7 | Kill Everyone | Hollywood Undead | Evil
+8 | Universe On Fire | GLORYHAMMER | Evil
+9 | Year 3000 | Busted | Neuro & Evil
+10 | Bitter Sweet Symphony | The Verve | Evil
+11 | Leave Out All The Rest | Linkin Park | Evil
+12 | Petals, and the Voices Which Trail Behind | avaraya | Evil
+13 | Monster | KIRA | Evil
+14 | Partners In Crime | Set It Off | Neuro & Evil
+15 | Mr Brightside | The Killers | Evil
+16 | As Alive As You Need Me To Be | Nine Inch Nails | Evil
+17 | BIRDBRAIN | Jamie Paige | Evil
+18 | Song of the Ancients | Keiichi Okabe | Neuro & Evil

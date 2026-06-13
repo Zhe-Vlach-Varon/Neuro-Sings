@@ -1,26 +1,26 @@
 !! Song Covers, mostly duets with collab partners, that were the only song sung during a stream
 2023-06-22 | Neuro | Stream Covers
 !! the vods say this stream was on the 22nd, not the 23rd as it was before
-1 | I See The Light | Mandy Moore, Zachary Levi | Neuro & Miyune | New | I see the light | as_custom;
+1 | I See The Light | Mandy Moore, Zachary Levi | Neuro & Miyune | I see the light | as_custom;
 2023-09-03
-2 | Baka Mitai (taxi driver) | Mitsuharu Fukuyama, Ryosuke Horii | Neuro | New | aura | as_custom;
+2 | Baka Mitai (taxi driver) | Mitsuharu Fukuyama, Ryosuke Horii | Neuro | aura | as_custom;
 2024-04-20
-3 | MOGU MOGU YUMMY | Nekomata Okayu | Neuro & Cerber | New | Mogu Mogu | as_custom;
+3 | MOGU MOGU YUMMY | Nekomata Okayu | Neuro & Cerber | Mogu Mogu | as_custom;
 2024-08-09
-4 | Everything Goes On | Porter Robinson | Neuro & MinikoMew | New | Everything goes on | as_custom;
+4 | Everything Goes On | Porter Robinson | Neuro & MinikoMew | Everything goes on | as_custom;
 2024-10-04
 Evil
-5 | Rises The Moon | Liana Flores | Evil & MinikoMew | New | Rises the moon | as_custom;
+5 | Rises The Moon | Liana Flores | Evil & MinikoMew | Rises the moon | as_custom;
 2024-10-27
-6 | Bring Me To Life | Evanescence | Evil & Cerber | New | Bring me to life | as_custom;
+6 | Bring Me To Life | Evanescence | Evil & Cerber | Bring me to life | as_custom;
 2025-03-25
-7 | Sweater Weather | The Neighbourhood | Evil | Duplicate
+7 | Sweater Weather | The Neighbourhood | Evil
 !! 2025-03-26
 !! Neuro
-!! 8 | Stay Alive | Rie Takahashi | Neuro | Duplicate
+!! 8 | Stay Alive | Rie Takahashi | Neuro
 !! rip stream version of song, forgor if there was much game audio or comments from Vedal
 !! 2025-12-05
-!! 9 | Stay Alive | Rie Takahashi | Neuro | Duplicate | Minecraft
+!! 9 | Stay Alive | Rie Takahashi | Neuro | Minecraft
 !! find better art for the Minecraft Hardcore stream
 !! extract the stream audio as the song cuts off before the end
 !!

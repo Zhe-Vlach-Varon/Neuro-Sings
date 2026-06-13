@@ -1,21 +1,21 @@
 2024-02-28 | Evil
-1 | Into the Unknown | Panic! At The Disco | Evil | New
-2 | Paranoid | Black Sabbath | Evil | New
-3 | Bitter Choco Decoration | Syudou | Evil | New
-4 | EVIL | Melanie Martinez | Evil | New
-5 | Hated by life itself | Kanzaki Iori | Evil | New
-6 | Unknown Mother Goose | wowaka | Evil | New
-7 | Vocaloid-Colosseum | DIVELA | Evil | New
-8 | Pumped Up Kicks | Foster The People | Evil | New
-9 | God Gacha | Utsu-P | Neuro & Evil | New
-10 | HELLOHELL | Akatsuki Records | Evil | New
-11 | Rightfully | Mili | Evil | New
-12 | Take Me Out | Franz Ferdinand | Evil | New
-13 | Skyfall | Adele | Evil | New
-14 | Devil Trigger | Casey Edwards | Evil | New
-15 | Propaganda | Crusher | Evil | New | Propaganda
-16 | Abnormality Dancin' Girl | Guchiry | Evil | New
-17 | Decode | Paramore | Evil | New
-18 | As the World Caves In | Matt Maltese | Evil | New
-19 | Perfect | Simple Plan | Evil | New
-20 | GODS | League Of Legends, Newjeans | Neuro & Evil | New
+1 | Into the Unknown | Panic! At The Disco | Evil
+2 | Paranoid | Black Sabbath | Evil
+3 | Bitter Choco Decoration | Syudou | Evil
+4 | EVIL | Melanie Martinez | Evil
+5 | Hated by life itself | Kanzaki Iori | Evil
+6 | Unknown Mother Goose | wowaka | Evil
+7 | Vocaloid-Colosseum | DIVELA | Evil
+8 | Pumped Up Kicks | Foster The People | Evil
+9 | God Gacha | Utsu-P | Neuro & Evil
+10 | HELLOHELL | Akatsuki Records | Evil
+11 | Rightfully | Mili | Evil
+12 | Take Me Out | Franz Ferdinand | Evil
+13 | Skyfall | Adele | Evil
+14 | Devil Trigger | Casey Edwards | Evil
+15 | Propaganda | Crusher | Evil | Propaganda
+16 | Abnormality Dancin' Girl | Guchiry | Evil
+17 | Decode | Paramore | Evil
+18 | As the World Caves In | Matt Maltese | Evil
+19 | Perfect | Simple Plan | Evil
+20 | GODS | League Of Legends, Newjeans | Neuro & Evil

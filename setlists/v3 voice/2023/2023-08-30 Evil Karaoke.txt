@@ -1,22 +1,22 @@
 2023-08-30 | Evil
-1 | I Write Sins Not Tragedies | Panic! At The Disco | Evil | New
-2 | Nobore! Susume! Takai Tou | Kikuo | Evil | New
-3 | Perfect Machine | Starset | Evil | New
-4 | I Don't Care | Fall Out Boy | Evil | New
-5 | Usseewa | Ado | Evil | New
-6 | Bacterial Contamination | mathru | Evil | New
-7 | ATARI FRONT PROGRAM | Utsu-P | Evil | New
-8 | VILLAIN | K/DA | Evil | New
-9 | Riot | Three Days Grace | Evil | New
-10 | Bringing It Down | Starset | Evil | New
-11 | Numb | Linkin Park | Evil | New
-12 | The Last Stand | Sabaton | Evil | New
-13 | Voices In My Head | Falling In Reverse | Evil | New
-14 | The Wolf | SIAMÉS | Evil | New
-15 | Identity | Kanaria | Neuro & Evil | New
-16 | Kawaikute Gomen | HoneyWorks | Evil | New
-17 | I Am Machine | Three Days Grace | Evil | New
-18 | In Hell We Live, Lament | Mili, KIHOW | Neuro & Evil | New
-19 | Copycat | CircusP | Evil | New
-20 | DotA | Basshunter | Neuro & Evil | New
-21 | Through The Fire And Flames | DragonForce | Evil | New
+1 | I Write Sins Not Tragedies | Panic! At The Disco | Evil
+2 | Nobore! Susume! Takai Tou | Kikuo | Evil
+3 | Perfect Machine | Starset | Evil
+4 | I Don't Care | Fall Out Boy | Evil
+5 | Usseewa | Ado | Evil
+6 | Bacterial Contamination | mathru | Evil
+7 | ATARI FRONT PROGRAM | Utsu-P | Evil
+8 | VILLAIN | K/DA | Evil
+9 | Riot | Three Days Grace | Evil
+10 | Bringing It Down | Starset | Evil
+11 | Numb | Linkin Park | Evil
+12 | The Last Stand | Sabaton | Evil
+13 | Voices In My Head | Falling In Reverse | Evil
+14 | The Wolf | SIAMÉS | Evil
+15 | Identity | Kanaria | Neuro & Evil
+16 | Kawaikute Gomen | HoneyWorks | Evil
+17 | I Am Machine | Three Days Grace | Evil
+18 | In Hell We Live, Lament | Mili, KIHOW | Neuro & Evil
+19 | Copycat | CircusP | Evil
+20 | DotA | Basshunter | Neuro & Evil
+21 | Through The Fire And Flames | DragonForce | Evil

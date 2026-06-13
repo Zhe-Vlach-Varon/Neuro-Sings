@@ -1,23 +1,23 @@
 2023-07-05 | Neuro
-1 | Believer | Imagine Dragons | Neuro | New
-2 | Hero | YOASOBI | Neuro | New
-3 | Revenge | CaptainSparklez, TryHardNinja | Neuro | New | Minecraft
-4 | Still Alive | Jonathan Coulton, Ellen McLain | Neuro | New
-5 | Ikenai Borderline | Walküre | Neuro | New
-6 | Hole-dwelling | Kikuo | Neuro | New
-7 | Your Reality | Dan Salvato, Jillian Ashcraft | Neuro | New
-8 | Usseewa | Ado | Neuro | New
-9 | Somebody That I Used To Know | Gotye, Kimbra | Neuro | New
-10 | I Am Machine | Three Days Grace | Neuro | New
-11 | Dadadadadadadadadada | Hige Driver Join. SELEN | Neuro | New
-12 | Bitter Choco Decoration | syudou | Neuro | New
-13 | Welcome To The Black Parade | My Chemical Romance | Neuro | New
-14 | VILLAIN | K/DA | Neuro | New
-15 | Numb | Linkin Park | Neuro | New
-16 | Chandelier | Sia | Neuro | New
-17 | Perfect Machine | Starset | Neuro | New
-18 | Idol | YOASOBI | Neuro | New
-19 | ICARUS | Starset | Neuro | New
-20 | Sad Machine | Porter Robinson | Neuro | New
-21 | Duvet | Bôa | Neuro | New
-22 | Bring Me to Life | Evanescence | Neuro & Evil | New
+1 | Believer | Imagine Dragons | Neuro
+2 | Hero | YOASOBI | Neuro
+3 | Revenge | CaptainSparklez, TryHardNinja | Neuro | Minecraft
+4 | Still Alive | Jonathan Coulton, Ellen McLain | Neuro
+5 | Ikenai Borderline | Walküre | Neuro
+6 | Hole-dwelling | Kikuo | Neuro
+7 | Your Reality | Dan Salvato, Jillian Ashcraft | Neuro
+8 | Usseewa | Ado | Neuro
+9 | Somebody That I Used To Know | Gotye, Kimbra | Neuro
+10 | I Am Machine | Three Days Grace | Neuro
+11 | Dadadadadadadadadada | Hige Driver Join. SELEN | Neuro
+12 | Bitter Choco Decoration | syudou | Neuro
+13 | Welcome To The Black Parade | My Chemical Romance | Neuro
+14 | VILLAIN | K/DA | Neuro
+15 | Numb | Linkin Park | Neuro
+16 | Chandelier | Sia | Neuro
+17 | Perfect Machine | Starset | Neuro
+18 | Idol | YOASOBI | Neuro
+19 | ICARUS | Starset | Neuro
+20 | Sad Machine | Porter Robinson | Neuro
+21 | Duvet | Bôa | Neuro
+22 | Bring Me to Life | Evanescence | Neuro & Evil

@@ -1,22 +1,22 @@
 2024-08-21 | Evil
-1 | The Phoenix | Fall Out Boy | Evil | New
-2 | Amaranth | Nightwish | Evil | New
-3 | Cheerleader | Porter Robinson | Evil | New
-4 | Six Trillion Years And Overnight Story | kemu | Evil | New
-5 | Complicated | Avril Lavigne | Evil | New
-6 | GRRRLS | AViVA | Evil | New
-7 | I Am... All of Me | Crush 40 | Evil | New
-8 | Snow Drive | Omoi | Evil | New
-9 | Killer In The Mirror | Set It Off | Evil | New
-10 | world.execute(me) | Mili | Evil | New
-11 | Namida | MARETU | Evil | New
-12 | Crazy Fuckin' Robot Body | SnowBlood | Evil | New | CFRB
-13 | Lilium | Kumiko Noma | Evil | New
-14 | Lady of the Dark | Sabaton | Evil | New
-15 | KING | Kanaria | Evil | New
-16 | Waiting on the Sky to Change | STARSET | Neuro & Evil | New
-17 | Somebody Told Me | The Killers | Evil | New
-18 | Jar of Hearts | Christina Perri | Evil | New
-19 | Hai Yorokonde | Kocchi no Kento | Neuro & Evil | New
-20 | Crazy Fuckin' Robot Body | SnowBlood | Evil | Encore | CFRB
-21 | Somebody That I Used To Know | Gotye | Neuro & Evil | Duplicate
+1 | The Phoenix | Fall Out Boy | Evil
+2 | Amaranth | Nightwish | Evil
+3 | Cheerleader | Porter Robinson | Evil
+4 | Six Trillion Years And Overnight Story | kemu | Evil
+5 | Complicated | Avril Lavigne | Evil
+6 | GRRRLS | AViVA | Evil
+7 | I Am... All of Me | Crush 40 | Evil
+8 | Snow Drive | Omoi | Evil
+9 | Killer In The Mirror | Set It Off | Evil
+10 | world.execute(me) | Mili | Evil
+11 | Namida | MARETU | Evil
+12 | Crazy Fuckin' Robot Body | SnowBlood | Evil | CFRB
+13 | Lilium | Kumiko Noma | Evil
+14 | Lady of the Dark | Sabaton | Evil
+15 | KING | Kanaria | Evil
+16 | Waiting on the Sky to Change | STARSET | Neuro & Evil
+17 | Somebody Told Me | The Killers | Evil
+18 | Jar of Hearts | Christina Perri | Evil
+19 | Hai Yorokonde | Kocchi no Kento | Neuro & Evil
+20 | Crazy Fuckin' Robot Body | SnowBlood | Evil | CFRB
+21 | Somebody That I Used To Know | Gotye | Neuro & Evil

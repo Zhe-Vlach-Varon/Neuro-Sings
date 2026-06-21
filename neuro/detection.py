@@ -854,7 +854,8 @@ def fill_in_setlists(out: neutils.SongJSON = {}) -> neutils.SongJSON:
 
                 out[album].sort(key=song_entry_sort_by_id)
 
-                for entry in albums[album][existing_song_count:]:
+                for entry in albums[album]:
+                # for entry in albums[album][existing_song_count:]:
                     # print(out)
                     # print("")
                     # print(entry)
@@ -895,9 +896,12 @@ def fill_in_setlists(out: neutils.SongJSON = {}) -> neutils.SongJSON:
                     # print(out[album][entry['id'] - 1 ])
 
     for album in out:
-        for song in out[album]:
+        for song in reversed(out[album]):
             if 'File_IN' not in song.keys():
                 song['duplicate'] = True
+            if neutils.does_matching_song_exist_in_list(song, songs_df.to_dicts()):
+                out[album].remove(song)
+
 
     return out
 

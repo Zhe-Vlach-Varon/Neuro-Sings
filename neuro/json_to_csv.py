@@ -169,6 +169,16 @@ def get_flags(song: neutils.SongEntry) -> str:
     
     return flags
 
+def clear_db() -> None:
+    songs_df = pl.DataFrame({}, schema=songs_schema)
+    dates_df = pl.DataFrame({}, schema=dates_schema)
+
+    songs_df.write_csv(SONGS_CSV)
+    dates_df.write_csv(DATES_CSV)
+    
+    songs_df.write_database("Songs", f"sqlite:///{SONGS_DB}", if_table_exists="replace")
+    dates_df.write_database("Dates", f"sqlite:///{SONGS_DB}", if_table_exists="replace")    
+
 
 def update_db() -> None:
     """Updates the song database, adding songs from the JSON file that aren't yet in it
@@ -354,6 +364,9 @@ def update_db() -> None:
                 flags = flags.replace('neuro;', '').replace('evil;', '')
                 if 'duet;' not in flags:
                     flags += 'duet;'
+
+            if "originals;" in flags or "official;" in flags:
+                version = 1
 
             df = pl.DataFrame(
                 {

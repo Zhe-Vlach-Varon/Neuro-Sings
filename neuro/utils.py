@@ -416,7 +416,7 @@ def do_song_titles_match(existing_song_title: str, new_song_title: str) -> bool:
         else:
             return False
 
-    songTitleNonAlphaNumStripRegex = r'[^a-z0-9\/]'
+    songTitleNonAlphaNumStripRegex = r'[^a-z0-9\/&]'
 
     new_title = re.sub(songTitleNonAlphaNumStripRegex, '', str(remove_accents(new_song_title)).lower())
     # new_title = new_song_title.lower()
@@ -623,14 +623,15 @@ def do_songs_match(s1: SongEntry, s2: SongEntry, ignore_date: bool = False) -> b
 
     return final_result
 
-def does_matching_song_exist_in_list(song: SongEntry, lst: list[SongEntry]) -> int:
+# TODO improve song match detection to fix Colorful Array duplicate not getting marked as being in the database already
+def does_matching_song_exist_in_list(song: SongEntry, lst: list[SongEntry], ignore_dates: bool = False, excl_lst: list[str] = []) -> int:
     """returns count of matching songs in list"""
     match_count = 0
     for entry in lst:
         # print(song)
         # print(entry)
         # print()
-        if do_songs_match(song, entry):
+        if do_songs_match(song, entry, ignore_dates):
             match_count += 1
     return match_count
 

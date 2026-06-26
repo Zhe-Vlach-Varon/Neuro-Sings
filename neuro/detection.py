@@ -11,7 +11,7 @@ import polars as pl
 from loguru import logger
 
 # TODO are the different unoffV3 subdirs actually needed, or just the root unoffV3 dir
-from neuro import CUSTOM_DIR, ROOT_DIR, SONGS_JSON, UNOFFICIALV3_DIR, UNOFFV3_DISC1, UNOFFV3_DISC2, UNOFFV3_DISC3, UNOFFV3_DISC4, UNOFFV3_DISC5, UNOFFV3_DISC6, UNOFFV3_DISC7, UNOFFV3_DISC8, UNOFFV3_EXTRA, UNOFFV3_DISC66, OFFICIAL_RELEASE_DIR, SETLISTS_DIR, OFFICIAL_CSV, ORIGINAL_CSV
+from neuro import CUSTOM_DIR, ROOT_DIR, SONGS_JSON, UNOFFICIALV3_DIR, UNOFFV3_EXTRA, UNOFFV3_DISC66, OFFICIAL_RELEASE_DIR, SETLISTS_DIR, OFFICIAL_CSV, ORIGINAL_CSV
 from neuro.polars_utils import load_db, load_dates
 import neuro.utils as neutils
 
@@ -35,20 +35,22 @@ def get_files(songs: pl.DataFrame) -> dict[str, list[Path]]:
     # TODO switch to using audio hash to check if song is already in database
     existing = set(map(lambda x: ROOT_DIR / Path(x), songs.get_column("File_IN").to_list()))
 
-    def get_audios(p: Path, *, filetype: str = "mp3") -> list[Path]:
-        files = list(p.glob(f"*.{filetype}"))
+    def get_audios(p: Path, *, filetype: str = "mp3", exclude_dirs = []) -> list[Path]:
+        files = list(p.glob(f"**/*.{filetype}"))
+        files_without_existing = list(filter(lambda f: f not in existing, files))
+        filtered_files = [f for f in files_without_existing if not any(d in f.parts for d in exclude_dirs)]
         if len(files) == 0:
             logger.warning(f"no files found in {p} of filetype {filetype}")
-        return list(filter(lambda f: f not in existing, files))
+        return filtered_files
 
     custom_dir = CUSTOM_DIR
-    unofficialV3_dir = [UNOFFICIALV3_DIR / UNOFFV3_DISC1, UNOFFICIALV3_DIR / UNOFFV3_DISC2, UNOFFICIALV3_DIR / UNOFFV3_DISC3, UNOFFICIALV3_DIR / UNOFFV3_DISC4, UNOFFICIALV3_DIR / UNOFFV3_DISC5, UNOFFICIALV3_DIR / UNOFFV3_DISC6, UNOFFICIALV3_DIR / UNOFFV3_DISC7, UNOFFICIALV3_DIR / UNOFFV3_DISC8]
+    unofficialV3_dir = UNOFFICIALV3_DIR
     arg_dir = UNOFFICIALV3_DIR / UNOFFV3_EXTRA / UNOFFV3_DISC66
     official_dir = OFFICIAL_RELEASE_DIR
 
     return {
         "Custom": get_audios(custom_dir) + get_audios(custom_dir, filetype="flac"),
-        "UnofficialV3": get_audios(unofficialV3_dir[0]) + get_audios(unofficialV3_dir[1]) + get_audios(unofficialV3_dir[2]) + get_audios(unofficialV3_dir[3]) + get_audios(unofficialV3_dir[4]) + get_audios(unofficialV3_dir[5]) + get_audios(unofficialV3_dir[6]) + get_audios(unofficialV3_dir[7]),
+        "UnofficialV3": get_audios(unofficialV3_dir, exclude_dirs=[UNOFFV3_EXTRA]),
         "ARG": get_audios(arg_dir),
         "Official": list(official_dir.glob(f"*/**/*.mp3")), # search in all subdirectories recursively, can't use this glob pattern for UnofficialV3 as that would also get the ARG songs a second time
     }
@@ -718,6 +720,8 @@ def fill_in_setlists(out: neutils.SongJSON = {}) -> neutils.SongJSON:
     # TODO move to utils or somewhere else
     date_format = "%Y-%m-%d"
 
+    total_setlist_song_count = 0
+
     for file in files:
         if file.name == 'Setlists.md' or file.is_dir():
             continue
@@ -765,6 +769,8 @@ def fill_in_setlists(out: neutils.SongJSON = {}) -> neutils.SongJSON:
             continue
         
         for album, songs in albums.items():
+            total_setlist_song_count += len(songs)
+
             contains_new_songs: bool = False
             for date in dates:
                 filtered_songs = songs_df.filter(pl.col('Album') == album)
@@ -894,6 +900,8 @@ def fill_in_setlists(out: neutils.SongJSON = {}) -> neutils.SongJSON:
 
                     # print("print(out[album][entry['id'] - 1 ])")
                     # print(out[album][entry['id'] - 1 ])
+
+    logger.info(f"total songs found in setlists: {total_setlist_song_count}")
 
     for album in out:
         for song in reversed(out[album]):

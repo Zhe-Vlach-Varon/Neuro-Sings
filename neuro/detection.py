@@ -713,16 +713,18 @@ def fill_in_setlists(out: neutils.SongJSON = {}) -> neutils.SongJSON:
     songs_df = load_db()
 
     files = list(SETLISTS_DIR.glob(f"**/*"))
-    # print("files")
-    # print(files)
-    files.sort()
+    karaoke_setlists = [f for f in files if 'non-karaoke' not in f.parts]
+    non_karaoke_setlists = [f for f in files if 'non-karaoke' in f.parts]
+    karaoke_setlists.sort()
+    sorted_setlist_files = karaoke_setlists + non_karaoke_setlists
+
 
     # TODO move to utils or somewhere else
     date_format = "%Y-%m-%d"
 
     total_setlist_song_count = 0
 
-    for file in files:
+    for file in sorted_setlist_files:
         if file.name == 'Setlists.md' or file.is_dir():
             continue
         # print("File_IN")
@@ -995,13 +997,14 @@ def export_json(all_songs: neutils.SongJSON) -> None:
     # Sorting songs by date for easier treatment
     # print(dated_songs)
     assert 'custom' not in dated_songs.keys()
-    sorted_songs = dict(sorted(dated_songs.items(), key=lambda item: item[1][-1]['Date']))
+    # sorted_songs = dict(sorted(dated_songs.items(), key=lambda item: item[1][-1]['Date']))
 
-    for key in keys_to_exclude:
-        if key in all_songs.keys():
-            sorted_songs[key] = all_songs[key]
+    # for key in keys_to_exclude:
+        # if key in all_songs.keys():
+            # sorted_songs[key] = all_songs[key]
 
     with open(SONGS_JSON, "w") as f:
         # print(sorted_songs)
-        json.dump(sorted_songs, f, indent=2, ensure_ascii=False)
+        json.dump(all_songs, f, indent=2, ensure_ascii=False)
+        # json.dump(sorted_songs, f, indent=2, ensure_ascii=False)
         f.write("\n")

@@ -17,6 +17,7 @@ songs_schema = {
     'Artist': pl.String,
     'ArtistOG': pl.String,
     'Cover Artist': pl.String,
+    'Lead Singer': pl.String,
     'Date': pl.String,
     'Album': pl.String,
     'Album_ID': pl.Int64,

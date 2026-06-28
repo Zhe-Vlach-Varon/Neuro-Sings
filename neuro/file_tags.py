@@ -123,6 +123,8 @@ class Song:
 
         self.who: str = ""
 
+        self.lead_singer = str(song_dict["Lead Singer"]).lower()
+
         self.d: SongEntry = song_dict
         self.k: SongEntry = karaoke_dict
 
@@ -338,7 +340,7 @@ class DriveSong(Song):
         elif self.flags.neuro:
             self.who = "neuro"
         else:
-            self.who = "twins"
+            self.who = self.lead_singer
 
         # Cover Image
         if self.image is None:

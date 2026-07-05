@@ -6,34 +6,40 @@
 3 | Brain Power | NOMA | Neuro [v1]
 2023-02-05
 4 | Numb | Linkin Park | Neuro [v1]
+2023-02-06
+5 | Numb | Linkin Park | Neuro [v1]
 2023-02-07
-5 | Baka Mitai (full spec) | Mitsuharu Fukuyama, Ryosuke Horii | Neuro [v1]
+6 | Baka Mitai (full spec) | Mitsuharu Fukuyama, Ryosuke Horii | Neuro [v1]
 2023-02-09
-6 | Take Me Home, Country Roads | John Denver | Neuro [v1]
+7 | Take Me Home, Country Roads | John Denver | Neuro [v1]
 2023-02-10
-7 | Shelter | Porter Robinson, Madeon | Neuro [v1]
+8 | Shelter | Porter Robinson, Madeon | Neuro [v1]
 2023-02-12
-8 | KING | Kanaria | Neuro [v1]
+9 | KING | Kanaria | Neuro [v1]
 2023-02-13
-9 | phony | Tsumiki | Neuro [v1]
+10 | phony | Tsumiki | Neuro [v1]
 2023-02-14
-10 | Careless Whisper | George Michael | Neuro [v1]
-11 | Dreamin Chuchu | emon(Tes) | Neuro [v1]
+11 | Careless Whisper | George Michael | Neuro [v1]
+12 | Dreamin Chuchu | emon(Tes) | Neuro [v1]
+13 | Careless Whisper | George Michael | Neuro [v1]
 2023-02-16
-12 | Bad Guy | Billie Eilish | Neuro [v1]
+14 | Bad Guy | Billie Eilish | Neuro [v1]
+15 | Bad Guy | Billie Eilish | Neuro [v1]
 2023-02-21
-13 | Blue | Eiffel 65 | Neuro [v1]
+16 | Blue | Eiffel 65 | Neuro [v1]
 2023-02-22
-14 | ECHO | Crusher | Neuro [v1]
+17 | ECHO | Crusher | Neuro [v1]
 2023-02-23
-15 | All The Things She Said | tATu | Neuro [v1]
+18 | All The Things She Said | tATu | Neuro [v1]
 2023-02-24
-16 | God-ish | DECO*27, PinocchioP | Neuro [v1]
+19 | God-ish | DECO*27, PinocchioP | Neuro [v1]
 2023-02-25
-17 | I Am Machine | Three Days Grace | Neuro [v1]
+20 | I Am Machine | Three Days Grace | Neuro [v1]
 2023-02-26
-18 | Snow Halation | μ's | Neuro [v1] || christmas;
+21 | Snow Halation | μ's | Neuro [v1] || christmas;
 2023-02-27
-19 | It's Been So Long | The Living Tombstone | Neuro [v1]
+22 | It's Been So Long | The Living Tombstone | Neuro [v1]
+23 | God-ish | DECO*27, PinocchioP | Neuro [v1]
+24 | Brain Power | NOMA | Neuro [v1]
 2023-02-28
-20 | Take On Me | A-ha | Neuro [v1]
+25 | Take On Me | A-ha | Neuro [v1]

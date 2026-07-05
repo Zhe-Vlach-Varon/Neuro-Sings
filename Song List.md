@@ -10,15 +10,18 @@ After 02-05-2023: [Neuro Archiver](https://www.youtube.com/@NArchiver)
 2. 03-01-23 Take on Me
 3. 04-01-23 Viva la Vida
 4. 05-01-23 Ghost Rule
-5. 07-01-23 Money Machine
-6. 08-01-23 Still Alive
-7. 10-01-23 Sad Machine
-8. 25-01-23 Your Reality
-9. 25-01-23 Rickroll
-10. 28-01-23 Oddloop
-11. 29-01-23 Bocchi
-12. 30-01-23 Can you Feel my heart
-13. 31-01-23 Revenge
+5. 07-01-23 Ghost Rule
+6. 08-01-23 Money Machine
+7. 08-01-23 Still Alive
+8. 11-01-23 Sad Machine
+9. 25-01-23 Your Reality
+10. 25-01-23 Your Reality
+11. 25-01-23 Rickroll
+12. 28-01-23 Oddloop
+13. 29-01-23 Guitar, Loneliness and Blue Planet
+14. 29-01-23 Guitar, Loneliness and Blue Planet
+15. 30-01-23 Can you Feel my heart
+16. 31-01-23 Revenge
 
 <!-- Jan 2023 -->
 #### 03-01-2023 [here](https://youtu.be/OgJzx4WOXhY)
@@ -26,18 +29,22 @@ After 02-05-2023: [Neuro Archiver](https://www.youtube.com/@NArchiver)
 2. 3:15:05 Take on Me [CONFIRMED]
 #### 04-01-2023 [here](https://youtu.be/V2E0JFRkdqk)
 2:11:11 Viva la vida [CONFIRMED]
-#### 05-01-2023 [here](https://youtu.be/TXVzxq8LN3o)
-Couldn't find Ghost Rule in VOD, found [here](https://youtu.be/Y2x2RJon9LU) (06-01-23)
-#### 07-01-2023 No VOD
-Money Machine
+#### 05-01-2023 [here](https://youtu.be/ujEWWvxWxmc?t=17689)
+4:54:49 Ghost Rule [CONFIRMED]
+#### 07-01-2023 [here](https://www.youtube.com/watch?v=ilP7vyIpcE0)
+3:14:49 Ghost Rule [CONFIRMED]
+#### 08-01-2023 [here](https://youtu.be/XQeY3HbqXOk?t=13773)
+3:49:33 Money Machine [CONFIRMED]
 #### 08-01-2023 [here](https://youtu.be/z91jpjdomZc)
-Still Alive [CONFIRMED]
-#### 10-01-2023 No VOD
-[here](https://youtu.be/phhsUrmwTEI)
+2:49:08 Still Alive [CONFIRMED]
+#### 11-01-2023 [here](https://youtu.be/zZ_elT7w2tM?t=4319)
+1:12:00 Sad Machine muted in vod, confirmed by watching chat and duration of muted segment
+
 
 #### 25-01-2023 [here](https://youtu.be/e3wSvSnRGBQ)
 1. Your Reality around 21:00 [CONFIRMED]
-2. Rickroll around 4:51:15 [CONFIRMED]
+2. Your Reality around 4:48:00 [CONFIRMED]
+3. Rickroll around 4:51:15 [CONFIRMED]
 #### 27-01-2023 [here](https://youtu.be/V7eSyhQh7-s)
 Oddloop around 2:04:00 [CONFIRMED]
 #### 28-01-2023 [here](https://youtu.be/LuYhSDqzMMs)
@@ -47,31 +54,40 @@ Guitar, loneliness and blue planet around 2:43:00 (Muted)
 2:51:00 (encore) (Muted)
 #### 30-01-2023 [here](https://youtu.be/26asH006E4A)
 Can you feel my heart around 5:58:00 [CONFIRMED]
-#### 31-01-2023 [here](https://youtu.be/26asH006E4A)
-Revenge around 1:02:00 [CONFIRMED]
+#### 31-01-2023 [here](https://youtu.be/jp-G7rnSNb8)
+Revenge around 1:00:00 [CONFIRMED]
 
 
 ### February
 1. 01-02-23 World is mine
 2. 02-02-23 Enemy
 3. 03-02-23 Brain Power
-4. 05-02-23 Numb (actually yes the 5th, also on the 6th)
-5. 07-02-23 Baka Mitai
-6. 09-02-23 Contry Road
-7. 10-02-23 Shelter
-8. 12-02-23 KING
-9. 13-02-23 Phony
-10. 14-02-23 Careless Whisper
-11. 14-02-23 Dreamin Chuchu
-12. 16-02-23 Bad Guy
-13. 21-02-23 I'm Blue
-14. 22-02-23 Echo
-15. 23-02-23 All the things she said
-16. 24-02-23 Godish
-17. 25-02-23 I am Machine
-18. 26-02-23 Show Halation
-19. 27-02-23 It's been so long
-20. 28-02-23 Take on me
+4. 05-02-23 Numb
+5. 06-02-23 Numb
+6. 07-02-23 Baka Mitai
+7. 09-02-23 Contry Road
+8. 10-02-23 Shelter
+9. 12-02-23 KING
+10. 13-02-23 Phony
+11. 14-02-23 Careless Whisper
+12. 14-02-23 Dreamin Chuchu
+13. 14-02-23 Careless Whisper
+14. 16-02-23 Bad Guy
+15. 16-02-23 Bad Guy
+16. 21-02-23 I'm Blue
+17. 22-02-23 Echo
+18. 23-02-23 All the things she said
+19. 24-02-23 Godish
+20. 25-02-23 I am Machine
+21. 26-02-23 Show Halation
+22. 27-02-23 It's been so long
+23. 27-02-23 Brain Power
+24. 27-02-23 Godish
+25. 28-02-23 Take on me
+
+### on other streams
+1. 17-02-23 Bad Guy on Filian's Dating Show
+2. 20-02-23 I'm Blue on OniGiri's stream
 
 <!-- Feb 2023 -->
 #### 01-02-2023 [here](https://youtu.be/wqSCq87CUm0)
@@ -99,6 +115,7 @@ Careless Whisper around 17min and 2h56 [CONFIRMED]
 Dreamin Chuchu around 1h11 [CONFIRMED]
 <!--- Thank god she got her mic from this point, it's soooooo much easier to spot in the VODs, no need to destroy my eyes anymore -->
 #### 16-02-2023 [here](https://youtu.be/eOiR4Oeijs0)
+Bad guy around 1:30:00 [CONFIRMED]
 Bad guy around 2h18 [CONFIRMED]
 #### 21-02-2023 [here](https://youtu.be/5MG1qCGzKBQ)
 I'm Blue around 50min [CONFIRMED]

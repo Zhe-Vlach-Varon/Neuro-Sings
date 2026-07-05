@@ -33,7 +33,7 @@ Date,Singer,Duet Format
 2024-05-24,Neuro,v1
 2024-05-29,Evil,v1
 2024-06-12,Neuro,v1
-2024-06-26,Twins,v1
+2024-06-26,Evil,v1
 2024-07-10,Neuro,v1
 2024-07-24,Evil,v1
 2024-08-07,Neuro,v1
@@ -46,7 +46,7 @@ Date,Singer,Duet Format
 2024-10-30,Neuro,v1
 2024-11-13,Evil,v1
 2024-11-27,Neuro,v1
-2024-12-19,Neuro,v2v1
+2024-12-19,Twins,v2v1
 2024-12-25,Twins,v2v1
 2024-12-30,Neuro,v2v1
 2025-03-05,Evil,v2v1
@@ -99,3 +99,4 @@ Date,Singer,Duet Format
 2026-06-10,Evil,v2
 2026-06-16,Neuro,v2
 2026-06-24,Neuro,v2
+2026-07-02,Evil,v2

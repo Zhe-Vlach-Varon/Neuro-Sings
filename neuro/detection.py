@@ -242,7 +242,7 @@ def extract_custom(files: list[Path], out: neutils.SongJSON = {}) -> neutils.Son
             "Cover Artist": cover_artist,
             "File_IN": str(file),
             "id": 999999,
-            # 'Date': "1970-01-01",
+            # 'Date': "2022-12-19",
             'Version': "1",
             'Special': "1",
             'Comment': None,
@@ -713,8 +713,8 @@ def fill_in_setlists(out: neutils.SongJSON = {}) -> neutils.SongJSON:
     songs_df = load_db()
 
     files = list(SETLISTS_DIR.glob(f"**/*"))
-    karaoke_setlists = [f for f in files if 'non-karaoke' not in f.parts]
-    non_karaoke_setlists = [f for f in files if 'non-karaoke' in f.parts]
+    karaoke_setlists = [f for f in files if 'non-karaoke' not in f.parts and not f.is_dir()]
+    non_karaoke_setlists = [f for f in files if 'non-karaoke' in f.parts and not f.is_dir()]
     karaoke_setlists.sort()
     sorted_setlist_files = karaoke_setlists + non_karaoke_setlists
 
@@ -807,19 +807,23 @@ def fill_in_setlists(out: neutils.SongJSON = {}) -> neutils.SongJSON:
                 # moves matching songs from out[src_album_name] to out[album]
                 if src_album_name in out.keys():
                     songs_to_check = out[src_album_name]
-                    for song in reversed(songs_to_check):
-                        for entry in albums[album][existing_song_count:]:
+                    for entry in albums[album][existing_song_count:]:
+                        for song in reversed(songs_to_check):
+                            if 'File_IN' in entry.keys() or entry['Date'] != song['Date']:
+                                continue
                             # print()
                             # print(song)
                             # print(entry)
-                            dup_encore_File_IN_check = (neutils.does_matching_song_exist_in_list(song, albums[album]) > neutils.does_matching_song_exist_in_list(song, out[album])) and not entry['duplicate'] and 'File_IN' in song.keys()
-                            if neutils.do_songs_match(song, entry) and dup_encore_File_IN_check:
+                            # dup_encore_File_IN_check = (neutils.does_matching_song_exist_in_list(song, albums[album]) > neutils.does_matching_song_exist_in_list(song, out[album])) and not entry['duplicate'] and 'File_IN' in song.keys() and 'File_IN' not in entry.keys()
+                            dup_encore_File_IN_check = True
+                            if neutils.do_songs_match(song, entry) and dup_encore_File_IN_check and song['Date'] == entry['Date']:
                                 if album not in out.keys():
                                     out[album] = []
                                 # print(album)
                                 # print(src_album_name)
-                                out[album].append(song)
                                 out[src_album_name].remove(song)
+                                song['id'] = entry['id']
+                                out[album].append(song)
 
             for date in dates:
                 # print(date)
@@ -844,7 +848,7 @@ def fill_in_setlists(out: neutils.SongJSON = {}) -> neutils.SongJSON:
                                                              song['Title'] + (( ' ' + song['Identify']) if (song['Identify'] is not None) and (not song['Identify'] == 'None') else ''))
                             )
                             and
-                                song['Cover Artist'].lower() == entry['Cover Artist'].lower() and not entry['encore']):
+                                song['Cover Artist'].lower() == entry['Cover Artist'].lower() and not entry['encore']) and (('Date' in song.keys() and 'Date' in entry.keys() and song['Date'] == entry['Date']) or ('Date' not in song.keys())):
                             for key in entry.keys():
                                 if key not in song.keys():
                                     song[key] = entry[key]
@@ -871,7 +875,7 @@ def fill_in_setlists(out: neutils.SongJSON = {}) -> neutils.SongJSON:
                     # print(found_ids)
                     # print("")
                     # print(entry['id'])
-                    if entry["id"] not in found_ids:
+                    if entry["id"] not in found_ids or len(out[album]) < entry["id"]:
                         out[album].insert((entry["id"]-1), entry)
                         # print('if entry["id"] not in found_ids:')
                     else:
@@ -924,7 +928,7 @@ def extract_all() -> neutils.SongJSON:
     """
     songs_db = load_db()
     dates_df = load_dates()
-    assert (songs_db.height == 0) == (dates_df.height == 0)
+    # assert (songs_db.height == 0) == (dates_df.height == 0)
 
     files = get_files(songs_db)
     regex = get_regexes()
@@ -997,7 +1001,7 @@ def export_json(all_songs: neutils.SongJSON) -> None:
     # Sorting songs by date for easier treatment
     # print(dated_songs)
     assert 'custom' not in dated_songs.keys()
-    # sorted_songs = dict(sorted(dated_songs.items(), key=lambda item: item[1][-1]['Date']))
+    sorted_songs = dict(sorted(dated_songs.items(), key=lambda item: item[1][-1]['Date']))
 
     # for key in keys_to_exclude:
         # if key in all_songs.keys():
@@ -1005,6 +1009,5 @@ def export_json(all_songs: neutils.SongJSON) -> None:
 
     with open(SONGS_JSON, "w") as f:
         # print(sorted_songs)
-        json.dump(all_songs, f, indent=2, ensure_ascii=False)
-        # json.dump(sorted_songs, f, indent=2, ensure_ascii=False)
+        json.dump(sorted_songs, f, indent=2, ensure_ascii=False)
         f.write("\n")

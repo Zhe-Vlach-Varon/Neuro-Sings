@@ -37,11 +37,15 @@
 2023-03-15
 24 | Gotta Catch 'Em All | John Siegler, Jason Paige | Neuro [v1]
 25 | Gotta Catch 'Em All | John Siegler, Jason Paige | Neuro [v1]
-2023-03-16
-26 | Venom | Kairiki Bear | Neuro [v1]
 2023-03-18
+26 | Believer | Imagine Dragons | Neuro [v1]
 27 | Believer | Imagine Dragons | Neuro [v1]
-28 | Believer | Imagine Dragons | Neuro [v1]
 2023-03-19
+28 | Ai Kotoba | DECO*27 | Neuro [v1]
 29 | Ai Kotoba | DECO*27 | Neuro [v1]
-30 | Ai Kotoba | DECO*27 | Neuro [v1]
+2023-03-20
+30 | Dramaturgy | Eve, Numa | Neuro [v1]
+31 | Dramaturgy | Eve, Numa | Neuro [v1]
+2023-03-21
+32 | I Kissed a Girl | Katy Perry | Neuro [v1]
+33 | Take on Me | a-ha | Neuro [v1]

@@ -1,35 +1,54 @@
-date,outfit,microphone
-2023-01-03,hiyori,none
-2023-01-04,hiyori,none
-2023-01-05,hiyori,none
-2023-01-07,hiyori,none
-2023-01-08,hiyori,none
-2023-01-10,hiyori,none
-2023-01-25,hiyori-desk,none
-2023-01-25,hiyori,none
-2023-01-27,hiyori,none
-2023-01-29,hiyori,none
-2023-01-30,hiyori,none
-2023-01-31,hiyori,none
-2023-02-01,hiyori,none
-2023-02-02,hiyori,none
-2023-02-03,hiyori,none
-2023-02-05,hiyori,none
-2023-02-07,hiyori,none
-2023-02-09,hiyori,none
-2023-02-10,hiyori,none
-2023-02-12,hiyori,none
-2023-02-14,hiyori-valentine,none
-2023-02-16,hiyori,pink
-2023-02-17,hiyori-no-chat,pink
-2023-02-19,hiyori-onigiri,none
-2023-02-21,hiyori,pink
-2023-02-22,hiyori,pink
-2023-02-23,hiyori,pink
-2023-02-24,hiyori,pink
-2023-02-25,hiyori,pink
-2023-02-26,hiyori,pink
-2023-02-27,hiyori,pink
-2023-02-28,hiyori,pink
-2023-03-01,hiyori,pink
-2023-03-02,hiyori,pink
+date,outfit,microphone,scene,guest
+2023-01-03,hiyori,none,pink gears,none
+2023-01-04,hiyori,none,pink gears,none
+2023-01-05,hiyori,none,pink gears,none
+2023-01-07,hiyori,none,pink gears,none
+2023-01-08,hiyori,none,pink gears,none
+2023-01-10,hiyori,none,pink gears,none
+2023-01-25,hiyori,none,classroom,none
+2023-01-25,hiyori,none,pink gears,none
+2023-01-27,hiyori,none,pink gears,none
+2023-01-29,hiyori,none,pink gears,none
+2023-01-30,hiyori,none,pink gears,none
+2023-01-31,hiyori,none,pink gears,none
+2023-02-01,hiyori,none,pink gears,none
+2023-02-02,hiyori,none,pink gears,none
+2023-02-03,hiyori,none,pink gears,none
+2023-02-05,hiyori,none,pink gears,none
+2023-02-07,hiyori,none,pink gears,none
+2023-02-09,hiyori,none,pink gears,none
+2023-02-10,hiyori,none,pink gears,none
+2023-02-12,hiyori,none,pink gears,none
+2023-02-14,hiyori,none,valentines resturant,none
+2023-02-16,hiyori,pink,pink gears,none
+2023-02-17,hiyori,pink,pink gears no chat,filian dating show
+2023-02-20,hiyori,none,onigiri street market,onigiri
+2023-02-21,hiyori,pink,pink gears,none
+2023-02-22,hiyori,pink,pink gears,none
+2023-02-23,hiyori,pink,pink gears,none
+2023-02-24,hiyori,pink,pink gears,none
+2023-02-25,hiyori,pink,pink gears,none
+2023-02-26,hiyori,pink,pink gears,none
+2023-02-27,hiyori,pink,pink gears,none
+2023-02-28,hiyori,pink,pink gears,none
+2023-03-01,hiyori,pink,pink gears,none
+2023-03-02,hiyori,pink,pink gears,none
+2023-03-03,hiyori,pink,pink gears,none
+2023-03-04,hiyori,none,pink gears,aletta sky
+2023-03-05,hiyori,pink,pink gears,none
+2023-03-06,hiyori,pink,pink gears,none
+2023-03-07,hiyori,pink,pink gears,none
+2023-03-08,hiyori,pink,pink gears,none
+2023-03-09,hiyori,pink,pink gears,none
+2023-03-10,hiyori,pink,vrchat dance,filian
+2023-03-12,hiyori,pink,pink gears,none
+2023-03-13,hiyori,pink,pink gears,none
+2023-03-14,hiyori,pink,pink gears,none
+2023-03-15,hiyori,pink,pink gears,none
+2023-03-16,hiyori,none,rizz-a-tuber,rizz-a-tuber rpr Camila Elly Geega Rainhoe UzuriMia Kitnetic Sorry OniGiri
+2023-03-18,hiyori,pink,pink gears,none
+2023-03-19,hiyori,pink,pink gears,none
+2023-03-20,hiyori,pink,pink gears,none
+2023-03-21,hiyori sunhat,pink,beach,none
+2023-03-22,hiyori,pink,concert lighting w/ blob visualizer,none
+2023-03-29,hiyori,pink,concert lighting w/ blob visualizer,none

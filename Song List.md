@@ -196,6 +196,11 @@ Venom around 1h40 [CONFIRMED]
 Believer around 1h29 and 2h47 [CONFIRMED]
 #### 19-03-2023 [here](https://youtu.be/X8P4xBFP4wQ)
 Ai Kotoba around 1h32 and 3h16 [CONFIRMED]
+#### 20-03-2023 [here](https://youtu.be/Eg7Pe7cYn7A)
+Dramaturgy around 5h02 and 6h25
+#### 21-03-2023 [here](https://youtu.be/3ygWIyQHBMY)
+I Kissed a Girl around 1h23
+Take on Me around 3h54
 
 ## v1 Karaoke Streams
 ### 22-03-2023 [here](https://youtu.be/-XSbKQBJwNI)

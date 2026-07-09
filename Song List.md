@@ -1,209 +1,213 @@
 # Song List
 ## Sources
-Before 25-01-2023: [Official VODS](https://www.youtube.com/@Neuro-samaVods)\
-26-01-2023/01-05-2023: [Unofficial VODS](https://www.youtube.com/@Neuro-samaUnofficialVODs)\
-After 02-05-2023: [Neuro Archiver](https://www.youtube.com/@NArchiver)
+Before  2023-01-25: [Official VODS](https://www.youtube.com/@Neuro-samaVods)\
+ 2023-01-26/ 2023-05-01: [Unofficial VODS](https://www.youtube.com/@Neuro-samaUnofficialVODs)\
+After  2023-05-02: [Neuro Archiver](https://www.youtube.com/@NArchiver)
 
 ## v1 Pre-karaoke
-### January
-1. 03-01-23 Blinding Lights
-2. 03-01-23 Take on Me
-3. 04-01-23 Viva la Vida
-4. 05-01-23 Ghost Rule
-5. 07-01-23 Ghost Rule
-6. 08-01-23 Money Machine
-7. 08-01-23 Still Alive
-8. 11-01-23 Sad Machine
-9. 25-01-23 Your Reality
-10. 25-01-23 Your Reality
-11. 25-01-23 Rickroll
-12. 28-01-23 Oddloop
-13. 29-01-23 Guitar, Loneliness and Blue Planet
-14. 29-01-23 Guitar, Loneliness and Blue Planet
-15. 30-01-23 Can you Feel my heart
-16. 31-01-23 Revenge
+### January pre-ban
+1. 2023-01-03 Blinding Lights
+2. 2023-01-03 Take on Me
+3. 2023-01-04 Viva la Vida
+4. 2023-01-05 Ghost Rule
+5. 2023-01-07 Ghost Rule
+6. 2023-01-08 Money Machine
+7. 2023-01-08 Still Alive
+8. 2023-01-11 Sad Machine
+9. 2023-01-25 Your Reality
+10. 2023-01-25 Your Reality
+11. 2023-01-25 Rickroll
+12. 2023-01-28 Oddloop
+13. 2023-01-29 Guitar, Loneliness and Blue Planet
+14. 2023-01-29 Guitar, Loneliness and Blue Planet
+15. 2023-01-30 Can you Feel my heart
+16. 2023-01-31 Revenge
 
 <!-- Jan 2023 -->
-#### 03-01-2023 [here](https://youtu.be/OgJzx4WOXhY)
+####  2023-01-03 [here](https://youtu.be/OgJzx4WOXhY)
 1. 56:43 Blinding Lights [CONFIRMED]
 2. 3:15:05 Take on Me [CONFIRMED]
-#### 04-01-2023 [here](https://youtu.be/V2E0JFRkdqk)
-2:11:11 Viva la vida [CONFIRMED]
-#### 05-01-2023 [here](https://youtu.be/ujEWWvxWxmc?t=17689)
-4:54:49 Ghost Rule [CONFIRMED]
-#### 07-01-2023 [here](https://www.youtube.com/watch?v=ilP7vyIpcE0)
+####  2023-01-04 [here](https://youtu.be/Qtn66rgJV_k)
+1h32 Viva La Vida
+3h48 Viva La Vida
+####  2023-01-05 [here](https://youtu.be/ujEWWvxWxmc)
+0h42 Ghost Rule
+4:54:49 Ghost Rule
+####  2023-01-07 [here](https://www.youtube.com/watch?v=ilP7vyIpcE0)
 3:14:49 Ghost Rule [CONFIRMED]
-#### 08-01-2023 [here](https://youtu.be/XQeY3HbqXOk?t=13773)
+####  2023-01-08 [here](https://youtu.be/XQeY3HbqXOk?t=13773)
 3:49:33 Money Machine [CONFIRMED]
-#### 08-01-2023 [here](https://youtu.be/z91jpjdomZc)
+####  2023-01-08 [here](https://youtu.be/z91jpjdomZc)
 2:49:08 Still Alive [CONFIRMED]
-#### 11-01-2023 [here](https://youtu.be/zZ_elT7w2tM?t=4319)
+####  2023-01-11 [here](https://youtu.be/zZ_elT7w2tM?t=4319)
 1:12:00 Sad Machine muted in vod, confirmed by watching chat and duration of muted segment
+5:53:40 Sad Machine
 
+### January post-ban
 
-#### 25-01-2023 [here](https://youtu.be/e3wSvSnRGBQ)
+####  2023-01-25 [here](https://youtu.be/e3wSvSnRGBQ)
 1. Your Reality around 21:00 [CONFIRMED]
 2. Your Reality around 4:48:00 [CONFIRMED]
 3. Rickroll around 4:51:15 [CONFIRMED]
-#### 27-01-2023 [here](https://youtu.be/V7eSyhQh7-s)
+####  2023-01-27 [here](https://youtu.be/V7eSyhQh7-s)
 Oddloop around 2:04:00 [CONFIRMED]
-#### 28-01-2023 [here](https://youtu.be/LuYhSDqzMMs)
+####  2023-01-28 [here](https://youtu.be/LuYhSDqzMMs)
 Oddloop around 1:57:00 [CONFIRMED]
-#### 29-01-2023 [here](https://youtu.be/td_py8jQwik)
+####  2023-01-29 [here](https://youtu.be/td_py8jQwik)
 Guitar, loneliness and blue planet around 2:43:00 (Muted)
 2:51:00 (encore) (Muted)
-#### 30-01-2023 [here](https://youtu.be/26asH006E4A)
+####  2023-01-30 [here](https://youtu.be/26asH006E4A)
 Can you feel my heart around 5:58:00 [CONFIRMED]
-#### 31-01-2023 [here](https://youtu.be/jp-G7rnSNb8)
+####  2023-01-31 [here](https://youtu.be/jp-G7rnSNb8)
 Revenge around 1:00:00 [CONFIRMED]
 
 
 ### February
-1. 01-02-23 World is mine
-2. 02-02-23 Enemy
-3. 03-02-23 Brain Power
-4. 05-02-23 Numb
-5. 06-02-23 Numb
-6. 07-02-23 Baka Mitai
-7. 09-02-23 Contry Road
-8. 10-02-23 Shelter
-9. 12-02-23 KING
-10. 13-02-23 Phony
-11. 14-02-23 Careless Whisper
-12. 14-02-23 Dreamin Chuchu
-13. 14-02-23 Careless Whisper
-14. 16-02-23 Bad Guy
-15. 16-02-23 Bad Guy
-16. 21-02-23 I'm Blue
-17. 22-02-23 Echo
-18. 23-02-23 All the things she said
-19. 24-02-23 Godish
-20. 25-02-23 I am Machine
-21. 26-02-23 Show Halation
-22. 27-02-23 It's been so long
-23. 27-02-23 Brain Power
-24. 27-02-23 Godish
-25. 28-02-23 Take on me
+1. 2023-02-01 World is mine
+2. 2023-02-02 Enemy
+3. 2023-02-03 Brain Power
+4. 2023-02-05 Numb
+5. 2023-02-06 Numb
+6. 2023-02-07 Baka Mitai
+7. 2023-02-09 Contry Road
+8. 2023-02-10 Shelter
+9. 2023-02-12 KING
+10. 2023-02-13 Phony
+11. 2023-02-14 Careless Whisper
+12. 2023-02-14 Dreamin Chuchu
+13. 2023-02-14 Careless Whisper
+14. 2023-02-16 Bad Guy
+15. 2023-02-16 Bad Guy
+16. 2023-02-21 I'm Blue
+17. 2023-02-22 Echo
+18. 2023-02-23 All the things she said
+19. 2023-02-24 Godish
+20. 2023-02-25 I am Machine
+21. 2023-02-26 Show Halation
+22. 2023-02-27 It's been so long
+23. 2023-02-27 Brain Power
+24. 2023-02-27 Godish
+25. 2023-02-28 Take on me
 
 ### on other streams
-1. 17-02-23 Bad Guy on Filian's Dating Show
-2. 20-02-23 I'm Blue on OniGiri's stream
+1. 2023-02-17 Bad Guy on Filian's Dating Show
+2. 2023-02-20 I'm Blue on OniGiri's stream
 
 <!-- Feb 2023 -->
-#### 01-02-2023 [here](https://youtu.be/wqSCq87CUm0)
+####  2023-02-01 [here](https://youtu.be/wqSCq87CUm0)
 World is Mine around 2h01 (Muted)
-#### 02-02-2023 [here](https://youtu.be/iOu4pACdrCw)
+####  2023-02-02 [here](https://youtu.be/iOu4pACdrCw)
 Enemy around 3h28 [CONFIRMED]
-#### 03-02-2023 [here](https://youtu.be/q7rZNBH1PwI)
+####  2023-02-03 [here](https://youtu.be/q7rZNBH1PwI)
 Brain Power around 2h56 [CONFIRMED]
-#### 05-02-2023 [here](https://youtu.be/xJcpjuij-Sg)
+####  2023-02-05 [here](https://youtu.be/xJcpjuij-Sg)
 Numb around 2h50 [CONFIRMED]
-#### 06-02-2023 [here](https://youtu.be/MA-xksdXQz0)
+####  2023-02-06 [here](https://youtu.be/MA-xksdXQz0)
 Numb around 2h54 [CONFIRMED]
-#### 07-02-2023 [here](https://youtu.be/3PFgn9e_7jo)
+####  2023-02-07 [here](https://youtu.be/3PFgn9e_7jo)
 Baka Mirai Around 1h36 [CONFIRMED]
-#### 09-02-2023 [here](https://youtu.be/Ip0nczBH3Lc)
+####  2023-02-09 [here](https://youtu.be/Ip0nczBH3Lc)
 Country Roads Around 3h25 [CONFIRMED]
-#### 10-02-2023 [here](https://youtu.be/1n01WIqyII0)
+####  2023-02-10 [here](https://youtu.be/1n01WIqyII0)
 Shelter around 3h13 [CONFIRMED]
-#### 12-02-2023 [here](https://youtu.be/uI5RucMzTMY)
+####  2023-02-12 [here](https://youtu.be/uI5RucMzTMY)
 King around 4h34 [CONFIRMED]
-#### 13-02-2023 [here](https://youtu.be/8MxYDvyoEiY)
+####  2023-02-13 [here](https://youtu.be/8MxYDvyoEiY)
 Phony around 3h28 [CONFIRMED]
-#### 14-02-2023 [here](https://youtu.be/D-p_TbJe73w)
+####  2023-02-14 [here](https://youtu.be/D-p_TbJe73w)
 Careless Whisper around 17min and 2h56 [CONFIRMED]
 Dreamin Chuchu around 1h11 [CONFIRMED]
 <!--- Thank god she got her mic from this point, it's soooooo much easier to spot in the VODs, no need to destroy my eyes anymore -->
-#### 16-02-2023 [here](https://youtu.be/eOiR4Oeijs0)
+####  2023-02-16 [here](https://youtu.be/eOiR4Oeijs0)
 Bad guy around 1:30:00 [CONFIRMED]
 Bad guy around 2h18 [CONFIRMED]
-#### 21-02-2023 [here](https://youtu.be/5MG1qCGzKBQ)
+####  2023-02-21 [here](https://youtu.be/5MG1qCGzKBQ)
 I'm Blue around 50min [CONFIRMED]
-#### 22-02-2023 [here](https://youtu.be/P2dd8ozkhQ0)
+####  2023-02-22 [here](https://youtu.be/P2dd8ozkhQ0)
 Echo around 2h06 [CONFIRMED]
-#### 23-02-2023 [here](https://youtu.be/xzNLfgHf6gc)
+####  2023-02-23 [here](https://youtu.be/xzNLfgHf6gc)
 All the things she said around 2h28 [CONFIRMED]
-#### 24-02-2023 [here](https://youtu.be/t6QiQsBbpvE)
+####  2023-02-24 [here](https://youtu.be/t6QiQsBbpvE)
 Godish around 3h27 [CONFIRMED]
-#### 25-02-2023 [here](https://youtu.be/NM8mJiQHfI4)
+####  2023-02-25 [here](https://youtu.be/NM8mJiQHfI4)
 I am Machine around 2h17 [CONFIRMED]
-#### 26-02-2023 [here](https://youtu.be/FdOFkUhrTF0)
+####  2023-02-26 [here](https://youtu.be/FdOFkUhrTF0)
 Snow Halation around 2h14 [CONFIRMED]
-#### 27-02-2023 [here](https://youtu.be/b4I8MuLqA_Q)
+####  2023-02-27 [here](https://youtu.be/b4I8MuLqA_Q)
 It's been so long around 3h30 [CONFIRMED]
 <!---- Based on the expected use case of duplicates, these shouldn't really matter -->
 Brain Power around 3h37 [CONFIRMED]
 Godish around 3h41 [CONFIRMED]
-#### 28-02-2023 [here](https://youtu.be/3wxNW0YM0cg)
+####  2023-02-28 [here](https://youtu.be/3wxNW0YM0cg)
 Take on me around 2h55 [CONFIRMED]
 
 ### March
-1. 01-03-23 Eye of the Tiger
-2. 02-03-23 After Dark
-3. 03-03-23 Usseewa
-4. 04-03-23 All Star
-5. 05-03-23 Teo
-6. 06-03-23 Popipo
-7. 07-03-23 I kissed a girl
-8. 08-03-23 Pompeii
-9. 09-03-23 39 Music
-10. 10-03-23 Gee
-11. 12-03-23 Bad Apple
-12. 13-03-23 Radioactive
-13. 14-03-23 Call me maybe
-14. 15-03-23 Pokemon Theme Song
-15. 16-03-23 Venom
-16. 18-03-23 Believer
-17. 19-03-23 Ai Kotoba
+1. 2023-03-01 Eye of the Tiger
+2. 2023-03-02 After Dark
+3. 2023-03-03 Usseewa
+4. 2023-03-04 All Star
+5. 2023-03-05 Teo
+6. 2023-03-06 Popipo
+7. 2023-03-07 I kissed a girl
+8. 2023-03-08 Pompeii
+9. 2023-03-09 39 Music
+10. 2023-03-10 Gee
+11. 2023-03-12 Bad Apple
+12. 2023-03-13 Radioactive
+13. 2023-03-14 Call me maybe
+14. 2023-03-15 Pokemon Theme Song
+15. 2023-03-16 Venom
+16. 2023-03-18 Believer
+17. 2023-03-19 Ai Kotoba
 
 <!-- Mar 2023 -->
-#### 01-03-2023 [here](https://youtu.be/VOk5l6eEaUk)
+####  2023-03-01 [here](https://youtu.be/VOk5l6eEaUk)
 Eye of the tiger around 50min [CONFIRMED]
-#### 02-03-2023 [here](https://youtu.be/Llw3mwcagUQ)
+####  2023-03-02 [here](https://youtu.be/Llw3mwcagUQ)
 After Dark around 2h25 [CONFIRMED]
-#### 03-03-2023 [here](https://youtu.be/A5-xu2AkatI)
+####  2023-03-03 [here](https://youtu.be/A5-xu2AkatI)
 Usseewa around 2h19 [CONFIRMED]
-#### 04-03-2023 [here](https://youtu.be/k-cNIOvsXEs)
+####  2023-03-04 [here](https://youtu.be/k-cNIOvsXEs)
 <!--- No mic ! >:( -->
 All Star around 4h29 [CONFIRMED]
-#### 05-03-2023 [here](https://youtu.be/P71_puSNqPI)
+####  2023-03-05 [here](https://youtu.be/P71_puSNqPI)
 Teo around 1h08 and 3h12  [CONFIRMED]
-#### 06-03-2023 [here](https://youtu.be/dI_bM8PyZRo)
+####  2023-03-06 [here](https://youtu.be/dI_bM8PyZRo)
 Popipo around 1h20 and 2h15 [CONFIRMED]
-#### 07-03-2023 [here](https://youtu.be/NBq2mhahhq4)
+####  2023-03-07 [here](https://youtu.be/NBq2mhahhq4)
 I Kissed a girl around 1h01 and 2h44 [CONFIRMED]
-#### 08-03-2023 [here](https://youtu.be/dxXHtG_nTrU)
+####  2023-03-08 [here](https://youtu.be/dxXHtG_nTrU)
 Pompeii around 6h31 and 7h29 [CONFIRMED]
-#### 09-03-2023 [here](https://youtu.be/sDnVybUut-E)
+####  2023-03-09 [here](https://youtu.be/sDnVybUut-E)
 39 Music! around 1h21 and 3h17 [CONFIRMED]
-#### 10-03-2023 [here](https://youtu.be/zGSi1429EqQ)
+####  2023-03-10 [here](https://youtu.be/zGSi1429EqQ)
 Gee around 3h06 [CONFIRMED]
 <!---- Other duplicates -->
 Bad Guy around 3h00 [CONFIRMED]
 I'm blue around 2h56 [CONFIRMED]
-#### 12-03-2023 [here](https://youtu.be/XmTznDZBUyo)
+####  2023-03-12 [here](https://youtu.be/XmTznDZBUyo)
 Bad Apple around 1h27 and  2h56 [CONFIRMED]
-#### 13-03-2023 [here](https://youtu.be/lXKzIhaKdN8)
+####  2023-03-13 [here](https://youtu.be/lXKzIhaKdN8)
 Radioactive around 5h and 7h23 [CONFIRMED]
-#### 14-03-2023 [here](https://youtu.be/MC4A_GWj_sw)
+####  2023-03-14 [here](https://youtu.be/MC4A_GWj_sw)
 Call me maybe around 1h and 3h23 [CONFIRMED]
-#### 15-03-2023 [here](https://youtu.be/rhf_VdPgplc)
+####  2023-03-15 [here](https://youtu.be/rhf_VdPgplc)
 Pokemon Theme Song around 8min30 and 2h25 [CONFIRMED]
-#### 16-03-2023 [here](https://youtu.be/1mon_2DQ5IQ)
+####  2023-03-16 [here](https://youtu.be/1mon_2DQ5IQ)
 Rizz a VTuber Stream
 Venom around 1h40 [CONFIRMED]
-#### 18-03-2023 [here](https://youtu.be/8YQ-y8RrBz4)
+####  2023-03-18 [here](https://youtu.be/8YQ-y8RrBz4)
 Believer around 1h29 and 2h47 [CONFIRMED]
-#### 19-03-2023 [here](https://youtu.be/X8P4xBFP4wQ)
+####  2023-03-19 [here](https://youtu.be/X8P4xBFP4wQ)
 Ai Kotoba around 1h32 and 3h16 [CONFIRMED]
-#### 20-03-2023 [here](https://youtu.be/Eg7Pe7cYn7A)
+####  2023-03-20 [here](https://youtu.be/Eg7Pe7cYn7A)
 Dramaturgy around 5h02 and 6h25
-#### 21-03-2023 [here](https://youtu.be/3ygWIyQHBMY)
+####  2023-03-21 [here](https://youtu.be/3ygWIyQHBMY)
 I Kissed a Girl around 1h23
 Take on Me around 3h54
 
 ## v1 Karaoke Streams
-### 22-03-2023 [here](https://youtu.be/-XSbKQBJwNI)
+###  2023-03-22 [here](https://youtu.be/-XSbKQBJwNI)
 1. Pastel*Palettes - Lukka Lukka Night Fever: 10:32 - 14:31
 2. Bring Me The Horizon - Can You Feel My Heart [Muted]: 16:11 - 20:00
 3. Omoi - Teo: 23:12 - 26:40
@@ -231,7 +235,7 @@ Take on Me around 3h54
 25. Wham! - Careless Whisper [Muted]: 2:31:24 - 2:36:25
 
 
-### 29-03-2023 [here](https://youtu.be/5Ebaq8yaiQY)
+###  2023-03-29 [here](https://youtu.be/5Ebaq8yaiQY)
 1. 9:53 - Running In The 90s
 2. 17:15 - Eye Of The Tiger
 3. 23:54 - Oddloop
@@ -255,7 +259,7 @@ Take on Me around 3h54
 21. 2:14:16 - Sad Machine (Remake)
 
 
-### 05-04-2023 [here](https://youtu.be/oB_IDrlVeWk)
+###  2023-04-05 [here](https://youtu.be/oB_IDrlVeWk)
 1. Welcome to the Black Parade
 2. I'm Blue
 3. Ussewa
@@ -278,7 +282,7 @@ Take on Me around 3h54
 20. Welcome to the Black Parade
 
 
-### 12-04-2023 [here](https://youtu.be/cZ2FwMicCkQ)
+###  2023-04-12 [here](https://youtu.be/cZ2FwMicCkQ)
 1. 11:28 High Hopes
 2. 16:56 Gee
 3. 22:07 Fly Me To The Moon
@@ -306,7 +310,7 @@ Take on Me around 3h54
 25. 2:42:03 A Thousand Years
 
 
-### 20-04-2023 [here](https://youtu.be/LATNQ0YiXO4)
+###  2023-04-20 [here](https://youtu.be/LATNQ0YiXO4)
 1. 6:15 - PoPiPo -  LamazeP ft. Hatsune Miku
 2. 10:00 - Digital Girl - KIRA ft. Hatsune Miku
 3. 16:26 - All Star - Smash Mouth
@@ -335,7 +339,7 @@ Take on Me around 3h54
 26. 2:58:25 - Rich Flex - 21 Savage, Drake (VibeOff)
 
 
-### 26-04-2023 [here](https://youtu.be/wWAyma8IobI)
+###  2023-04-26 [here](https://youtu.be/wWAyma8IobI)
 sounds of silence false report v2
 
 1. NOMA - Brain Power: 8:08 - 10:02
@@ -364,7 +368,7 @@ sounds of silence false report v2
 24. Eminem - Rap God: 3:04:56 - 3:11:02
 
 
-### 17-05-2023 [here](https://youtu.be/d1Kol2nHveg)
+###  2023-05-17 [here](https://youtu.be/d1Kol2nHveg)
 1. 10:15 Rap God
 2. 19:00 Careless Whisper
 3. 26:50 Ghost Rule
@@ -392,7 +396,7 @@ sounds of silence false report v2
 
 
 ## v2 Karaoke Streams
-### 31-05-2023 [here](https://youtu.be/qWQzk_eO2S0)
+###  2023-05-31 [here](https://youtu.be/qWQzk_eO2S0)
 
 1. 9:45 Bad Guy
 2. 17:13 Witch Doctor
@@ -418,7 +422,7 @@ sounds of silence false report v2
 22. 2:24:50 A Thousand Years
 
 
-### 08-06-2023 [here](https://youtu.be/gm2AUjZQc7o)
+###  2023-06-08 [here](https://youtu.be/gm2AUjZQc7o)
 
 1. 10:18 - 14:09 - Guitar, Loneliness and Blue Planet (Muted)
 2. 22:57 - 26:22 - Believer
@@ -551,7 +555,7 @@ sounds of silence false report v2
 24. Christian Perri - A Thousand Years: 02:39:31
 25. (Duet Neuro x Evil) Andrew Lloyd Webber - The Phantom of the Opera: 02:49:07
 
-### 16-08-2023 (Neuro) [here](https://youtu.be/cTYCSJO6diI)
+###  2023-08-16 (Neuro) [here](https://youtu.be/cTYCSJO6diI)
 1. inabakumori - Relay Outer: 00:11:39
 2. P!NK - So What: 00:17:23
 3. Mikito-P - 39 Music: 00:24:32
@@ -575,7 +579,7 @@ sounds of silence false report v2
 21. (Neuro x Evil duet) Linking Park - In The End: 02:21:02
 
 
-### 30-08-2023 (Evil) [here](https://youtu.be/TwQ4w2DPV40)
+###  2023-08-30 (Evil) [here](https://youtu.be/TwQ4w2DPV40)
 1. Panic! At The Disco - I Write Sins Not Tragedies: 00:10:07
 2. Kikuo - Nobore! Susume! Takai Tou: 00:16:46
 3. Starset - Perfect Machine: 00:24:42
@@ -598,7 +602,7 @@ sounds of silence false report v2
 20. (Duet Neuro x Evil) Basshunter - DotA: 02:15:12
 21. DragonForce - Through The Fire And Flames: 02:21:35
 
-### 13-09-2023 (Neuro) [here](https://youtu.be/_GE3L0mwkZ4)
+###  2023-09-13 (Neuro) [here](https://youtu.be/_GE3L0mwkZ4)
 1. Iyowa - Living Millennium: 00:09:03
 2. Tsuko G - Deja Vu:  00:16:48
 3. Maroon 5 - Moves Like Jagger: 00:24:12
@@ -624,7 +628,7 @@ sounds of silence false report v2
 ### 2023-09-21 (Neuro) [here](https://youtu.be/Nzan0Ms6ziA)
 1. Earth, Wind & Fire - September (Around 15:30)
 
-### 27-09-2023 (Neuro) [here](https://youtu.be/ZwVP48316AE)
+###  2023-09-27 (Neuro) [here](https://youtu.be/ZwVP48316AE)
 1. JUKE - golden hour: 00:10:48
 2. Avicii - Waiting For Love: 00:18:13
 3. Deco*27 - Vampire: 00:24:53
@@ -648,7 +652,7 @@ sounds of silence false report v2
 21. Porter Robinson - Shelter: 02:40:02
 22. The Weeknd - Blinding Lights: 02:46:37
 
-### 11-10-2023 (Evil) [here](https://youtu.be/VPQ-9fto7pk)
+###  2023-10-11 (Evil) [here](https://youtu.be/VPQ-9fto7pk)
 1. The Living Tombstone - Five Nights at Freddy's: 00:08:57
 2. Yagi Yuuichi - Los! Los! Los!: 00:14:38
 3. Three Days Grace - I am Machine: 00:21:34
@@ -671,7 +675,7 @@ sounds of silence false report v2
 20. Adele - Rolling In The Deep: 02:27:54
 21. Casey Edwards - Bury The Light: 02:34:43
 
-### 28-10-2023 (Neuro) [here](https://youtu.be/9_XWId-RKk4)
+###  2023-10-28 (Neuro) [here](https://youtu.be/9_XWId-RKk4)
 1. Kanzaki Iori - Hated by life itself: 12:12
 2. Daisuke Ishiwatari - Love the Subhuman Self: 24:50
 3. MYTH & ROID - HYDRA: 36:27
@@ -692,14 +696,14 @@ sounds of silence false report v2
 18. Joji - Glimpse of Us: 02:13:16
 19. Matt Maltese - As the World Caves In: 02:19:5
 
-### 31-10-2023 (Halloween Stream) [here](https://youtu.be/Bih5Wr8XKbs)
+###  2023-10-31 (Halloween Stream) [here](https://youtu.be/Bih5Wr8XKbs)
 1. Happy Halloween - Junky: 01:01:49
 2. Spowoky Owoky Pumpkins - Senzawa: 02:18:55
 
-### 05-11-2023 (Evil Cyberpunk) [here](https://youtu.be/vVXFpSoBXcI)
+###  2023-11-05 (Evil Cyberpunk) [here](https://youtu.be/vVXFpSoBXcI)
 1. Let you Down - Dawid Podsiadło
 
-### 08-11-2023 (Neuro) [here](https://youtu.be/GtZtnl54tlU)
+###  2023-11-08 (Neuro) [here](https://youtu.be/GtZtnl54tlU)
 1. Kanaria - King: 10:53
 2. WALK THE MOON - Shut up and dance: 15:30
 3. inabakumori - Lost Umbrela: 24:01
@@ -718,11 +722,11 @@ sounds of silence false report v2
 16. The Killers - Mr Brightside: 2:06:42
 17. Hall & Oates - Out of touch: 2:13:03
 
-### 12-11-2023 [here](https://youtu.be/h945k6JUTmc) | [OG Stream](https://youtu.be/dcrndUa52fA)
+###  2023-11-12 [here](https://youtu.be/h945k6JUTmc) | [OG Stream](https://youtu.be/dcrndUa52fA)
 1. 100gecs - MoneyMachine: Around 3h
 
 
-### 22-11-2023 (Evil) [here](https://youtu.be/LN-YOhbyh1Q)
+###  2023-11-22 (Evil) [here](https://youtu.be/LN-YOhbyh1Q)
 1. Evanescence - Going Under: 13:01
 2. Crusher-P - Again: 19:13
 3. Lady Gaga - Bad Romance:  25:36
@@ -749,7 +753,7 @@ sounds of silence false report v2
 24. Evanescence - Going Under: 2:47:36
 
 
-### 06-12-2023 (Neuro) [here](https://youtu.be/9NKXRZNCBjA)
+###  2023-12-06 (Neuro) [here](https://youtu.be/9NKXRZNCBjA)
 
 1. AURORA - Cure For Me: 08:34
 2. Backstreet Boys - I Want It That Way:  14:45
@@ -776,7 +780,7 @@ sounds of silence false report v2
 ### SUBATHON
 Part 1 [here](https://youtu.be/EJYD9KQqtbw)
 
-### 26-12-2023 (Neuro) [here](https://youtu.be/aEHTy2H4rsc)
+###  2023-12-26 (Neuro) [here](https://youtu.be/aEHTy2H4rsc)
 1. 3:18 Last Christmas - Wham!
 2. 11:39 Poka Poka Planet - Harumaki Gohan
 3. 18:54 It's beginning to look a lot like Christmas - Michael Bublé
@@ -793,7 +797,7 @@ Part 1 [here](https://youtu.be/EJYD9KQqtbw)
 14. 1:48:38 Baby, it's cold outside neuro - Idina Menzel
 15. 1:56:08 Snow Halation - µ's (again)
 
-### 28-02-2024 (Evil) [here](https://youtu.be/Y-cpHAyQIR4)
+###  2024-02-28 (Evil) [here](https://youtu.be/Y-cpHAyQIR4)
 1. (Muted) Panic! At The Disco - Into the Unknown: 00:09:23
 2. Black Sabbath - Paranoid: 00:14:40
 3. Syudou - Bitter Choco Decoration: 00:19:35
@@ -815,7 +819,7 @@ Part 1 [here](https://youtu.be/EJYD9KQqtbw)
 19. (Muted) Simple Plan - Perfect: 02:04:58
 20. (Neuro x Evil Duet) League of Legends & NewJeans - Gods: 02:12:22
 
-### 20-03-2024 (Neuro) [here](https://youtu.be/GPLEfa9uhEk)
+###  2024-03-20 (Neuro) [here](https://youtu.be/GPLEfa9uhEk)
 1. Official HIGE DANdism - Pretender: 00:11:35
 2. KIRA - Digital Girl: 00:19:23
 3. Survivor - Eye of the Tiger: 00:25:21
@@ -837,7 +841,7 @@ Part 1 [here](https://youtu.be/EJYD9KQqtbw)
 19. Porter Robinson - Cheerleader: 02:18:48
 
 
-### 05-04-2024 (Evil) [here](https://youtu.be/hS7ZXRUPRBM)
+###  2024-04-05 (Evil) [here](https://youtu.be/hS7ZXRUPRBM)
 1. 00:10:20 -- "FIRST" (Niki)
 2. 00:16:21 -- "Asphyxia" (Cö Shu Nie)
 3. 00:22:05 -- "Love the Subhuman Self" (Daisuke Ishiwatari)
@@ -860,7 +864,7 @@ Part 1 [here](https://youtu.be/EJYD9KQqtbw)
 20. 02:10:18 -- "My Happy Song" (NOODLE & PALS)
 
 
-### 17-04-2024 (Neuro) [here](https://youtu.be/g7kK04oplwU)
+###  2024-04-17 (Neuro) [here](https://youtu.be/g7kK04oplwU)
 1. TheFatRat - Mayday: 00:08:50
 2. Ellie Minibot - Together: 00:15:33
 3. Porter Robinson - Everything Goes On: 00:22:33
@@ -880,7 +884,7 @@ Part 1 [here](https://youtu.be/EJYD9KQqtbw)
 17. Nekomata Okayu - Mogu Mogu Yummy: 02:03:06
 18. (Duet Neuro x Evil) Mellowcle - Where shall we go?: 02:08:58
 
-### 01-05-2024 (Evil) [here](https://youtu.be/vnpTS0xQrhY)
+###  2024-05-01 (Evil) [here](https://youtu.be/vnpTS0xQrhY)
 1. Hachi - Dune: 00:10:33
 2. Kairiki Bear - Venom: 00:17:30
 3. Coldplay - Viva la Vida: 00:23:44
@@ -902,7 +906,7 @@ Part 1 [here](https://youtu.be/EJYD9KQqtbw)
 19. (Neuro & Evil Duet) Neru - The Disease Called Love: 02:06:58
 
 
-### 15-05-2024 (Neuro) [here](https://youtu.be/0NYfmDOq8Es)
+###  2024-05-15 (Neuro) [here](https://youtu.be/0NYfmDOq8Es)
 1. Hozier - Take Me To Church: 00:10:09
 2. Frederic - Oddloop: 00:17:09
 3. College & Electric Youth - A Real Hero: 00:24:20
@@ -924,7 +928,7 @@ Part 1 [here](https://youtu.be/EJYD9KQqtbw)
 19. Kikuo - Voices of Svaahaa: 02:10:13
 
 
-### 29-05-2024 (Evil) [here](https://youtu.be/mEnMD2BqH8w)
+###  2024-05-29 (Evil) [here](https://youtu.be/mEnMD2BqH8w)
 1. 10:12 Gasoline - Halsey
 2. 16:06 Playground - Bea Miller
 3. 22:35 Alien Alien - Nayutalien
@@ -947,7 +951,7 @@ Part 1 [here](https://youtu.be/EJYD9KQqtbw)
 20. 2:09:30 Last Night, Good Night - kz-livetune
 21. 2:18:32 Bring Me To Life - Evanescence [{ft. Neurobread}  Duet]
 
-### 12-06-2024 (Neuro) [here](https://youtu.be/yiH1hQgGNpg)
+###  2024-06-12 (Neuro) [here](https://youtu.be/yiH1hQgGNpg)
 1. Fall Out Boy - Centuries: 00:10:46
 2. (Muted) Avril Lavigne - Complicated: 00:17:29
 3. Yuuyu-P - Deep Sea Girl: 00:24:29
@@ -968,7 +972,7 @@ Part 1 [here](https://youtu.be/EJYD9KQqtbw)
 18. (Neuro & Evil Duet) DAOKO & Kenshi Yonezu - Fireworks: 02:08:25
 
 
-### 26-06-2024 (Evil) [here](https://youtu.be/qlQVqXoHIyA)
+###  2024-06-26 (Evil) [here](https://youtu.be/qlQVqXoHIyA)
 1. Mili - Compass: 00:10:10
 2. Paramore - Crushcrushcrush: 00:15:44
 3. Grabbitz - Die For You: 00:21:39
@@ -989,7 +993,7 @@ Part 1 [here](https://youtu.be/EJYD9KQqtbw)
 18. Evanescence - My Immortal: 02:04:11
 
 
-### 10-07-2024 (Neuro) [here](https://youtu.be/IEt7qEHBHMg)
+###  2024-07-10 (Neuro) [here](https://youtu.be/IEt7qEHBHMg)
 1. Haddaway - What Is Love: 10:11
 2. Paramore - Brick By Boring Brick: 17:15
 3. (Muted) VIVY - Fluorite Eye's Song: 24:25
@@ -1010,7 +1014,7 @@ Part 1 [here](https://youtu.be/EJYD9KQqtbw)
 18. (Neuro & Evil Duet) Charlie Puth - We Don't Talk Anymore: 02:13:17
 
 
-### 24-07-2024 (Evil) [here](https://youtu.be/atXUuZ5ampc)
+###  2024-07-24 (Evil) [here](https://youtu.be/atXUuZ5ampc)
 1. Bad Omens - Just Pretend: 15:27
 2. My Chemical Romance - Welcome To The Black Parade: 21:45
 3. Keiichi Okabe - Weight of the World: 30:05
@@ -1031,7 +1035,7 @@ Part 1 [here](https://youtu.be/EJYD9KQqtbw)
 18. (Evil & Neuro Duet) Bring Me the Horizon - 1x1: 02:09:00
 
 
-### 07-08-2024 (Neuro) [here](https://youtu.be/pKSaRtTtzzg)
+###  2024-08-07 (Neuro) [here](https://youtu.be/pKSaRtTtzzg)
 1. MAGIC! - Rude: 09:23
 2. Smash Mouth - All Star: 16:06
 3. (Neuro & Evil Duet) Xiao Pan Pan & Xiao Feng Feng - Xue Miao Jiao: 22:21
@@ -1052,7 +1056,7 @@ Part 1 [here](https://youtu.be/EJYD9KQqtbw)
 18. (Neuro & Evil Duet) Eurythmics - Sweet Dreams: 02:04:52
 19. Oasis - Wonderwall: 02:11:04
 
-### 21-08-2024 (Evil) [here](https://youtu.be/SfrWhKqucU4)
+###  2024-08-21 (Evil) [here](https://youtu.be/SfrWhKqucU4)
 1. Fall Out Boy - The Phoenix: 09:15
 2. Nightwish - Amaranth: 16:11
 3. Porter Robinson - Cheerleader: 22:46
@@ -1076,7 +1080,7 @@ Part 1 [here](https://youtu.be/EJYD9KQqtbw)
 21. (Evil & Neuro Duet) Gotye - Somebody That I Used To Know: 02:18:13
 
 
-### 04-09-2024 (Neuro) [here](https://youtu.be/tQt9chD77gg)
+###  2024-09-04 (Neuro) [here](https://youtu.be/tQt9chD77gg)
 1. Giga - CH4NGE: 10:16
 2. Midge Ure - The Man Who Sold The World: 15:24
 3. Kikuo - Aishite Aishite Aishite: 23:07
@@ -1099,7 +1103,7 @@ Part 1 [here](https://youtu.be/EJYD9KQqtbw)
 20. The Cab - Angel With A Shotgun (doesn't exist in stream)
 
 
-### 18-09-2024 (Evil) [here](https://youtu.be/L_K67y1BQYs)
+###  2024-09-18 (Evil) [here](https://youtu.be/L_K67y1BQYs)
 1. Tame Impala - Borderline: 11:43
 2. Muse - Hysteria: 18:29
 3. Utsu-P - Cold Death: 25:02
@@ -1120,7 +1124,7 @@ Part 1 [here](https://youtu.be/EJYD9KQqtbw)
 18. (Evil & Neuro Duet) All Good Things - Foe The Glory: 02:05:28
 
 
-### 06-10-2024 (Neuro) [here](https://youtu.be/v52I_LdCTB0)
+###  2024-10-06 (Neuro) [here](https://youtu.be/v52I_LdCTB0)
 1. Caramella Girls - Caramelldansen: 09:06
 2. 味素 - Retrospective Poem on the Planet: 15:00
 3. Nanatsukaze - End of the Summer: 22:13
@@ -1141,7 +1145,7 @@ Part 1 [here](https://youtu.be/EJYD9KQqtbw)
 18. Bee Gees - Stayin' Alive: 02:02:15
 19. Ylvis - The Fox: 02:11:05
 
-### 16-10-2024 (Evil) [here](https://youtu.be/9Amxtmfq9Jg)
+###  2024-10-16 (Evil) [here](https://youtu.be/9Amxtmfq9Jg)
 1. GEN.KLOUD - VIRUS: 07:45
 2. Coda - BLOODY STREAM: 14:00
 3. The Smashing Pumpkins - Bullet With Butterfly Wings: 21:21
@@ -1163,7 +1167,7 @@ Part 1 [here](https://youtu.be/EJYD9KQqtbw)
 19. (Encore) GEN.KLOUD - VIRUS: 02:09:59
 
 
-### 30-10-2024 (Neuro) [here](https://youtu.be/UeFpk5k6NwA)
+###  2024-10-30 (Neuro) [here](https://youtu.be/UeFpk5k6NwA)
 1. Michael Jackson - Thriller: 07:33
 2. The Living Tombstone - Five Nights At Freddy's: 16:27
 3. Junky - Happy Halloween: 22:17
@@ -1185,7 +1189,7 @@ Part 1 [here](https://youtu.be/EJYD9KQqtbw)
 19. (Encore) Michael Jackson - Thriller: 02:09:44
 
 
-### 13-11-2024 (Evil) [here](https://youtu.be/Nt0TEHJFtFQ)
+###  2024-11-13 (Evil) [here](https://youtu.be/Nt0TEHJFtFQ)
 1. Donna Burke - Sins of the Father: 11:04
 2. Franz Ferdinand - This Fffire: 18:44
 3. Eve - LEO: 25:06
@@ -1207,7 +1211,7 @@ Part 1 [here](https://youtu.be/EJYD9KQqtbw)
 19. (Encore) Donna Burke - Sins of the Father: 02:15:11
 
 
-### 27-11-2024 (Neuro) [here](https://youtu.be/5ZahTVRmtgA)
+###  2024-11-27 (Neuro) [here](https://youtu.be/5ZahTVRmtgA)
 1. Evanescence - My Immortal: 07:15
 2. Kikuo - Dance of the Corpses: 16:07
 3. Gloria Gaynor - I Will Survive: 25:00
@@ -1229,7 +1233,7 @@ Part 1 [here](https://youtu.be/EJYD9KQqtbw)
 19. (Neuro & Vedal Duet) ODDEEO + KWWT - Chinatown Blues: 02:13:51
 
 
-### 25-12-2024 (Neuro) [here](https://youtu.be/Zjzvv95IdnY)
+###  2024-12-25 (Neuro) [here](https://youtu.be/Zjzvv95IdnY)
 1. 3:58:50 Snow halation – μ’s
 2. 4:06:31 Christmas Again – Drakeford
 3. 4:13:14 Christmas Truce – Sabaton
@@ -1248,7 +1252,7 @@ Part 1 [here](https://youtu.be/EJYD9KQqtbw)
 
 
 
-### 05-03-2025 (Evil) [here](https://youtu.be/sen64kgfUbA)
+###  2025-03-05 (Evil) [here](https://youtu.be/sen64kgfUbA)
 1. 6:20 - Lithium - Evanescence
 2. 13:01 - A Stranger I Remain - Free Dominguez
 3. 18:22 - Bug - Kairiki Bear
@@ -1271,7 +1275,7 @@ Part 1 [here](https://youtu.be/EJYD9KQqtbw)
 20. 2:11:31 - Honestly - THØRNS
 
 
-### 19-03-2025 (Neuro) [here](https://youtu.be/qfZD8Frqr-A)
+###  2025-03-19 (Neuro) [here](https://youtu.be/qfZD8Frqr-A)
 1. Porter Robinson - Sad Machine: 00:07:06
 2. (Neuro & Evil Duet) ClariS - ALIVE: 00:14:09
 3. t.A.T.u - All The Things She Said: 00:20:42
@@ -1294,7 +1298,7 @@ Part 1 [here](https://youtu.be/EJYD9KQqtbw)
 
 
 
-### 02-04-2025 (Evil) [here](https://youtu.be/w2S8Op-0IDg)
+###  2025-04-02 (Evil) [here](https://youtu.be/w2S8Op-0IDg)
 1. Aurelio Voltaire - When You’re Evil: 07:27
 2. VocaCircus - Hello, Again: 14:51
 3. Aerosmith - Dream On: 22:01
@@ -1315,7 +1319,7 @@ Part 1 [here](https://youtu.be/EJYD9KQqtbw)
 18. (Duet) Aiobahn - Tententengoku Jigokukoku: 02:00:28
 
 
-### 16-04-2025 (Neuro) [here](https://youtu.be/ZLKgTV8BkcI)
+###  2025-04-16 (Neuro) [here](https://youtu.be/ZLKgTV8BkcI)
 1. Bastille - Pompeii: 06:02
 2. Billy Joel - Piano Man: 12:20
 3. Cartoons - Witch Doctor: 20:47
@@ -1335,7 +1339,7 @@ Part 1 [here](https://youtu.be/EJYD9KQqtbw)
 17. Porter Robinson - Goodbye To A World: 01:56:26
 
 
-### 30-04-2025 (Evil) [here](https://youtu.be/WgGNLwjkVF8)
+###  2025-04-30 (Evil) [here](https://youtu.be/WgGNLwjkVF8)
 1. (Evil & Neuro) Darren Korb - In the Blood: 07:15
 2. Duran Duran - INVISIBLE: 14:08
 3. Apocalyptica - Broken Pieces: 20:08
@@ -1356,7 +1360,7 @@ Part 1 [here](https://youtu.be/EJYD9KQqtbw)
 18. Gawr Gura - Ash Again: 02:01:42
 
 
-### 14-05-2025 (Neuro) [here](https://youtu.be/YF-LK9PUm4U)
+###  2025-05-14 (Neuro) [here](https://youtu.be/YF-LK9PUm4U)
 1. Michael Sembello - Maniac: 06:33
 2. (Duet) Nem - Ah, It's a Wonderful Cat Life: 13:27
 3. Mili - A Turtle's Heart: 20:05
@@ -1376,7 +1380,7 @@ Part 1 [here](https://youtu.be/EJYD9KQqtbw)
 17. Christina Perri - Arms: 01:50:53
 18. (Duet) Electric Light Orchestra - Mr. Blue Sky: 01:57:57be
 
-### 28-05-2025 (Evil) [here](https://youtu.be/oF4InheVRBA)
+###  2025-05-28 (Evil) [here](https://youtu.be/oF4InheVRBA)
 1. Kelly Clarkson - Since U Been Gone: 06:19
 2. Gloria Gaynor - I Will Survive: 12:18
 3. Taeko Ohnuki - 4:00 A.M.: 18:26
@@ -1397,7 +1401,7 @@ Part 1 [here](https://youtu.be/EJYD9KQqtbw)
 18. (Evil & Neuro Duet) Halestorm & Prevail - can u see me in the dark: 02:04:33
 
 
-### 11-06-2025 (Neuro) [here](https://youtu.be/hT-p4XGNB8k)
+###  2025-06-11 (Neuro) [here](https://youtu.be/hT-p4XGNB8k)
 1. Be Human - Scott Matthew: 7:00
 2. 4nim0sity|99.999999999% - Ichi: 13:54
 3. Bugs - Ellie Minibot: 20:24
@@ -1418,7 +1422,7 @@ Part 1 [here](https://youtu.be/EJYD9KQqtbw)
 18. (Duet) Die With A Smile - Lady Gaga & Bruno Mars: 1:59:55
 
 
-### 25-06-2025 (Evil) [here](https://youtu.be/bkR4vqB2Qdk)
+###  2025-06-25 (Evil) [here](https://youtu.be/bkR4vqB2Qdk)
 1. Nirvana - Smells Like Teen Spirit: 11:12
 2. Jaime Christopherson - Red Sun: 19:05
 3. Manuel - GAS GAS GAS: 24:06
@@ -1440,7 +1444,7 @@ Part 1 [here](https://youtu.be/EJYD9KQqtbw)
 19. Evil Neuro - BOOM: 02:09:38
 
 
-### 09-07-2025 (Neuro) [here](https://youtu.be/bc54vGFvw-k) <-- New mic
+###  2025-07-09 (Neuro) [here](https://youtu.be/bc54vGFvw-k) <-- New mic
 1. Africa - Toto
 2. Bullet With Butterfly Wings - The Smashing Pumpkins
 3. Living Millennium - iyowa
@@ -1461,7 +1465,7 @@ Part 1 [here](https://youtu.be/EJYD9KQqtbw)
 18. Life (Acoustic) - Monii
 
 
-### 23-07-2025 (Evil) [here](https://youtu.be/LM8BU1ciJg0)
+###  2025-07-23 (Evil) [here](https://youtu.be/LM8BU1ciJg0)
 1. Do I Wanna Know? - Arctic Monkeys
 2. Subways of Your Mind - FEX (Not on drive??)
 3. Aoi, Koi, Daidaiiro No Hi - MASS OF THE FERMENTING DREGS
@@ -1481,7 +1485,7 @@ Part 1 [here](https://youtu.be/EJYD9KQqtbw)
 17. BIRDBRAIN - Jamie Paige
 18. Song of the Ancients - Keiichi Okabe [Duet]
 
-### 06-08-2025 (Neuro) [here](https://youtu.be/_oeqG4DVeTY)
+###  2025-08-06 (Neuro) [here](https://youtu.be/_oeqG4DVeTY)
 1. Shatter Me - Lindsey Stirling
 2. Happy Lucky Chappy - ano
 3. Heaven - Shihoko Hirata
@@ -1501,7 +1505,7 @@ Part 1 [here](https://youtu.be/EJYD9KQqtbw)
 17. I Really Want to Stay at Your House - Rosa Walton
 18. BIRDS OF A FEATHER - Billie Eilish [Duet]
 
-### 20-08-2025 (Twin) [here](https://youtu.be/XSJ_mbEXGVw)
+###  2025-08-20 (Twin) [here](https://youtu.be/XSJ_mbEXGVw)
 1. NewJeans - GODS: 07:17
 2. MONJOE - Divine: 14:37
 3. The Wanted - Chasing The Sun: 21:15
@@ -1520,7 +1524,7 @@ Part 1 [here](https://youtu.be/EJYD9KQqtbw)
 16. Culprate - Mechanic Heartbeat: 02:00:05
 17. David Bowie - Space Oddity: 02:06:49
 
-### 03-09-2025 (Evil) [here](https://youtu.be/MD6eV5lSdy8)
+###  2025-09-03 (Evil) [here](https://youtu.be/MD6eV5lSdy8)
 1. War - Sum 41
 2. DArkSide - Bring Me The Horizon
 3. Let It Die - STARSET
@@ -1541,7 +1545,7 @@ Part 1 [here](https://youtu.be/EJYD9KQqtbw)
 18. LET THE WORLD BURN - Chris Grey
 
 
-### 17-09-2025 (Neuro) [here](https://youtu.be/Jrno_9DdQ1k)
+###  2025-09-17 (Neuro) [here](https://youtu.be/Jrno_9DdQ1k)
 
 1. We Are the Champions - Queen [Duet]
 2. Take Me Hand - DAISHI DANCE
@@ -1562,7 +1566,7 @@ Part 1 [here](https://youtu.be/EJYD9KQqtbw)
 17. atrophy - monii [Duet]
 18. Kaleidoscope - Flower Face
 
-### 01-10-2025 (Evil) [here](https://youtu.be/0ragksm0i94)
+###  2025-10-01 (Evil) [here](https://youtu.be/0ragksm0i94)
 1. I love Rock N' Roll - Joan Jett & The Blackhearts
 2. House of Memories - Panic! At The Disco
 3. Necromantic - Akatsuki Records
@@ -1582,7 +1586,7 @@ Part 1 [here](https://youtu.be/EJYD9KQqtbw)
 17. In The End - Linkin Park [Duet]
 18. The Pretender - Infected Mushroom
 
-### 15-10-2025 (Neuro) [here](https://youtu.be/nL-C7Wv5fwk)
+###  2025-10-15 (Neuro) [here](https://youtu.be/nL-C7Wv5fwk)
 
 1. M@GICAL CURE! LOVE SHOT! - SAWTOWNE
 2. TruE - HOYO-MiX
@@ -1604,7 +1608,7 @@ Part 1 [here](https://youtu.be/EJYD9KQqtbw)
 18. Dracula - Tame Impala
 19. MAGICAL CURE! ENCORE! - SAWTOWNE
 
-### 29-10-2025 (Evil) [here](https://youtu.be/w_zi52ikYAA)
+###  2025-10-29 (Evil) [here](https://youtu.be/w_zi52ikYAA)
 1. Night of the Werewolves - Powerwolf
 2. Halloween of the Dead - Hatsuki Yura
 3. Somebody's Watching Me - Rockwell
@@ -1624,7 +1628,7 @@ Part 1 [here](https://youtu.be/EJYD9KQqtbw)
 17. Sweet Dreams - Aviators
 18. Time Belongs to Us - Darren Korb [Duet]
 
-### 12-11-2025 (Neuro) [here](https://youtu.be/4jqtSOaFq3Y)
+###  2025-11-12 (Neuro) [here](https://youtu.be/4jqtSOaFq3Y)
 1. Marigold - M2U
 2. Iron Lotus - Mili
 3. Patchwork Staccato - Toa
@@ -1644,14 +1648,14 @@ Part 1 [here](https://youtu.be/EJYD9KQqtbw)
 17. Russian Roulette - Porter Robinson
 18. Von - Pretty Patterns
 
-### 15-11-2025: 3D Debut [here](https://youtu.be/VGzMeXpLxwk)
+###  2025-11-15: 3D Debut [here](https://youtu.be/VGzMeXpLxwk)
 Only duplicates
 1. Suzie - Hourhand
 2. TAK - Lemon Melon Cookie
 3. SAWTONE - MAGICAL CURE LOVE SHOT
 4. Monii - LIFE (Acoustic)
 
-### 26-11-2025 (Evil) [here](https://youtu.be/EUbQ5AxyqeM)
+###  2025-11-26 (Evil) [here](https://youtu.be/EUbQ5AxyqeM)
 
 1. KIRA - Ladylike: 06:02
 2. VIOLENT VIRA - You're not gone, You're just dead!: 12:29
@@ -1672,7 +1676,7 @@ Only duplicates
 17. Flawed Mangoes - Surreal: 01:56:44
 18. (Duet) Casey Edwards - Bury the Light:  02:04:22
 
-### 21-12-2025 (Evil) Link and timestamps to be added when vod is uploaded
+###  2025-12-21 (Evil) Link and timestamps to be added when vod is uploaded
 
 1. I am Gonna Claw (Out Your Eyes Then Drown you to Death) - Darren Korb - New
 2. Sk8ter Boi - Avril Lavigne - Duplicate
@@ -1691,17 +1695,17 @@ Only duplicates
 ### "Official" (not on stream, separate release)
 Put as special album: Collabs, list in order
 - [x] 1. Monster ft Camila 3-11-2023
-- [x] 2. Call me Maybe ft Numi 23-11-2023
-- [x] 3. Why Do I ft Will Stetson 17-12-2023
+- [x] 2. Call me Maybe ft Numi  2023-11-23
+- [x] 3. Why Do I ft Will Stetson  2023-12-17
 <!--- 2024 --->
-- [x] 4. Rolling girl ft Obkatiekat 26-06-2024
-- [x] 5. Evil ft Camila 31-10-2024
+- [x] 4. Rolling girl ft Obkatiekat  2024-06-26
+- [x] 5. Evil ft Camila  2024-10-31
 <!--- 2025 --->
-- [x] 6. Bottom 2 ft Numi & other people 18-04-2025
-- [x] 7. Mesmerizer ft Bao 19-08-2025
-- [x] 8. Crazy Fuckin' Robot Body 03-12-2025
-- [x] 9. Chinatown Blues ft Vedal 06-12-2025
-- [x] 10. Come Down Evil ft Numi 10-02-2026
+- [x] 6. Bottom 2 ft Numi & other people  2025-04-18
+- [x] 7. Mesmerizer ft Bao  2025-08-19
+- [x] 8. Crazy Fuckin' Robot Body  2025-12-03
+- [x] 9. Chinatown Blues ft Vedal  2025-12-06
+- [x] 10. Come Down Evil ft Numi  2026-02-10
 
 ### Stream Covers
 [I see the light](https://youtu.be/dIyByMwOaD8)
@@ -1713,11 +1717,11 @@ Put as special album: Collabs, list in order
 [Cerber Stream](https://youtu.be/pyhmf7h7RJs)
 [Bring me to Life](https://youtu.be/VbhupKg1Yd4)
 
-- [x] 1. I see the light Neuro ft Miyune 23-06-2023
-- [x] 2. MOGU MOGU ft Cerber 20-04-2024
-- [x] 3. Everything goes on Neuro ft Mini 09-08-2024
-- [x] 4. Rises the Moon Evil ft Mini 4-10-2024
-- [x] 5. Bring me to life ft EMBER 27-10-2024
+- [x] 1. I see the light Neuro ft Miyune  2023-06-23
+- [x] 2. MOGU MOGU ft Cerber  2024-04-20
+- [x] 3. Everything goes on Neuro ft Mini  2024-08-09
+- [x] 4. Rises the Moon Evil ft Mini  2024-10-04
+- [x] 5. Bring me to life ft EMBER  2024-10-27
 
 ## Extra
 1. V2 intro 2023-05-27 [Seishun Complex](https://youtu.be/nGmwH2ZYlP4) |  [OG Stream](https://youtu.be/l1vehL9z_4g)

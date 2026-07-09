@@ -1,5 +1,3 @@
-!! using multiple album info lines in order to catch multiple tracks from
-!! different dates that belong to the same album
 2023-06-21 | Neuro [v2] | Unused Covers
 1 | Goddess | Cepheid, Nonon | Neuro [v2] || unused;
 !! NN release

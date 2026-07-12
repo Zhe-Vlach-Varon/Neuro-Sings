@@ -10,6 +10,8 @@ from neuro import SONG_ROOT_DIR, ROOT_DIR, DATES_CSV, LOG_DIR, SETLISTS_DIR, SON
 from neuro.polars_utils import load_dates, load_db, songs_schema, dates_schema
 import neuro.utils as neutils
 
+from neuro.detection import check_missing_setlist_entries
+
 from tqdm import tqdm
 
 
@@ -236,6 +238,8 @@ def update_db() -> None:
     # album 2 could have duplicate song_A, first_run song_B
     # where at least one of the albums is a non-karaoke album (Theme Streams, Other Streams)
 
+    dupes_to_process = []
+
     for album, songs in json_data.items():
 
         if album not in non_karaoke_albums:
@@ -262,6 +266,7 @@ def update_db() -> None:
             if singer == 'Neuro & Evil':
                 singer = "Twins"
             eliv = song['Lead Singer'] == "Evil"
+            lead_singer = song['Lead Singer']
             # print("adding dates to database")
             # print(date)
             if date[0] == "2" and date not in dates_df.get_column("Date") and date > "2023-06-08" and song['Cover Artist'] in ['Neuro', 'Evil', 'Neuro & Evil']:
@@ -275,7 +280,7 @@ def update_db() -> None:
                 df = pl.DataFrame(
                     {
                         "Date": date,
-                        "Singer": singer,
+                        "Singer": lead_singer if not twin_duet_stream else 'Twins',
                         "Duet Format": duet_format,
                     }
                 )
@@ -398,21 +403,27 @@ def update_db() -> None:
                 # print(song)
                 # print(song['duplicate'])
                 # print(song['encore'])
-                df = get_most_recent_version(df.to_dicts()[0], json_data, song['encore'], song['Lead Singer'])
+                # df = get_most_recent_version(df.to_dicts()[0], json_data, song['encore'], song['Lead Singer'])
+                dupes_to_process.append((df, song['encore'], song['Lead Singer']))
 
             id += 1
             remove += 1
             # with pl.Config(tbl_cols=-1):
                 # print(songs_df.tail(5))
                 # print(df)
-            songs_df.extend(df)
-            logger.info(f"[Song][+] {artist} - {name}")
+            if not song['duplicate']:
+                songs_df.extend(df)
+                logger.info(f"[Song][+] {artist} - {name}")
 
         if remove == len(songs):
             if named_album:
                 album_names.append(album)
             else:
                 streams_done += [date]
+
+    for dupe in dupes_to_process:
+        songs_df.extend(get_most_recent_version(dupe[0].to_dicts()[0], json_data, dupe[1], dupe[2]))
+        logger.info(f"[Song][+] {dupe[0]['Artist'][0]} - {dupe[0]['Title'][0]}")
 
     for date in streams_done:
         json_data.pop(album)
@@ -438,6 +449,8 @@ def update_db() -> None:
     # Write modifications if DBs
     sorted_songs_df.write_database("Songs", f"sqlite:///{SONGS_DB}", if_table_exists="replace")
     sorted_dates_df.write_database("Dates", f"sqlite:///{SONGS_DB}", if_table_exists="replace")
+
+    check_missing_setlist_entries()    
 
 
 # Shouldn't ever need to use this again, was used to update database after switching from using file hashes to using hashes of the audio data

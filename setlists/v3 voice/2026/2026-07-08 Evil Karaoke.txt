@@ -2,7 +2,7 @@
 1 | hello world | Louie Zong | Evil
 2 | Deep Sea Girl | Yuuyu | Evil
 3 | Run to You | Bryan Adams | Evil
-4 | Live and Learn | Crush 40 | Neuro & Evil
+4 | Live & Learn | Crush 40 | Neuro & Evil
 5 | LEMON MELON COOKIE | TAK | Evil
 6 | Keep Myself Alive | Get Scared | Evil
 7 | Back from the Dead | Skillet | Evil

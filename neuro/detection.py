@@ -598,7 +598,7 @@ def parse_setlist(p: Path) -> neutils.SongJSON:
                     album = fields[2]
                     # print(album)
                 else:
-                    if album_song_count < 17:
+                    if album_song_count < 15:
                         album = f"{singer} {date} Mini-Karaoke"
                     else:
                         album = f"{singer} {date} Karaoke"
@@ -910,12 +910,17 @@ def fill_in_setlists(out: neutils.SongJSON = {}) -> neutils.SongJSON:
     logger.info(f"total songs found in setlists: {total_setlist_song_count}")
 
     for album in out:
+        filtered = songs_df.filter((pl.col('Album') == album))
         for song in reversed(out[album]):
             if 'File_IN' not in song.keys():
                 song['duplicate'] = True
-            if neutils.does_matching_song_exist_in_list(song, songs_df.to_dicts()):
+            if neutils.does_matching_song_exist_in_list(song, filtered.to_dicts()):
+                logger.info(f"removing {song['Artist']} - {song['Title']} - {song['Cover Artist']} with date {song['Date']}")
                 out[album].remove(song)
 
+    # sorted_songs = []
+
+    # for album, songs in out
 
     return out
 
@@ -962,6 +967,61 @@ def extract_all() -> neutils.SongJSON:
 
     return out
 
+def check_missing_setlist_entries() -> list[dict]:
+    """Checks the song database for missing entries based on setlist files."""
+    songs_df = load_db()
+    missing_entries = []
+    
+    files = list(SETLISTS_DIR.glob("**/*"))
+    karaoke_setlists = [f for f in files if 'non-karaoke' not in f.parts and not f.is_dir()]
+    non_karaoke_setlists = [f for f in files if 'non-karaoke' in f.parts and not f.is_dir()]
+    sorted_setlist_files = sorted(karaoke_setlists + non_karaoke_setlists)
+
+    total_setlist_song_count = 0
+
+    for file in sorted_setlist_files:
+        if file.name == 'Setlists.md' or file.is_dir():
+            continue
+            
+        albums = parse_setlist(file)
+        if not albums:
+            continue
+            
+        for album_name, songs in albums.items():
+            total_setlist_song_count += len(songs)
+            for song in songs:
+                db_matches = songs_df.filter(
+                    (pl.col('Album') == album_name) & (pl.col('Date') == song.get('Date'))
+                )
+                
+                title = song.get('Title', '')
+                identify = song.get('Identify', '')
+                full_title = f"{title} {identify}".strip()
+                artist = song.get('Artist', '')
+                cover_artist = song.get('Cover Artist', '')
+                
+                found = neutils.does_matching_song_exist_in_list(song, db_matches.to_dicts())
+                            
+                if not found:
+                    missing_entries.append({
+                        'Source_Setlist': str(file),
+                        'Album': album_name,
+                        'Date': song.get('Date'),
+                        'Artist': artist,
+                        'Title': title,
+                        'Identify': identify,
+                        'Cover Artist': cover_artist,
+                        'Track_ID': song.get('id')
+                    })
+                    
+    if missing_entries:
+        logger.warning(f"Found {len(missing_entries)}/{total_setlist_song_count} missing song entries in the database from setlists.")
+        for entry in missing_entries:
+            logger.warning(f"  Missing: {entry['Album']} ({entry['Date']}) - {entry['Track_ID']}. {entry['Artist']} - {entry['Title']} {entry['Identify']}")
+    else:
+        logger.info("All setlist entries are present in the database.")
+        
+    return missing_entries
 
 def export_json(all_songs: neutils.SongJSON) -> None:
     """Takes an existing result of new files search and exports it in a json file.
@@ -1001,7 +1061,7 @@ def export_json(all_songs: neutils.SongJSON) -> None:
     # Sorting songs by date for easier treatment
     # print(dated_songs)
     assert 'custom' not in dated_songs.keys()
-    sorted_songs = dict(sorted(dated_songs.items(), key=lambda item: item[1][-1]['Date']))
+    sorted_songs = dict(sorted(dated_songs.items(), key=lambda item: item[1][0]['Date']))
 
     # for key in keys_to_exclude:
         # if key in all_songs.keys():

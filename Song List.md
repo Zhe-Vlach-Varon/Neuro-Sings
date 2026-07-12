@@ -9,19 +9,24 @@ After  2023-05-02: [Neuro Archiver](https://www.youtube.com/@NArchiver)
 1. 2023-01-03 Blinding Lights
 2. 2023-01-03 Take on Me
 3. 2023-01-04 Viva la Vida
-4. 2023-01-05 Ghost Rule
-5. 2023-01-07 Ghost Rule
-6. 2023-01-08 Money Machine
-7. 2023-01-08 Still Alive
-8. 2023-01-11 Sad Machine
-9. 2023-01-25 Your Reality
-10. 2023-01-25 Your Reality
-11. 2023-01-25 Rickroll
-12. 2023-01-28 Oddloop
-13. 2023-01-29 Guitar, Loneliness and Blue Planet
-14. 2023-01-29 Guitar, Loneliness and Blue Planet
-15. 2023-01-30 Can you Feel my heart
-16. 2023-01-31 Revenge
+4. 2023-01-04 Viva la Vida
+5. 2023-01-05 Ghost Rule
+6. 2023-01-07 Ghost Rule
+7. 2023-01-07 Ghost Rule
+8. 2023-01-08 Money Machine
+9. 2023-01-08 Still Alive
+10. 2023-01-11 Sad Machine
+11. 2023-01-11 Sad Machine
+12. 2023-01-25 Your Reality
+13. 2023-01-25 Your Reality
+14. 2023-01-25 Rickroll
+15. 2023-01-28 Oddloop
+16. 2023-01-29 Guitar, Loneliness and Blue Planet
+17. 2023-01-29 Guitar, Loneliness and Blue Planet
+18. 2023-01-30 Can you Feel my heart
+18. 2023-01-30 Can you Feel my heart
+20. 2023-01-31 Revenge
+21. 2023-01-31 Revenge
 
 <!-- Jan 2023 -->
 ####  2023-01-03 [here](https://youtu.be/OgJzx4WOXhY)
@@ -51,15 +56,20 @@ After  2023-05-02: [Neuro Archiver](https://www.youtube.com/@NArchiver)
 3. Rickroll around 4:51:15 [CONFIRMED]
 ####  2023-01-27 [here](https://youtu.be/V7eSyhQh7-s)
 Oddloop around 2:04:00 [CONFIRMED]
+<!--
+this vod is actaully the same as the one from official vod channel label as Jan 27th 2023
 ####  2023-01-28 [here](https://youtu.be/LuYhSDqzMMs)
 Oddloop around 1:57:00 [CONFIRMED]
+-->
 ####  2023-01-29 [here](https://youtu.be/td_py8jQwik)
 Guitar, loneliness and blue planet around 2:43:00 (Muted)
 2:51:00 (encore) (Muted)
-####  2023-01-30 [here](https://youtu.be/26asH006E4A)
-Can you feel my heart around 5:58:00 [CONFIRMED]
-####  2023-01-31 [here](https://youtu.be/jp-G7rnSNb8)
+####  2023-01-30 [here](https://youtu.be/n3z4YdgHMEo)
+Can you feel my heart around 3:20:20 [CONFIRMED]
+Can you feel my heart around 5:57:15 [CONFIRMED]
+####  2023-01-31 [here](https://youtu.be/E3SPvvNSKAE)
 Revenge around 1:00:00 [CONFIRMED]
+Revenge around 3:25:30 [CONFIRMED]
 
 
 ### February

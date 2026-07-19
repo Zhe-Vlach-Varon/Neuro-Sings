@@ -309,13 +309,50 @@ class DriveSong(Song):
     
     def create_placeholder_files(self, *, out_dir: Path, create: bool = True, numberedFiles: bool = False) -> bool:
         name = self.file_name(self.flags.as_custom, numberedFiles=numberedFiles)
-        os.mkdir(out_dir / name)
-        metadata_file = ROOT_DIR / out_dir / name / "metadata.txt"
-        metadata = {}
-        # make metadata file
-        # write metadata to metadata file
-        # copy cover image to folder
-        return False
+        dir_path = out_dir / name
+        
+        if not create and dir_path.exists():
+            return False
+        
+        dir_path.mkdir(parents=True, exist_ok=True)
+        
+        metadata_file = dir_path / "metadata.txt"
+        metadata_content = (
+            f"Title: {self.title}\n"
+            f"Title (OG): {self.title_og}\n"
+            f"Artist: {self.artist}\n"
+            f"Artist (OG): {self.artist_og}\n"
+            f"Cover Artist: {self.cover_artist}\n"
+            f"Version: {self.version}\n"
+            f"Album: {self.album}\n"
+            f"Date: {self.date}\n"
+            f"Track: {self.track_n}\n"
+            f"Identify: {self.identify}\n"
+            f"Key: {self.key or 'N/A'}\n"
+            f"Tempo: {self.tempo or 'N/A'}\n"
+            f"Comment: {self.comment}\n"
+            f"Special: {self.special}\n"
+            f"Hash: {self.hash_in}\n"
+            f"Flags: {self.d.get('Flags', 'N/A')}\n"
+            f"Lead Singer: {self.lead_singer}\n"
+        )
+        metadata_file.write_text(metadata_content)
+        
+        # Copy cover image to folder
+        if self.image is None:
+            if self.flags.duet:
+                cover = IMAGES_COVERS_DIR / Path(f"{self.date}-{self.who}-duet.jpg")
+            elif self.flags.v1 or self.flags.v2:
+                cover = IMAGES_COVERS_DIR / Path(f"{self.date}.jpg")
+            else:
+                cover = IMAGES_COVERS_DIR / Path(f"{self.date}-{self.who}.jpg")
+        else:
+            cover = IMAGES_CUSTOM_DIR / f"{self.image}.jpg"
+        
+        if cover.exists():
+            shutil.copy2(cover, dir_path / "cover.jpg")
+        
+        return True
 
     def apply_tags(self, ascii_tags: bool = False) -> None:
         """Applies ID3 tags on the file. First uses EasyID3 for text tags. Then ID3 to write the cover
@@ -399,14 +436,54 @@ class CustomSong(Song):
         return False
     
     def create_placeholder_files(self, *, out_dir: Path, create: bool = True, numberedFiles: bool = False) -> bool:
-        name = self.file_name(self.flags.as_custom, numberedFiles=numberedFiles)
-        os.mkdir(out_dir / name)
-        metadata_file = ROOT_DIR / out_dir / name / "metadata.txt"
-        metadata = {}
-        # make metadata file
-        # write metadata to metadata file
-        # copy cover image to folder
-        return False
+        name = self.file_name(not self.flags.as_drive, numberedFiles=numberedFiles)
+        dir_path = out_dir / name
+        
+        if not create and dir_path.exists():
+            return False
+        
+        dir_path.mkdir(parents=True, exist_ok=True)
+        
+        metadata_file = dir_path / "metadata.txt"
+        metadata_content = (
+            f"Title: {self.title}\n"
+            f"Title (OG): {self.title_og}\n"
+            f"Artist: {self.artist}\n"
+            f"Artist (OG): {self.artist_og}\n"
+            f"Cover Artist: {self.cover_artist}\n"
+            f"Version: {self.version}\n"
+            f"Album: {self.album}\n"
+            f"Date: {self.date}\n"
+            f"Track: {self.track_n}\n"
+            f"Identify: {self.identify}\n"
+            f"Key: {self.key or 'N/A'}\n"
+            f"Tempo: {self.tempo or 'N/A'}\n"
+            f"Comment: {self.comment}\n"
+            f"Special: {self.special}\n"
+            f"Hash: {self.hash_in}\n"
+            f"Flags: {self.d.get('Flags', 'N/A')}\n"
+            f"Lead Singer: {self.lead_singer}\n"
+        )
+        metadata_file.write_text(metadata_content)
+        
+        # Copy cover image to folder
+        if self.image is None and not self.flags.as_drive:
+            if self.flags.duet:
+                cover = IMAGES_COVERS_DIR / Path(f"{self.date}-{self.who}-duet.jpg")
+            elif self.flags.v1 or self.flags.v2:
+                cover = IMAGES_COVERS_DIR / Path(f"{self.date}.jpg")
+            else:
+                cover = IMAGES_COVERS_DIR / Path(f"{self.date}-{self.who}.jpg")
+        elif self.image is not None:
+            cover = IMAGES_CUSTOM_DIR / f"{self.image}.jpg"
+        else:
+            # For custom songs with as_drive flag but no image, try to find a cover
+            cover = None
+        
+        if cover and cover.exists():
+            shutil.copy2(cover, dir_path / "cover.jpg")
+        
+        return True
 
     def apply_tags(self, ascii_tags: bool = False) -> None:
         """Custom Song version of the tag management. Here it needs to check the file's format first\

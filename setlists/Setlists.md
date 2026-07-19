@@ -8,7 +8,7 @@ There are three types of lines in a setlist file
 |------|-------|
 |Album Info | The first line must be an Album Info line, specifies date, singer, and optional album title and album cover |
 | Lead Singer Change | specifies lead singer for the following block of songs |
-| Song | lists track nuber, song title, original artist, singer(s), whether it is a new song or a duplicate and optional song cover art |
+| Song | lists track nuber, song title, original artist, singer(s), and optional song cover art |
 | Comment or other line not to process | Start a line with two exclamation points `!!` to tell the setlist parser not to parse this line |
 ### Album Info Line
 Lists info about the karaoke stream
@@ -48,7 +48,5 @@ Lists info about a song, fields are separated by `|`
 | Song Title | The full title as given by Unofficial Neuro Karaoke Archive | Required |
 | Original Artist | full artist credits as given by Unofficial Neuro Karaoke Archive | Required |
 | Singer | Neuro, Evil, Twin-Duet, Collab-Duet(Singers) defaults to Album Lead Singer | Optional |
-| Is New Song | if a song is a duplicate, there is no new file from the archive | Required |
 | Cover Art | custom cover art to use for this song (see Album Cover Art above for details) if omitted falls back to first the Album Cover Art, then the default karaoke stream cover art generation | Optional |
 | Additional Flags | additional flags to be added to the song record in the database, can be anything you might want to filter by, as long as each flag is followed by a `;` with no spaces before or after | Optional
-<!-- automate detection of new songs vs duplicates -->

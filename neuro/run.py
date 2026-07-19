@@ -14,7 +14,7 @@ from neuro.utils import MP3GainMode, MP3ModeTuple, format_logger, time_format, g
 
 DateDict = dict[str, dict[str, str]]
 
-g_hash_to_file_dict: dict[str, str] = []
+g_hash_to_file_dict: dict[str, str] = {}
 
 def new_batch_detection() -> None:
     """Re-runs the song detection based on regex. Adds songs that aren't already in\
@@ -60,7 +60,7 @@ def generate_from_preset(preset: Preset, dates_dict: DateDict) -> None:
             'song_files': None,
             'metadata_files': None,
             }
-        if s.flags.originals or s.flags.official:
+        if s.flags.originals or s.flags.official or s.flags.copyright_issues:
             final_out_paths['song_files'] = Path(preset.root / 'official_releases' if preset.root is not None else 'official_releases') / preset.subdir
 
             final_out_paths['metadata_files'] = Path(preset.root / 'unofficial_releases' if preset.root is not None else 'unofficial_releases') / preset.subdir
@@ -184,12 +184,12 @@ def generate_albums() -> None:
         album = s.album
 
     
-        if s.flags.originals or s.flags.official:
-            final_out_paths['song_files'] = Path(str(OUT_ROOT) + '/official_releases/albums/' + album)
+        if s.flags.originals or s.flags.official or s.flags.copyright_issues:
+            final_out_paths['song_files'] = Path(str(OUT_ROOT)) / 'official_releases' / 'albums' / album
 
-            final_out_paths['metadata_files'] = Path(str(OUT_ROOT) + '/unofficial_releases/albums/' + album)
+            final_out_paths['metadata_files'] = Path(str(OUT_ROOT)) / 'unofficial_releases' / 'albums' / album
         else:
-            final_out_paths['song_files'] = Path(str(OUT_ROOT) + '/unofficial_releases/albums/' + album)
+            final_out_paths['song_files'] = Path(str(OUT_ROOT)) / 'unofficial_releases' / 'albums' / album
 
         os.makedirs(final_out_paths['song_files'], exist_ok=True)
         if s.hash_in in g_hash_to_file_dict.keys():

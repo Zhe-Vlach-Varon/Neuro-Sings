@@ -37,3 +37,5 @@ ORIGINAL_CSV = DATA_DIR / 'original_songs.csv'
 SETLISTS_DIR = ROOT_DIR / "setlists"
 
 LOG_DIR = ROOT_DIR / Path("logs")
+
+COPYRIGHT_ISSUES_CSV = DATA_DIR / "copyright_issues.csv"

@@ -19,11 +19,12 @@ from mutagen.id3 import ID3, ID3NoHeaderError
 
 import tinytag
 import json
+import csv
 
 import loguru
 from loguru import logger
 
-from neuro import LOG_DIR, OFFICIAL_RELEASE_DIR, UNOFFICIALV3_DIR, CUSTOM_DIR, DRIVE_DIR, SETLISTS_DIR, UNOFFV3_EXTRA, UNOFFV3_DISC66
+from neuro import DATA_DIR, LOG_DIR, OFFICIAL_RELEASE_DIR, UNOFFICIALV3_DIR, CUSTOM_DIR, DRIVE_DIR, SETLISTS_DIR, UNOFFV3_EXTRA, UNOFFV3_DISC66
 
 SongEntry = dict[str, Optional[str]]
 """Dictionary representing a song in the JSON, containing fields like "Title", "Artist", etc..."""
@@ -623,8 +624,15 @@ def do_songs_match(s1: SongEntry, s2: SongEntry, ignore_date: bool = False) -> b
 
     return final_result
 
+def get_matching_songs_from_list(song: SongEntry, lst: list[SongEntry], ignore_dates: bool = False):
+    matches = []
+    for entry in lst:
+        if do_songs_match(song, entry, ignore_dates):
+            matches.append(entry)
+    return matches
+
 # TODO improve song match detection to fix Colorful Array duplicate not getting marked as being in the database already
-def does_matching_song_exist_in_list(song: SongEntry, lst: list[SongEntry], ignore_dates: bool = False, excl_lst: list[str] = []) -> int:
+def does_matching_song_exist_in_list(song: SongEntry, lst: list[SongEntry], ignore_dates: bool = False) -> int:
     """returns count of matching songs in list"""
     match_count = 0
     for entry in lst:
@@ -671,3 +679,39 @@ def sanitize_filename(filename: str) -> str:
     filename = unicodedata.normalize('NFC', filename)
 
     return filename
+
+def is_copyright_issue(title: Optional[str], artist: Optional[str]) -> bool:
+    """Checks if a song matches any entry in copyright_issues.csv.
+    
+    Uses do_song_titles_match and get_song_artists_match_count for matching.
+    
+    Args:
+        title: Song title to check.
+        artist: Song artist to check.
+    
+    Returns:
+        bool: True if the song matches any copyright issue entry.
+    """
+    if title is None or artist is None:
+        return False
+    
+    copyright_file = DATA_DIR / "copyright_issues.csv"
+    
+    # Load copyright issues once (could be cached if called many times)
+    copyright_entries = []
+    if copyright_file.exists():
+        with open(copyright_file, 'r', encoding='utf-8') as f:
+            reader = csv.DictReader(f, delimiter='|')
+            for row in reader:
+                copyright_entries.append({
+                    'title': row.get('title', '').strip(),
+                    'artist': row.get('artist', '').strip(),
+                })
+    
+    for entry in copyright_entries:
+        title_match = do_song_titles_match(title, entry['title'])
+        artist_match = get_song_artists_match_count(artist, entry['artist']) > 0
+        if title_match and artist_match:
+            return True
+    
+    return False

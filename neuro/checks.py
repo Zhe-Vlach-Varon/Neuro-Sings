@@ -12,6 +12,7 @@ from tqdm import tqdm
 from neuro import LOG_DIR, ROOT_DIR
 from neuro.polars_utils import load_db
 from neuro.utils import format_logger, get_sha256, get_audio_hash
+from neuro.detection import check_missing_setlist_entries
 
 
 def check_ascii() -> None:
@@ -133,6 +134,7 @@ def all_tests() -> None:
     check_hash()
     check_mp3gain()
     check_are_dbs_identical()
+    check_missing_setlist_entries()
 
 
 if __name__ == "__main__":

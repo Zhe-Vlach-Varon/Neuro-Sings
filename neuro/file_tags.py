@@ -50,6 +50,7 @@ class Song:
         """Songs that have been officially released on at least one streaming service (excluding youtube, because appearently chinatown blues mv version is now included in unofficial archive)"""
         encore: bool
         """Songs that were re-run during the same stream"""
+        copyright_issues: bool
 
     def init_flags(self, flags: Optional[str]) -> None:
         """Detects song's flags by searching substrings in the flags column.\

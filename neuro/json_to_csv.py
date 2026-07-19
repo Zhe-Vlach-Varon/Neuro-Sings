@@ -356,14 +356,20 @@ def update_db() -> None:
             # flags = get_flags(file, eliv)
             flags = get_flags(song)
             assert flags is not None
+
+            if neutils.is_copyright_issue(song['Title'], song['Artist']):
+                flags += 'copyright_issues;'
+
             flags += song['additional flags']
 
             if twin_duet_stream:
+                # print(song)
                 pre_replace_flags = flags
                 # print(f'twin stream: yes: pre-replace: {flags}')
                 flags = flags.replace('evil;', '').replace('neuro;', '')
                 # print(f'twin stream: yes: post-replace: {flags}')
-                assert pre_replace_flags != flags
+                if 'evil;' in pre_replace_flags or 'neuro;' in pre_replace_flags:
+                    assert pre_replace_flags != flags
 
             if song['Cover Artist'] == 'Neuro & Evil' and 'original' in flags:
                 flags = flags.replace('neuro;', '').replace('evil;', '')

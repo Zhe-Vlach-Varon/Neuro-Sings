@@ -21,6 +21,7 @@ requires-python = ">=3.11, <3.13"
 readme = "README.md"
 license-files = ["LICENSE-APACHE", "LICENSE-MIT"]
 
+# WHEN ADDING A COMMAND HERE, run 'pdm install' after for it to be added to path
 [project.scripts] # Shortcuts, have a command for main run so that it emulates a "real" run
 songs-generate = "neuro.run:generate_songs"
 albums-generate = "neuro.run:generate_albums"
@@ -35,6 +36,8 @@ update-filenames = "neuro.json_to_csv:update_db_filenames"
 add-special = "neuro.json_to_csv:add_special"
 add-comment = "neuro.json_to_csv:add_comment"
 db-check = "neuro.checks:all_tests"
+setlists-pull = "neuro._shortcuts:setlists_pull"
+setlists-push = "neuro._shortcuts:setlists_push"
 drive-pull = "neuro._shortcuts:drive_pull"
 drive-push = "neuro._shortcuts:drive_push"
 db-sync = "neuro._shortcuts:dbs_sync"

@@ -11,7 +11,7 @@ import polars as pl
 from loguru import logger
 
 # TODO are the different unoffV3 subdirs actually needed, or just the root unoffV3 dir
-from neuro import CUSTOM_DIR, ROOT_DIR, SONGS_JSON, UNOFFICIALV3_DIR, UNOFFV3_EXTRA, UNOFFV3_DISC66, OFFICIAL_RELEASE_DIR, SETLISTS_DIR, OFFICIAL_CSV, ORIGINAL_CSV
+from neuro import CUSTOM_DIR, ROOT_DIR, SONGS_JSON, UNOFFICIALV3_DIR, UNOFFV3_EXTRA, UNOFFV3_DISC66, OFFICIAL_RELEASE_DIR, COPYRIGHT_ISSUES_DIR, SETLISTS_DIR, OFFICIAL_CSV, ORIGINAL_CSV
 from neuro.polars_utils import load_db, load_dates
 import neuro.utils as neutils
 
@@ -47,12 +47,14 @@ def get_files(songs: pl.DataFrame) -> dict[str, list[Path]]:
     unofficialV3_dir = UNOFFICIALV3_DIR
     arg_dir = UNOFFICIALV3_DIR / UNOFFV3_EXTRA / UNOFFV3_DISC66
     official_dir = OFFICIAL_RELEASE_DIR
+    copyright_issues_dir = COPYRIGHT_ISSUES_DIR
 
     return {
         "Custom": get_audios(custom_dir) + get_audios(custom_dir, filetype="flac"),
         "UnofficialV3": get_audios(unofficialV3_dir, exclude_dirs=[UNOFFV3_EXTRA]),
         "ARG": get_audios(arg_dir),
         "Official": list(official_dir.glob(f"*/**/*.mp3")), # search in all subdirectories recursively, can't use this glob pattern for UnofficialV3 as that would also get the ARG songs a second time
+        "Copyright": get_audios(copyright_issues_dir),
     }
 
 
@@ -935,6 +937,9 @@ def extract_all() -> neutils.SongJSON:
 
     # Official Releases
     extract_official(files['Official'], out)
+
+    # Songs with copyright issues that can't be distributed
+    extract_unofficialV3(files['Copyright'], out)
 
     # Custom
     # print(files['Custom'])

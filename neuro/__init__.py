@@ -30,6 +30,7 @@ UNOFFV3_EXTRA = "Extra Content"
 UNOFFV3_DISC66 = "DISC 66 - ARG"
 
 OFFICIAL_RELEASE_DIR = SONG_ROOT_DIR / "officially released songs"
+COPYRIGHT_ISSUES_DIR = SONG_ROOT_DIR / "copyright_issues"
 
 OFFICIAL_CSV = DATA_DIR / 'official_covers.csv'
 ORIGINAL_CSV = DATA_DIR / 'original_songs.csv'
@@ -39,3 +40,7 @@ SETLISTS_DIR = ROOT_DIR / "setlists"
 LOG_DIR = ROOT_DIR / Path("logs")
 
 COPYRIGHT_ISSUES_CSV = DATA_DIR / "copyright_issues.csv"
+
+OUT_ROOT_DIR = Path("out")
+OUT_UNOFFICIAL_DIR = OUT_ROOT_DIR / "unofficial_releases"
+OUT_OFFICIAL_DIR = OUT_ROOT_DIR / "official_releases"

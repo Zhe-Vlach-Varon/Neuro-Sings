@@ -6,7 +6,7 @@ from typing import Literal, Optional
 import polars as pl
 from loguru import logger
 
-from neuro import SONG_ROOT_DIR, ROOT_DIR, DATES_CSV, LOG_DIR, SETLISTS_DIR, SONGS_CSV, SONGS_DB, SONGS_JSON
+from neuro import SONG_ROOT_DIR, ROOT_DIR, DATES_CSV, LOG_DIR, SETLISTS_DIR, SONGS_CSV, SONGS_DB, SONGS_JSON, OFFICIAL_RELEASE_DIR
 from neuro.polars_utils import load_dates, load_db, songs_schema, dates_schema
 import neuro.utils as neutils
 
@@ -113,7 +113,7 @@ def get_flags_old(file: Path, eliv: Optional[bool] = None) -> Optional[str]:
         flags += "collab;"
 
     # additional tags
-    if "officially released songs" in str(file):
+    if OFFICIAL_RELEASE_DIR.name in str(file):
         flags += "official;"
         
     # Null out flags if empty

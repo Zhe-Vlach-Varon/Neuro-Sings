@@ -506,6 +506,14 @@ def extract_official(files: list[Path], out: neutils.SongJSON ={}) -> neutils.So
     # exit()
     return out
 
+def get_default_album_name(album_song_count: int, singer:str, date: str) -> str:
+    if album_song_count < 15:
+        album = f"{singer} {date} Mini-Karaoke"
+    else:
+        album = f"{singer} {date} Karaoke"
+
+    return album
+
 def parse_setlist(p: Path) -> tuple[neutils.SongJSON, list[str]]:
     with open(p, 'r') as file:
         lines = file.readlines()
@@ -592,20 +600,13 @@ def parse_setlist(p: Path) -> tuple[neutils.SongJSON, list[str]]:
                     logger.error("not enough fields in album info line in setlist file: " + str(p))
                     exit(1)
                 if len(fields) == 2:
-                    if album_song_count < 17:
-                        album = f"{singer} {date} Mini-Karaoke"
-                    else:
-                        album = f"{singer} {date} Karaoke"
+                    get_default_album_name(album_song_count, singer, date)
                     # print(album)
                 elif len(fields) >= 3 and not fields[2] == '':
                     album = fields[2]
                     # print(album)
                 else:
-                    if album_song_count < 15:
-                        album = f"{singer} {date} Mini-Karaoke"
-                    else:
-                        album = f"{singer} {date} Karaoke"
-                    # print(album)
+                    get_default_album_name(album_song_count, singer, date)
                 if album not in songs.keys():
                     # print('adding album to songs: ' + album)
                     songs[album] = []

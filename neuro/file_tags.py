@@ -139,6 +139,20 @@ class Song:
         """Virtual method"""
         raise NotImplementedError
     
+    def create_file_link(self, *, out_dir: Path, existing_path: Path, create: bool = True, numberedFiles: bool = False) -> bool:
+        """Creates a filesystem symlink from self.outfile to an existing file.
+        
+        Args:
+            out_dir: Output directory (same as create_out_file).
+            existing_path: Path to the existing file to link to.
+            create: If False and self.outfile already exists, skip.
+            numberedFiles: Passed to file_name (same as create_out_file).
+
+        Returns:
+            True if the link was created, False if skipped.
+        """
+        raise NotImplementedError
+    
     def apply_tags(self, ascii_tags: bool = False) -> None:
         """virtual method"""
         raise NotImplementedError
@@ -353,6 +367,35 @@ class DriveSong(Song):
             shutil.copy2(cover, dir_path / "cover.jpg")
         
         return True
+    
+    def create_file_link(self, *, out_dir: Path, existing_path: Path, create: bool = True, numberedFiles: bool = False) -> bool:
+        """Creates a symlink from self.outfile to existing_path for a drive song.
+        
+        Args:
+            out_dir: Output directory.
+            existing_path: Path to the existing file to link to.
+            create: If False and self.outfile already exists, skip.
+            numberedFiles: Passed to file_name.
+
+        Returns:
+            True if the link was created, False if skipped.
+        """
+        name = self.file_name(self.flags.as_custom, numberedFiles=numberedFiles)
+        self.outfile = ROOT_DIR / out_dir / f"{name}.mp3"
+
+        full_existing_path = Path.cwd() / existing_path
+
+        if not full_existing_path.exists():
+            logger.error(f"file does not exist {full_existing_path}")
+            exit(1)
+
+        if not create and self.outfile.exists():
+            return False
+
+        if self.outfile.exists() or self.outfile.is_symlink():
+            self.outfile.unlink()
+        self.outfile.symlink_to(full_existing_path)
+        return True
 
     def apply_tags(self, ascii_tags: bool = False) -> None:
         """Applies ID3 tags on the file. First uses EasyID3 for text tags. Then ID3 to write the cover
@@ -483,6 +526,38 @@ class CustomSong(Song):
         if cover and cover.exists():
             shutil.copy2(cover, dir_path / "cover.jpg")
         
+        return True
+    
+    def create_file_link(self, *, out_dir: Path, existing_path: Path, create: bool = True, numberedFiles: bool = False) -> bool:
+        """Creates a symlink from self.outfile to existing_path for a custom song.
+        
+        Args:
+            out_dir: Output directory.
+            existing_path: Path to the existing file to link to.
+            create: If False and self.outfile already exists, skip.
+            numberedFiles: Passed to file_name.
+
+        Returns:
+            True if the link was created, False if skipped.
+        """
+        file = self.file
+        ext = file.suffix
+
+        name = self.file_name(not self.flags.as_drive, numberedFiles=numberedFiles)
+        self.outfile = ROOT_DIR / out_dir / f"{name}{ext}"
+
+        full_existing_path = Path.cwd() / existing_path
+
+        if not full_existing_path.exists():
+            logger.error(f"file does not exist {full_existing_path}")
+            exit(1)
+
+        if not create and self.outfile.exists():
+            return False
+
+        if self.outfile.exists() or self.outfile.is_symlink():
+            self.outfile.unlink()
+        self.outfile.symlink_to(full_existing_path)
         return True
 
     def apply_tags(self, ascii_tags: bool = False) -> None:

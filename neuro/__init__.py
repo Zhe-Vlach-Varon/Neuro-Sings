@@ -29,7 +29,7 @@ UNOFFICIALV3_DIR = SONG_ROOT_DIR / "unofficialV3"
 UNOFFV3_EXTRA = "Extra Content"
 UNOFFV3_DISC66 = "DISC 66 - ARG"
 
-OFFICIAL_RELEASE_DIR = SONG_ROOT_DIR / "officially released songs"
+OFFICIAL_RELEASE_DIR = SONG_ROOT_DIR / "officially_released_songs"
 COPYRIGHT_ISSUES_DIR = SONG_ROOT_DIR / "copyright_issues"
 
 OFFICIAL_CSV = DATA_DIR / 'official_covers.csv'

@@ -10,7 +10,6 @@ import tinytag
 import polars as pl
 from loguru import logger
 
-# TODO are the different unoffV3 subdirs actually needed, or just the root unoffV3 dir
 from neuro import CUSTOM_DIR, ROOT_DIR, SONGS_JSON, UNOFFICIALV3_DIR, UNOFFV3_EXTRA, UNOFFV3_DISC66, OFFICIAL_RELEASE_DIR, COPYRIGHT_ISSUES_DIR, SETLISTS_DIR, OFFICIAL_CSV, ORIGINAL_CSV
 from neuro.polars_utils import load_db, load_dates
 import neuro.utils as neutils
@@ -405,8 +404,6 @@ def extract_official(files: list[Path], out: neutils.SongJSON ={}) -> neutils.So
     original_songs_csv = pl.read_csv(ORIGINAL_CSV).to_dicts()
 
     songs_db = load_db()
-    
-    # TODO figure out why the artist order matters for official covers
 
     id = 1
 
@@ -432,8 +429,7 @@ def extract_official(files: list[Path], out: neutils.SongJSON ={}) -> neutils.So
                 elif 'Evil' in song['Cover Artist']:
                     lead_singer = 'Evil'
                 else:
-                    print('how did we get here: neuro/detection.py:423')
-                    print(song['Cover Artist'])
+                    logger.error(f"how did we get here: neuro/detection.py: unexpected Cover Artist")
                     exit(1)
                 if title == 'Chinatown Blues':
                     version = '2'
@@ -578,8 +574,7 @@ def parse_setlist(p: Path) -> tuple[neutils.SongJSON, list[str]]:
             date = input_date.strftime(date_format)
             if len(fields) == 1:
                 if found_album_line == False:
-                    print('first album info line only has date field')
-                    print(p)
+                    logger.error(f'first album info line only has date field: {p}')
                     exit(1)
                 else:
                     continue

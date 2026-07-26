@@ -4,6 +4,8 @@
 use-root = true
 # Can be relative or absolute
 out-root = "out"
+# whether to make file links or make full copies
+make-links = true
 
 [features]
 # Needs mp3gain installed and accessible via the path

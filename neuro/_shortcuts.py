@@ -41,7 +41,7 @@ RCLONE_SYNC = "rclone sync"
 
 # rclone sync options
 # COMMON_OPTIONS = " --stats-file-name-length 0 --progress --transfers 2 --track-renames"
-COMMON_OPTIONS = " --stats-file-name-length 0 --progress --track-renames"
+COMMON_OPTIONS = " --stats-file-name-length 0 --progress --track-renames --checksum"
 DRIVE_OPTIONS = " --drive-use-trash=false"
 CHECK_OPTIONS = " --dry-run"
 PURGE_OPTIONS = " --max-transfer=1B"

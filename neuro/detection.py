@@ -600,13 +600,13 @@ def parse_setlist(p: Path) -> tuple[neutils.SongJSON, list[str]]:
                     logger.error("not enough fields in album info line in setlist file: " + str(p))
                     exit(1)
                 if len(fields) == 2:
-                    get_default_album_name(album_song_count, singer, date)
+                    album = get_default_album_name(album_song_count, singer, date)
                     # print(album)
                 elif len(fields) >= 3 and not fields[2] == '':
                     album = fields[2]
                     # print(album)
                 else:
-                    get_default_album_name(album_song_count, singer, date)
+                    album = get_default_album_name(album_song_count, singer, date)
                 if album not in songs.keys():
                     # print('adding album to songs: ' + album)
                     songs[album] = []

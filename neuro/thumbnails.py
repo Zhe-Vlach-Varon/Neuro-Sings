@@ -18,13 +18,14 @@ from neuro import (
     IMAGES_CUSTOM_DIR,
     IMAGES_DATES_DIR,
     LOG_DIR,
+    FONT_PATH,
 )
 from neuro.polars_utils import load_dates
 from neuro.utils import format_logger, time_format
 
 def apply_text(image: Image.Image,
                         text: str,
-                        font_file: str | Path = Path("images/fonts/First Coffee.ttf"),
+                        font_file: str | Path = Path(FONT_PATH),
                         font_size: int = 64,
                         font_fill_color = (255, 241, 242),
                         font_stroke_width: int = 2,

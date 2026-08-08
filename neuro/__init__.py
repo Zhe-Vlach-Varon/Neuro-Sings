@@ -44,3 +44,6 @@ COPYRIGHT_ISSUES_CSV = DATA_DIR / "copyright_issues.csv"
 OUT_ROOT_DIR = Path("out")
 OUT_UNOFFICIAL_DIR = OUT_ROOT_DIR / "unofficial_releases"
 OUT_OFFICIAL_DIR = OUT_ROOT_DIR / "official_releases"
+
+FONTS_DIR = Path("fonts")
+FONT_PATH = FONTS_DIR / "First Coffee.ttf"

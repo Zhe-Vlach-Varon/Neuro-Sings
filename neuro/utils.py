@@ -715,3 +715,51 @@ def is_copyright_issue(title: Optional[str], artist: Optional[str]) -> bool:
             return True
     
     return False
+
+def get_flags(song: SongEntry) -> str:
+
+    """ Singing voice version: 'v1', 'v2', 'v3', ''
+        Lead singer: 'neuro', 'evil'
+        Duet: 'duet', ''
+        Duplicate: 'duplicate', ''
+        Encore: 'encore', ''
+        Collab: 'collab', ''
+        Official: 'official', ''
+        Original: 'original', ''
+        Halloween: 'halloween', ''
+            manually added flag
+        Christmas: 'christmas', ''
+            manually added flag
+        Quarantine: 'quarantine', ''
+            manually added flag
+        Mashup: 'mashup', ''
+        ARG: 'arg', ''
+        arg songs have only the arg flag"""
+
+    flags: str = ""
+
+    cover_artist = song['Cover Artist']
+    lead_singer = song['Lead Singer']
+    duplicate = song['duplicate']
+    encore = song['encore']
+
+    if lead_singer == 'Study-sama':
+        return 'arg;'
+
+    if '[v1]' in cover_artist:
+        flags = 'v1;neuro;'
+    elif '[v2]' in cover_artist:
+        flags = 'v2;neuro;'
+    else:
+        flags = 'v3;'
+
+        if lead_singer == 'Neuro':
+            flags += 'neuro;'
+        if lead_singer == 'Evil':
+            flags += 'evil;'
+    if cover_artist == 'Neuro & Evil':
+        flags += 'duet;'
+    elif ('Neuro ' in cover_artist and ' & ' in cover_artist and 'Evil' not in cover_artist) or 'Evil & ' in cover_artist or 'Neuro, Evil, ' in cover_artist:
+        flags += 'collab;'
+    
+    return flags

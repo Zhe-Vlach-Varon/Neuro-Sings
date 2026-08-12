@@ -717,195 +717,127 @@ def get_setlist_files() -> list[Path]:
     return sorted_setlist_files
 
 
-def fill_in_setlists(out: neutils.SongJSON = {}) -> neutils.SongJSON:
-    # check if a setlist file with a date not already in dates exists
-    # check each existing entry under the date in out:SongJSON, and update "id", removing those entries from the in-memory copy of the setlist
-    # for each remaining entry in the setlist, create a duplicate entry using the most recent version of the song from the same singer from the setlist date or before
-
-    # keep track of which setlist files have been seen before
-
+def fill_in_setlists(out: neutils.SongJSON | None = None) -> neutils.SongJSON:
+    """Fills in missing setlist entries into the output dictionary."""
+    if out is None:
+        out = {}
     songs_df = load_db()
 
     sorted_setlist_files = get_setlist_files()
-
-
-    # TODO move to utils or somewhere else
-    date_format = "%Y-%m-%d"
-
     total_setlist_song_count = 0
+
+    def _move_songs_to_named_album(src_album_name: str, target_album: str, setlist_songs: list, existing_count: int) -> None:
+        if src_album_name not in out:
+            return
+        songs_to_check = out[src_album_name]
+        for entry in setlist_songs[existing_count:]:
+            for i, song in enumerate(songs_to_check):
+                if 'File_IN' in entry or entry['Date'] != song['Date']:
+                    continue
+                if neutils.do_songs_match(song, entry) and song['Date'] == entry['Date']:
+                    if target_album not in out:
+                        out[target_album] = []
+                    out[src_album_name].pop(i)
+                    song['id'] = entry['id']
+                    song['Lead Singer'] = entry['Lead Singer']
+                    song['Image'] = entry['Image']
+                    song['additional flags'] = entry['additional flags']
+                    if song['Date'] == entry['Date']:
+                        setlist_songs.remove(entry)
+                    out[target_album].append(song)
+                    break
+
+    def _merge_setlist_data_to_out(album: str, setlist_songs: list, existing_count: int, found_ids: list) -> None:
+        for song in out[album]:
+            for entry in setlist_songs[existing_count:]:
+                title_match = (
+                    neutils.do_song_titles_match(
+                        song['Title'] + ((' ' + song['Identify']) if song.get('Identify') and song['Identify'] != 'None' else ''),
+                        entry['Title'] + ((' ' + entry['Identify']) if entry.get('Identify') and entry['Identify'] != 'None' else '')
+                    ) or neutils.do_song_titles_match(
+                        entry['Title'] + ((' ' + entry['Identify']) if entry.get('Identify') and entry['Identify'] != 'None' else ''),
+                        song['Title'] + ((' ' + song['Identify']) if song.get('Identify') and song['Identify'] != 'None' else '')
+                    )
+                )
+
+                artist_match = (
+                    neutils.get_song_artists_match_count(song['Artist'], entry['Artist']) > 0 or
+                    neutils.get_song_artists_match_count(song['ArtistOG'], entry['Artist']) > 0 or
+                    neutils.get_song_artists_match_count(song['Artist'], entry['ArtistOG']) > 0 or
+                    neutils.get_song_artists_match_count(song['ArtistOG'], entry['ArtistOG']) > 0
+                )
+
+                cover_match = song['Cover Artist'].lower() == entry['Cover Artist'].lower() and not entry['encore']
+                date_match = ('Date' in song and 'Date' in entry and song['Date'] == entry['Date']) or ('Date' not in song)
+
+                if artist_match and title_match and cover_match and date_match:
+                    for key in entry.keys():
+                        if key not in song:
+                            song[key] = entry[key]
+                    song['id'] = entry['id']
+                    song['Lead Singer'] = entry['Lead Singer']
+                    found_ids.append(entry["id"])
+                    break
+
+    def _sort_and_insert_songs(album: str, setlist_songs: list, existing_count: int, found_ids: list) -> None:
+        out[album].sort(key=song_entry_sort_by_id)
+
+        for entry in setlist_songs:
+            if entry["id"] not in found_ids or len(out[album]) < entry["id"]:
+                out[album].insert(entry["id"] - 1, entry)
+            else:
+                idx = entry['id'] - 1 - existing_count
+                out[album][idx]['id'] = entry['id']
+                out[album][idx]['Image'] = entry['Image'] if entry['Image'] is not None else ''
+                out[album][idx]['additional flags'] = entry['additional flags'] if entry['additional flags'] is not None else ''
 
     for file in sorted_setlist_files:
         if file.name == 'Setlists.md' or file.is_dir():
             continue
-        # print("File_IN")
-        # print(file)
 
-
-        # print("if not date in dates_df.get_column(\"Date\"):")
-        # print(dates)
-        # if not date in dates_df.get_column("Date"):
-        #     # TODO log f"date from filename {date} is already in dates table"
-        #     continue
-        # TODO remove this commented out code so songs can be added to albums at later dates
-        # print("File_IN")
-        # print(file)
         albums, dates = parse_setlist(file)
-
-        if albums is None:
+        if not albums:
             continue
-        
+
         for album, songs in albums.items():
             total_setlist_song_count += len(songs)
 
-            contains_new_songs: bool = False
-            for date in dates:
-                filtered_songs = songs_df.filter(pl.col('Album') == album)
-                if filtered_songs.height:
-                    existing_song_count = filtered_songs.height
-                else:
-                    existing_song_count = 0
-                if existing_song_count and (len(albums[album]) == existing_song_count):
-                    # TODO filter out songs already in database, and only add setlist entries for songs not in database
-                    continue
-                # print("fill_in_duplicates")
-                # print(out.keys())
-                # print("album: " + album)
-                # print("date: " + date)
-                # print(songs)
-                contains_new_songs = False
-                for song in songs:
-                    contains_new_songs = contains_new_songs or not song['duplicate']
-                    if contains_new_songs:
-                        break
-                if not contains_new_songs:
-                    out[album] = albums[album][existing_song_count:]
-                if album not in out.keys():
-                    out[album] = []
+            filtered_songs = songs_df.filter(pl.col('Album') == album)
+            existing_song_count = filtered_songs.height if filtered_songs.height else 0
+
+            if existing_song_count and len(songs) == existing_song_count:
+                continue
+
+            contains_new_songs = any(not song['duplicate'] for song in songs)
+
+            if not contains_new_songs:
+                out[album] = albums[album][existing_song_count:]
+                continue
+
+            if album not in out:
+                out[album] = []
 
             found_ids = []
+            for src_album_name in dates + ['custom']:
+                _move_songs_to_named_album(src_album_name, album, songs, existing_song_count)
 
-            # TODO if song is discovered that goes in the middle of a setlist, will need to update track numbering of all songs after it
-            # TODO if a gap exists in track numbering of an album in the database, only add songs in the gap to json
+            if contains_new_songs and album in out:
+                _merge_setlist_data_to_out(album, songs, existing_song_count, found_ids)
 
-            # TODO fix for songs from one named setlist on a date getting added to a different named setlist for the same date
-
-            def move_songs_to_named_album(src_album_name: str):
-                # moves matching songs from out[src_album_name] to out[album]
-                if src_album_name in out.keys():
-                    songs_to_check = out[src_album_name]
-                    for entry in albums[album][existing_song_count:]:
-                        for song in reversed(songs_to_check):
-                            if 'File_IN' in entry.keys() or entry['Date'] != song['Date']:
-                                continue
-                            # print()
-                            # print(song)
-                            # print(entry)
-                            # dup_encore_File_IN_check = (neutils.does_matching_song_exist_in_list(song, albums[album]) > neutils.does_matching_song_exist_in_list(song, out[album])) and not entry['duplicate'] and 'File_IN' in song.keys() and 'File_IN' not in entry.keys()
-                            dup_encore_File_IN_check = True
-                            if neutils.do_songs_match(song, entry) and dup_encore_File_IN_check and song['Date'] == entry['Date']:
-                                if album not in out.keys():
-                                    out[album] = []
-                                # print(album)
-                                # print(src_album_name)
-                                out[src_album_name].remove(song)
-                                song['id'] = entry['id']
-                                song['Lead Singer'] = entry['Lead Singer']
-                                song['Image'] = entry['Image']
-                                song['additional flags'] = entry['additional flags']
-                                if song['Date'] == entry['Date']:
-                                    albums[album].remove(entry)
-                                out[album].append(song)
-
-            for date in dates:
-                # print(date)
-                move_songs_to_named_album(date)
-            move_songs_to_named_album('custom')
-
-            if contains_new_songs and album in out.keys():
-                for song in out[album]:
-                    for entry in albums[album][existing_song_count:]:
-                        if (
-                            (
-                                neutils.get_song_artists_match_count(song['Artist'], entry['Artist'])
-                             or neutils.get_song_artists_match_count(song['ArtistOG'], entry['Artist'])
-                             or neutils.get_song_artists_match_count(song['Artist'], entry['ArtistOG'])
-                             or neutils.get_song_artists_match_count(song['ArtistOG'], entry['ArtistOG'])
-                            )
-                            and
-                            (
-                                neutils.do_song_titles_match(song['Title'] + (( ' ' + song['Identify']) if (song['Identify'] is not None) and (not song['Identify'] == 'None') else ''),
-                                                             entry['Title'] + (( ' ' + entry['Identify']) if (entry['Identify'] is not None) and (not entry['Identify'] == 'None') else ''))
-                             or neutils.do_song_titles_match(entry['Title'] + (( ' ' + entry['Identify']) if (entry['Identify'] is not None) and (not entry['Identify'] == 'None') else ''),
-                                                             song['Title'] + (( ' ' + song['Identify']) if (song['Identify'] is not None) and (not song['Identify'] == 'None') else ''))
-                            )
-                            and
-                                song['Cover Artist'].lower() == entry['Cover Artist'].lower() and not entry['encore']) and (('Date' in song.keys() and 'Date' in entry.keys() and song['Date'] == entry['Date']) or ('Date' not in song.keys())):
-                            for key in entry.keys():
-                                if key not in song.keys():
-                                    song[key] = entry[key]
-                            song['id'] = entry['id']
-                            song['Lead Singer'] = entry['Lead Singer']
-                            found_ids.append(entry["id"])
-                            # print(entry)
-                            # print(song)
-                            # print("")
-                            # print("")
-
-
-                # print("found_ids")
-                # print(found_ids)
-
-                out[album].sort(key=song_entry_sort_by_id)
-
-                for entry in albums[album]:
-                # for entry in albums[album][existing_song_count:]:
-                    # print(out)
-                    # print("")
-                    # print(entry)
-                    # print("")
-                    # print(found_ids)
-                    # print("")
-                    # print(entry['id'])
-                    if entry["id"] not in found_ids or len(out[album]) < entry["id"]:
-                        out[album].insert((entry["id"]-1), entry)
-                        # print('if entry["id"] not in found_ids:')
-                    else:
-                        # print(entry['id'] - 1)
-                        # print(out[album][entry['id'] - 1 ])
-                        # print(entry)
-                        # print(out[album][entry['id'] - 1 ]['Date'])
-                        # print(entry['Date'])
-                        
-                        out[album][entry['id'] - 1 - existing_song_count]['id'] = entry['id']
-                        if entry['Image'] is not None:
-                            out[album][entry['id'] - 1 - existing_song_count]['Image'] = entry['Image']
-                        else:
-                            out[album][entry['id'] - 1 - existing_song_count]['Image'] = ''
-
-                        if entry['additional flags'] is not None:
-                            out[album][entry['id'] - 1 - existing_song_count]['additional flags'] = entry['additional flags']
-                        else:
-                            out[album][entry['id'] - 1 - existing_song_count]['additional flags'] = ''
-
-
-
-                    # print("print(out[album][entry['id'] - 1 ])")
-                    # print(out[album][entry['id'] - 1 ])
+            _sort_and_insert_songs(album, songs, existing_song_count, found_ids)
 
     logger.info(f"total songs found in setlists: {total_setlist_song_count}")
 
-    for album in out:
-        filtered = songs_df.filter((pl.col('Album') == album))
+    for album in list(out.keys()):
+        filtered = songs_df.filter(pl.col('Album') == album)
         for song in reversed(out[album]):
-            if 'File_IN' not in song.keys():
+            if 'File_IN' not in song:
                 song['duplicate'] = True
             if neutils.does_matching_song_exist_in_list(song, filtered.to_dicts()):
                 logger.info(f"removing {song['Artist']} - {song['Title']} - {song['Cover Artist']} with date {song['Date']}")
                 out[album].remove(song)
-
-    # sorted_songs = []
-
-    # for album, songs in out
+        if not out[album]:
+            del out[album]
 
     return out
 
@@ -1124,6 +1056,9 @@ def check_missing_setlist_entries() -> list[dict]:
         logger.info("All setlist entries match the database.")
         
     return discrepencies
+
+def run_setlist_check() -> int:
+    return len(check_missing_setlist_entries()) == 0
 
 def export_json(all_songs: neutils.SongJSON) -> None:
     """Takes an existing result of new files search and exports it in a json file.

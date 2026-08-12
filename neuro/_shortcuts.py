@@ -47,7 +47,7 @@ COMMON_OPTIONS = " --stats-file-name-length 0 --progress --track-renames --check
 DRIVE_OPTIONS = " --drive-use-trash=false"
 CHECK_OPTIONS = " --dry-run"
 PURGE_OPTIONS = " --max-transfer=1B"
-remote_links = False
+remote_links = True
 local_links = True
 LINK_OPTIONS =  " --skip-links" if remote_links and local_links else (" --copy-links" if local_links else "")
 

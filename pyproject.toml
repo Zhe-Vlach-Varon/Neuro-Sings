@@ -43,7 +43,7 @@ drive-pull = "neuro._shortcuts:drive_pull"
 drive-push = "neuro._shortcuts:drive_push"
 db-sync = "neuro._shortcuts:dbs_sync"
 mp3gain_standalone = "neuro.run:mp3gain_standalone"
-setlist-check = "neuro.detection:check_missing_setlist_entries"
+setlist-check = "neuro.detection:run_setlist_check"
 
 [build-system]
 requires = ["pdm-backend"]

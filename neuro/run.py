@@ -220,8 +220,6 @@ def generate_albums(create_placeholders: bool = False) -> None:
             logger.error(f"[GEN] [{i+1:4d}/{N_SONGS}] [{album}] ERROR {song_dict['Title']} unofficial song file not found: {song_dict['File_IN']}")
             exit(1)
 
-    
-
 
 def parse_mp3gain(config: dict) -> MP3ModeTuple:
     """Gets the mp3gain global config from the config file.

@@ -696,6 +696,5 @@ class CustomSong(Song):
         file.save()
 
 
-
 if __name__ == "__main__":
     format_logger(log_file=LOG_DIR / "tags.log")

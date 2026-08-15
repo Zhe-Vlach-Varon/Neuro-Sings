@@ -245,7 +245,6 @@ def drive_push() -> None:
     logger.success("finished uploading to gdrive")
 
 
-
 def dbs_sync() -> None:
     format_logger(log_file=LOG_DIR / "sync.log")
     FROM_DB = False

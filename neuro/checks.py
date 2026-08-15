@@ -11,7 +11,7 @@ from tqdm import tqdm
 
 from neuro import LOG_DIR, ROOT_DIR
 from neuro.polars_utils import load_db
-from neuro.utils import format_logger, get_sha256, get_audio_hash
+from neuro.utils import format_logger, get_audio_hash
 from neuro.detection import check_missing_setlist_entries
 
 
@@ -40,11 +40,8 @@ def check_hash() -> None:
     logger.debug("Checking files' hashes")
     for song in tqdm(songs.iter_rows(named=True), total=len(songs)):
         file = ROOT_DIR / Path(song["File_IN"])
-        # TODO add debug mode toggles
-        # print(file)
         assert file.exists()
         hash = song["Hash_IN"]
-        # print(get_audio_hash(file))
         assert get_audio_hash(file) == hash, f"{file}"
 
 
@@ -128,7 +125,6 @@ def check_are_dbs_identical():
 def all_tests() -> None:
     """Runs all checks defined in this file"""
     format_logger(log_file=LOG_DIR / "checks.log")
-    # check_ascii()
     check_case("Artist")
     check_case("Title")
     check_hash()

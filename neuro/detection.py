@@ -224,9 +224,7 @@ def extract_custom(files: list[Path], out: neutils.SongJSON = {}) -> neutils.Son
     """
 
     # there are a lot less custom songs, since most of the ones that were are included in the Unofficial Archive that is the new source for mp3 files
-    # print(files)
     for file in files:
-        # print(file)
         filename = file.stem
         fields = filename.split(' - ')
         artist = fields[0]
@@ -256,10 +254,6 @@ def extract_custom(files: list[Path], out: neutils.SongJSON = {}) -> neutils.Son
         else:
             out[album] = [data]
 
-    # for album in out.keys():
-    #     for song in out[album]:
-    #         print(song)
-    # exit()
 
     return out
 
@@ -289,14 +283,6 @@ def extract_unofficialV3(files: list[Path], out: neutils.SongJSON = {}) -> neuti
         title_og = ""
         identify = ""
         trackInfo = tinytag.TinyTag.get(file)
-        # print("")
-        # print("")
-        # print(file)
-        # print(trackInfo.comment)
-        # print(trackInfo.other.keys())
-        # for key in trackInfo.other.keys():
-            # print(key)
-            # print(trackInfo.other[key])
         if len(trackInfo.comment) > 0 and trackInfo.comment.startswith('{') and trackInfo.comment.endswith('}'):
             trackJSon = json.loads(trackInfo.comment)
             input_date = parse(trackJSon['Date'])
@@ -308,12 +294,8 @@ def extract_unofficialV3(files: list[Path], out: neutils.SongJSON = {}) -> neuti
             identify = trackJSon['Identify']
         elif 'comment' in trackInfo.other.keys():
             found_json = False
-            # print("")
-            # print(trackInfo.other['comment'])
             assert len(trackInfo.other['comment'])
             for comment in trackInfo.other['comment']:
-                # print("")
-                # print(comment)
                 if comment.startswith('{') and comment.endswith('}'):
                     trackJSon = json.loads(comment)
                     found_json = True
@@ -369,7 +351,6 @@ def extract_arg(files: list[Path], out: neutils.SongJSON = {}) -> neutils.SongJS
         duplicate = False
         trackInfo = tinytag.TinyTag.get(file)
         date = trackInfo.comment
-        # print(date)
 
         data = {
             'Cover Artist' : artist,
@@ -411,10 +392,6 @@ def extract_official(files: list[Path], out: neutils.SongJSON ={}) -> neutils.So
         for file in files:
             if str(file) in songs_db['File_IN']:
                 continue
-            # print(file)
-            # print(song)
-            # print(f'{str(do_song_titles_match(file.stem, song['Title']))}')
-            # print(f'{str(do_song_titles_match(song['Title'], file.stem))}')
             # need to try both orders because for some reason the mp3 file of CFRB is named 'Robot Body.mp3'
             if neutils.do_song_titles_match(file.stem, song['Title']) or neutils.do_song_titles_match(song['Title'], file.stem):
                 artist = song['Artist']
@@ -465,10 +442,6 @@ def extract_official(files: list[Path], out: neutils.SongJSON ={}) -> neutils.So
         for file in files:
             if str(file) in songs_db['File_IN']:
                 continue
-            # print(file)
-            # print(song)
-            # print(f'{str(do_song_titles_match(file.stem, song['Title']))}')
-            # print(f'{str(do_song_titles_match(song['Title'], file.stem))}')
             if neutils.do_song_titles_match(file.stem, song['Title']) or neutils.do_song_titles_match(song['Title'], file.stem):
                 artist = song['Artist']
                 cover_artist = artist
@@ -499,11 +472,6 @@ def extract_official(files: list[Path], out: neutils.SongJSON ={}) -> neutils.So
                     out['custom'] = [data]
                 id += 1
 
-    # for album in out.keys():
-    #     print(album)
-    #     for song in out[album]:
-    #         print(song)
-    # exit()
     return out
 
 def get_default_album_name(album_song_count: int, singer:str, date: str) -> str:
@@ -521,13 +489,8 @@ def parse_setlist(p: Path) -> tuple[neutils.SongJSON, list[str]]:
     logger.info(f'parsing setlist {p.name}')
 
     songs: neutils.SongJSON = {}
-    
-    # print("lines")
-    # print(lines)
 
-    # print('\nfields')
 
-    is_album_info_line = False
     is_singer_change_line = False
     is_song_line = False
 
@@ -551,13 +514,10 @@ def parse_setlist(p: Path) -> tuple[neutils.SongJSON, list[str]]:
             continue # this is a comment line, do not process
         fields = line.strip('\n').split('|')
         fields = [f.strip() for f in fields]
-        # print(fields)
 
         date_format = "%Y-%m-%d"
         try:
             is_album_info_line = bool(datetime.strptime(fields[0], date_format))
-            # print(fields[0])
-            # print("album info line")
         except:
             is_album_info_line = False
 
@@ -565,19 +525,16 @@ def parse_setlist(p: Path) -> tuple[neutils.SongJSON, list[str]]:
         # checking if starts with "Neuro" because 2026-04-01 April Fools karaoke included a song using v1 voice
         if not is_album_info_line and (fields[0].startswith("Neuro") or fields[0] == "Evil"):
             is_singer_change_line = True
-            # print("singer change line")
         else:
             is_singer_change_line = False
 
         if (not is_album_info_line) and (not is_singer_change_line):
             is_song_line = True
-            # print("song line")
         else:
             is_song_line = False
 
         
         if is_album_info_line:
-            # print("album info line")
             input_date = parse(fields[0])
             date = input_date.strftime(date_format)
             if len(fields) == 1:
@@ -590,25 +547,16 @@ def parse_setlist(p: Path) -> tuple[neutils.SongJSON, list[str]]:
                 album_art = None # reset album cover art to None
                 singer = fields[1]
                 lead_singer = singer
-                # print(fields[1])
-                # if date in dates_df.get_column("Date"):
-                    # continue
-                    # TODO check if song is in database with the same date, and only if it isn't, add the setlist entry to the json
-                    # print("placeholder code")
-                # print(len(fields))
                 if len(fields) < 2:
                     logger.error("not enough fields in album info line in setlist file: " + str(p))
                     exit(1)
                 if len(fields) == 2:
                     album = get_default_album_name(album_song_count, singer, date)
-                    # print(album)
                 elif len(fields) >= 3 and not fields[2] == '':
                     album = fields[2]
-                    # print(album)
                 else:
                     album = get_default_album_name(album_song_count, singer, date)
                 if album not in songs.keys():
-                    # print('adding album to songs: ' + album)
                     songs[album] = []
                 if len(fields) >= 4:
                     album_art = fields[3]
@@ -616,20 +564,13 @@ def parse_setlist(p: Path) -> tuple[neutils.SongJSON, list[str]]:
                 continue
         
         if is_singer_change_line and found_album_line:
-            # print("singer change line")
             lead_singer = fields[0]
             continue
 
         if is_song_line and found_album_line:
-            # print(fields)
-            # TRACK# | SONG_TITLE | ARTIST | COVER_ARTIST | NEW/DUPLICATE | SONG_COVER_ART(OPTIONAL) | additional flags
             song_art = None # reset song specific art to None
-            # print("song line")
             id = int(fields[0])
             song_title, identify = neutils.split_title_and_identify(fields[1])
-            # print(fields[1])
-            # print(song_title)
-            # print(identify)
             artist = fields[2]
             if not fields[3] == '':
                 cover_artist = fields[3]
@@ -648,7 +589,6 @@ def parse_setlist(p: Path) -> tuple[neutils.SongJSON, list[str]]:
             else:
                 additionalFlags = ''
 
-            # print(song_art)
             data = {
                 'Artist': artist,
                 'ArtistOG': "",
@@ -674,7 +614,6 @@ def parse_setlist(p: Path) -> tuple[neutils.SongJSON, list[str]]:
                 data['encore'] = True
                 data['duplicate'] = True
 
-            # print(album)
             songs[album].append(data)
             seen_songs.append(data)
 
@@ -694,13 +633,8 @@ def parse_setlist(p: Path) -> tuple[neutils.SongJSON, list[str]]:
         twin_album_stream_title = album.replace('Neuro', 'Twins').replace('Evil', 'Twins')
         songs[twin_album_stream_title] = songs.pop(album)
 
-    # print(songs)
     return songs, dates
 
-    # TODO error checking
-
-    # add way to tag which outfit/hairstyle each singer is wearing
-    # add way to tag if stream was a 2d or 3d stream
 
 def song_entry_sort_by_id(e):
     if e['id'] is None:
@@ -849,17 +783,7 @@ def extract_all() -> neutils.SongJSON:
             They are grouped by date, or category if no date was provided in filename.
     """
     songs_db = load_db()
-    dates_df = load_dates()
-    # assert (songs_db.height == 0) == (dates_df.height == 0)
-
     files = get_files(songs_db)
-    regex = get_regexes()
-
-    # for file in files:
-    #     print(file)
-    #     for song in files[file]:
-    #         print(f"  {song}")
-    # exit()
 
     out: neutils.SongJSON = {}
 
@@ -870,7 +794,6 @@ def extract_all() -> neutils.SongJSON:
     extract_unofficialV3(files['Copyright'], out)
 
     # Custom
-    # print(files['Custom'])
     extract_custom(files["Custom"], out)
 
     # unofficial v3
@@ -882,8 +805,6 @@ def extract_all() -> neutils.SongJSON:
     # fill in duplicates
     fill_in_setlists(out)
 
-    # if 'custom' in out.keys() and len(out["custom"]) == 0:
-    #     out.pop("custom")
 
     return out
 
@@ -1067,42 +988,26 @@ def export_json(all_songs: neutils.SongJSON) -> None:
         all_songs (SongJSON): Dictionary with lists of files grouped by date.
     """
 
-    # with open(Path(ROOT_DIR / "data" / "unsorted.json"), "w") as f:
-    #     # print(sorted_songs)
-    #     json.dump(all_songs, f, indent=2, ensure_ascii=False)
-    #     f.write("\n")
 
-    # print("")
-    # print(all_songs)
     all_keys = sorted(all_songs)
-    # print("")
-    # print(all_keys)
 
     for key in reversed(all_keys):
         if len(all_songs[key]) == 0:
             all_songs.pop(key)
             all_keys.remove(key)
     
-    # print("")
     for key, songs in all_songs.items():
-        # print(key)
         if not key == 'custom':
             for song in songs:
-                # print(song)
                 assert 'Date' in song.keys()
 
     keys_to_exclude = ['custom']
-    # print(keys_to_exclude)
     dated_songs = {k:v for k,v in all_songs.items() if k not in keys_to_exclude}
 
     # Sorting songs by date for easier treatment
-    # print(dated_songs)
     assert 'custom' not in dated_songs.keys()
     sorted_songs = dict(sorted(dated_songs.items(), key=lambda item: item[1][0]['Date']))
 
-    # for key in keys_to_exclude:
-        # if key in all_songs.keys():
-            # sorted_songs[key] = all_songs[key]
 
     with open(SONGS_JSON, "w") as f:
         # print(sorted_songs)

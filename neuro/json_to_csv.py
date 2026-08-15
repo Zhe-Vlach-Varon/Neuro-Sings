@@ -15,65 +15,6 @@ from neuro.detection import check_missing_setlist_entries
 from tqdm import tqdm
 
 
-def is_eliv(s: neutils.SongEntry) -> bool:
-    """Checks if the file from an Entry is sung by Evil.
-
-    Args:
-        s (SongEntry): Song Entry.
-
-    Returns:
-        bool: True if it's sung by Evil.
-    """
-    if s["File_IN"] is not None:
-        return "Evil.v" in s["File_IN"]
-    else:
-        return False
-
-def is_duet(s: neutils.SongEntry) -> bool:
-    """Checks if the file from an Entry is a duet.
-
-    Args:
-        s (SongEntry): Song Entry.
-
-    Returns:
-        bool: True if it's in the subfolder.
-    """
-    assert s["File_IN"] is not None
-    return "(Duet.v" in s["File_IN"] and "Neuro & Evil)" in s["File_IN"]
-
-
-def is_eliv_old(s: neutils.SongEntry) -> bool:
-    """Checks if the file from an Entry is in the Evil subdirectory.
-
-    Args:
-        s (SongEntry): Song Entry.
-
-    Returns:
-        bool: True if it's in the subfolder.
-    """
-    assert s["File_IN"] is not None
-    return "/Evil" in s["File_IN"]
-
-
-def field_ascii(song: neutils.SongEntry, field: Literal["Title", "Artist"]) -> tuple[str, str]:
-    """Gets the "normal" and "ASCII" versions of the 2 fields that have these variants.
-
-    Args:
-        song (SongEntry): A song Entry (dict from JSON file).
-        field (Literal["Title", "Artist"]): The field.
-
-    Returns:
-        tuple[str, str]: A tuple with (normal, ascci).
-    """
-    normal = song[f"{field}"]
-    assert normal is not None
-
-    ascii = song.get(f"{field}_ASCII", normal)
-    assert ascii is not None
-
-    return normal, ascii
-
-
 def clear_db() -> None:
     songs_df = pl.DataFrame({}, schema=songs_schema)
     dates_df = pl.DataFrame({}, schema=dates_schema)
@@ -280,119 +221,11 @@ def update_db() -> None:
 
     check_missing_setlist_entries()    
 
-
-# Shouldn't ever need to use this again, was used to update database after switching from using file hashes to using hashes of the audio data
-def update_db_hashes() -> None:
-    songs = load_db()
-    schema = songs.schema
-
-    new_songs_df = pl.DataFrame(schema=schema)
-
-    for song in tqdm(songs.iter_rows(named=True), total=len(songs)):
-        file = ROOT_DIR / Path(song["File_IN"])
-        # print(file)
-        assert file.exists()
-        hash = song["Hash_IN"]
-        # print(get_audio_hash(file))
-        if neutils.get_audio_hash(file) != hash:
-            song["Hash_IN"] = neutils.get_audio_hash(file)
-        new_songs_df.extend(pl.DataFrame(song))
-            
-    new_songs_df.write_csv(SONGS_CSV)
-    new_songs_df.write_database("Songs", f"sqlite:///{SONGS_DB}", if_table_exists="replace")
-
-def update_db_filenames() -> None:
-    songs = load_db()
-    schema = songs.schema
-
-    updated_songs = pl.DataFrame(schema=schema)
-
-    file_mapping = neutils.get_audio_hash_to_file_mapping(SONG_ROOT_DIR)
-
-    songs_updated = 0
-
-    for song in tqdm(songs.iter_rows(named=True), total=len(songs)):
-        # print()
-        # print(song)
-        file = Path(song["File_IN"])
-        new_file = Path(file_mapping[song['Hash_IN']]).relative_to(ROOT_DIR)
-        logger.debug(f"File: {file}")
-        logger.debug(f"New File: {new_file}")
-        if not str(file) == str(new_file):
-            logger.info(f"updating File_IN for {song['Title']}")
-            song['File_IN'] = str(new_file)
-            songs_updated += 1
-        updated_songs.extend(pl.DataFrame(song))
-
-    logger.info(f"updated {songs_updated} songs")
-
-    updated_songs.write_csv(SONGS_CSV)
-    updated_songs.write_database("Songs", f"sqlite:///{SONGS_DB}", if_table_exists="replace")
-
-
-def add_cover_artist() -> None:
-    songs = load_db()
-    schema = songs.schema
-    # print(schema)
-
-    new_songs_df = pl.DataFrame(schema=schema)
-
-    for song in tqdm(songs.iter_rows(named=True), total=len(songs)):
-        file = ROOT_DIR / Path(song["File_IN"])
-        # print(file)
-        assert file.exists()
-        singer = neutils.get_cover_artist(file)
-        song["Cover Artist"] = singer
-        new_songs_df.extend(pl.DataFrame(song))
-            
-    new_songs_df.write_csv(SONGS_CSV)
-    new_songs_df.write_database("Songs", f"sqlite:///{SONGS_DB}", if_table_exists="replace")
-
-def add_special() -> None:
-    songs = load_db()
-    schema = songs.schema
-    # print(schema)
-
-    new_songs_df = pl.DataFrame(schema=schema)
-
-    for song in tqdm(songs.iter_rows(named=True), total=len(songs)):
-        file = ROOT_DIR / Path(song["File_IN"])
-        # print(file)
-        assert file.exists()
-        special = neutils.get_special(file)
-        song["Special"] = special
-        new_songs_df.extend(pl.DataFrame(song))
-            
-    new_songs_df.write_csv(SONGS_CSV)
-    new_songs_df.write_database("Songs", f"sqlite:///{SONGS_DB}", if_table_exists="replace")
-
-def add_comment() -> None:
-    songs = load_db()
-    schema = songs.schema
-    # print(schema)
-
-    new_songs_df = pl.DataFrame(schema=schema)
-
-    for song in tqdm(songs.iter_rows(named=True), total=len(songs)):
-        file = ROOT_DIR / Path(song["File_IN"])
-        # print(file)
-        assert file.exists()
-        comment = neutils.get_comment(file)
-        if comment == "None":
-            comment = None
-        song["Comment"] = comment
-        new_songs_df.extend(pl.DataFrame(song))
-            
-    new_songs_df.write_csv(SONGS_CSV)
-    new_songs_df.write_database("Songs", f"sqlite:///{SONGS_DB}", if_table_exists="replace")
-
-
 def get_most_recent_version(song: dict, json_data: neutils.SongJSON, encore: bool, lead_singer: str) -> pl.DataFrame:
     # if json for song has duplicate true, search database for most recent version of song with same singer
     # either detect singer from existing data, or add cover_artist field to database
     songDB = load_db()
 
-    # print(song['Album'][0])
 
     latest_version = None
 
@@ -403,14 +236,6 @@ def get_most_recent_version(song: dict, json_data: neutils.SongJSON, encore: boo
         (pl.col("Date") <= song["Date"]) &
         (~pl.col("Flags").str.contains("duplicate"))
     ).sort(pl.col("Date"), descending=True)
-
-    # print("filtered_songs")
-    # print(filtered_songs)
-    # print("get_most_recent_version:song")
-    # print(song)
-    # TODO if filtered_songs.height is 0, check the the new_songs JSONObject and find the most recent version that is not the current song
-    #          will need this for karaoke setlists that have an encore
-    # TODO make sure that when searching for previous versions, to not consider songs with a later date, and also not songs with a later track number
 
     filtered_json_songs = []
 
@@ -451,17 +276,8 @@ def get_most_recent_version(song: dict, json_data: neutils.SongJSON, encore: boo
         logger.error(f"Album: {song['Album']}")
         for key in song.keys():
             logger.error(f"{key}: {song[key]}")
-        # with open("get_most_recent_version_json_data.txt", "w") as f:
-        #     json.dump(json_data, f, indent=4)
         exit(1)
 
-
-    # print("latest_version")
-    # print(latest_version)
-
-    # TODO get latest version of the two from json and db
-
-    # already checked that flags does not contain duplicate when filtering
     flags += "duplicate;"
     
     if encore:
@@ -472,7 +288,6 @@ def get_most_recent_version(song: dict, json_data: neutils.SongJSON, encore: boo
     if lead_singer == 'Evil':
         flags = flags.replace('neuro', 'evil')
 
-    # print(song)
     entry_flags = song['Flags'].split(';')
     for fl in entry_flags:
         if fl not in flags:
@@ -504,8 +319,6 @@ def get_most_recent_version(song: dict, json_data: neutils.SongJSON, encore: boo
             }
         )
     elif len(filtered_json_songs) > 0 and latest_version == latest_json_version:
-        # print(song)
-        # print(latest_version)
         new_duplicate_song = pl.DataFrame(
         {
                "id": song["id"],
@@ -534,7 +347,6 @@ def get_most_recent_version(song: dict, json_data: neutils.SongJSON, encore: boo
         logger.error("How did we get here?!")
         logger.error("unable to get latest version")
         exit(1)
-    # print(song["Image"])
 
     return new_duplicate_song
 

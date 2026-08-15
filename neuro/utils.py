@@ -120,32 +120,6 @@ def file_check(file_: Path | str, /) -> None:
         raise FileNotFoundError(err)
 
 
-def get_sha256(file: Path) -> str:
-    """Computes the SHA-256 of a given file.
-
-    Args:
-        file (Path): File to get the hash.
-
-    Returns:
-        str: A string with the hash.
-    """
-    # https://stackoverflow.com/questions/22058048/hashing-a-file-in-python
-    # BUF_SIZE is totally arbitrary, change for your app!
-    BUF_SIZE = 65536  # lets read stuff in 64kb chunks!
-
-    sha256 = hashlib.sha256()
-    file_check(file)
-    with open(file, "rb") as f:
-        while True:
-            data = f.read(BUF_SIZE)
-            if not data:
-                break
-            sha256.update(data)
-    return sha256.hexdigest()
-
-    
-
-
 def time_format(dt: float, precise: bool = False) -> str:
     """Formats a floating point number of seconds as min/sec, sec, or ms, ...
     Done automatically once and for all
@@ -261,151 +235,18 @@ def get_audio_hash(file_path: Path) -> (str | None):
         return None
 
 def get_audio_hash_to_file_mapping(p: Path, *, filetype: str = "mp3") -> dict:
-    # print(p)
     files = list(p.glob(f"**/*.{filetype}"))
     file_mapping = {}
 
     for file in files:
-        # print(file)
         hash = get_audio_hash(file)
         file_mapping[hash] = Path(file)
     
     return file_mapping
 
-def get_old_to_new_file_mapping_by_audio_hash(old_dir: Path, new_dir: Path, filetype: str = "mp3") -> dict:
-    old_to_new_mapping: dict = {}
-
-    old_file_map = get_audio_hash_to_file_mapping(old_dir)
-    new_file_map = get_audio_hash_to_file_mapping(new_dir)
-
-    old_hashes = list(dict.fromkeys(old_file_map.keys()))
-    new_hashes = list(dict.fromkeys(new_file_map.keys()))
-
-    in_both_count = 0
-    in_new_only_count = 0
-    in_old_only_count = 0
-
-    in_old_only_list = []
-    in_new_only_list = []
-    in_both_list = []
-
-    for hash in old_hashes:
-        # print("")
-        # print(hash)
-        # print(old_file_map[hash])
-        if hash in new_hashes:
-            # print(new_file_map[hash])
-            in_both_count += 1
-            in_both_list.append((hash, old_file_map[hash], new_file_map[hash]))
-        else:
-            # print("not in new")
-            in_old_only_count += 1
-            in_old_only_list.append((hash, old_file_map[hash], "N/A"))
-    
-    for hash in new_hashes:
-        # print("")
-        # print(hash)
-        # print(new_file_map[hash])
-        # if hash in old_hashes:
-        if not hash in old_hashes:
-            # print(old_file_map[hash])
-        # else:
-            # print("not in old")
-            in_new_only_count += 1
-            in_new_only_list.append((hash, "N/A", new_file_map[hash]))
-
-    # print("counts")
-    # print("in both: " + str(in_both_count))
-    # print("in new only: " + str(in_new_only_count))
-    # print("in old only: " + str(in_old_only_count))
-
-    # print("\n\n")
-
-    # print("In new archive only")
-    # for song in in_new_only_list:
-        # print(song)
-    
-    # print("\n\n")
-
-    # print("In old archive only:")
-    # for song in in_old_only_list:
-        # print(song)
-
-    return old_to_new_mapping
-
-
-# used once to fill in "Cover Artist" field added to database
-def get_cover_artist(file: Path) -> str:
-    if file.is_relative_to(UNOFFICIALV3_DIR):
-        trackInfo = tinytag.TinyTag.get(file)
-        trackJSon = json.loads(trackInfo.other['comment'][0])
-        return trackJSon['CoverArtist']
-    elif file.is_relative_to(DRIVE_DIR):
-        if "/Duet" in str(file) or "/Anniversary" in str(file):
-            return "Neuro & Evil"
-        elif "/Evil" in str(file):
-            return "Evil"
-        elif "/v2 voice" in str(file):
-            return "Neuro [v2]"
-        elif "/v1 voice" in str(file):
-            return "Neuro [v1]"
-        else:
-            return "Neuro"
-    elif file.is_relative_to(CUSTOM_DIR):
-        if "Study-sama" in str(file):
-            return "Study-sama"
-        else:
-            return None
-    elif file.is_relative_to(OFFICIAL_RELEASE_DIR):
-        return None
-    else:
-        return None
-    # These last few return None because the bulk of songs are covered by the other cases and there will be few enough songs left to manually update in a reasonable time
-
-def get_special(file: Path) -> str:
-    # print(file)
-    # print(file.is_relative_to(UNOFFICIALV3_DIR / UNOFFV3_EXTRA / UNOFFV3_DISC66))
-    if file.is_relative_to(UNOFFICIALV3_DIR / UNOFFV3_EXTRA / UNOFFV3_DISC66):
-        return "0"
-    if file.is_relative_to(UNOFFICIALV3_DIR):
-        trackInfo = tinytag.TinyTag.get(file)
-        if len(trackInfo.comment) > 0 and trackInfo.comment.startswith('{') and trackInfo.comment.endswith('}'):
-            trackJSon = json.loads(trackInfo.comment)
-            special = trackJSon['Special']
-        elif 'comment' in trackInfo.other.keys():
-            for comment in trackInfo.other['comment']:
-                if comment.startswith('{') and comment.endswith('}'):
-                    trackJSon = json.loads(comment)
-                    special = trackJSon['Special']
-        return special
-    return "0"
-
-def get_comment(file: Path) -> str:
-    # print(file)
-    # print(file.is_relative_to(UNOFFICIALV3_DIR / UNOFFV3_EXTRA / UNOFFV3_DISC66))
-    if file.is_relative_to(UNOFFICIALV3_DIR / UNOFFV3_EXTRA / UNOFFV3_DISC66):
-        return None
-    if file.is_relative_to(UNOFFICIALV3_DIR):
-        trackInfo = tinytag.TinyTag.get(file)
-        if len(trackInfo.comment) > 0 and trackInfo.comment.startswith('{') and trackInfo.comment.endswith('}'):
-            trackJSon = json.loads(trackInfo.comment)
-            comment_str = trackJSon['Comment']
-        elif 'comment' in trackInfo.other.keys():
-            for comment in trackInfo.other['comment']:
-                if comment.startswith('{') and comment.endswith('}'):
-                    trackJSon = json.loads(comment)
-                    comment_str = trackJSon['Comment']
-        return comment_str
-    return None
-
 def do_song_titles_match(existing_song_title: str, new_song_title: str) -> bool:
     if existing_song_title is None or new_song_title is None:
-        # print(existing_song_title)
-        # print(new_song_title)
         return False
-
-    # print("do_song_titles_match:existing: " + existing_song_title)
-    # print("do_song_titles_match:new: " + new_song_title)
 
     if existing_song_title.startswith('Numbers') and new_song_title.startswith('Numbers'):
         if existing_song_title == 'Numbers' and new_song_title == 'Numbers':
@@ -420,13 +261,7 @@ def do_song_titles_match(existing_song_title: str, new_song_title: str) -> bool:
     songTitleNonAlphaNumStripRegex = r'[^a-z0-9\/&]'
 
     new_title = re.sub(songTitleNonAlphaNumStripRegex, '', str(remove_accents(new_song_title)).lower())
-    # new_title = new_song_title.lower()
     existing_title = re.sub(songTitleNonAlphaNumStripRegex, '', str(remove_accents(existing_song_title)).lower())
-    # existing_title = existing_song_title.lower()
-
-    # print(new_title)
-    # print(existing_title)
-
     nightcore_regex = r'((nightcore|chipmunk)(ver(sion)?)?)'
 
     new_is_nightcore = False
@@ -442,28 +277,15 @@ def do_song_titles_match(existing_song_title: str, new_song_title: str) -> bool:
 
     titles_match = (str.lower(new_title) in str.lower(existing_title)) and (new_is_nightcore == existing_is_nightcore)
 
-    # print(titles_match)
-
-    # if "puru" in new_title and "puru" in existing_title:
-    #     exit(1)
-
     return titles_match
 
 def get_song_artists_match_count(existing_song_artists: str, new_song_artists: str) -> int:
-    # print("get_song_artists_match_count:new: " + new_song_artists)
-    # print("get_song_artists_match_count:existing: " + existing_song_artists)
-
     artistCharacterStripRegex = r'[\_\-\(\)\[\]\{\}\<\>\.\*\/\'\\]'
     artistStripProducerPRegex = r'p$'
     artistNameSplitRegex = r',|&|\+|( [xX] )'
 
-    # TODO if needed add special case for September - Earth, Wind & Fire
-
     existing_artists = re.split(artistNameSplitRegex,  str(re.sub(artistStripProducerPRegex, '', re.sub(artistCharacterStripRegex, '', str(remove_accents(existing_song_artists))).lower())))
     new_artists = re.split(artistNameSplitRegex,  str(re.sub(artistStripProducerPRegex, '', re.sub(artistCharacterStripRegex, '', str(remove_accents(new_song_artists))).lower())))
-
-    # print(new_artists)
-    # print(existing_artists)
 
     artists_match_count = 0
 
@@ -471,8 +293,6 @@ def get_song_artists_match_count(existing_song_artists: str, new_song_artists: s
         for new_artist in new_artists:
             if re.sub(' ', '', str(new_artist)) in re.sub(' ', '', str(existing_artist)):
                 artists_match_count += 1
-
-    # print(artists_match_count)
 
     return artists_match_count
 
@@ -482,59 +302,36 @@ def remove_accents(s):
 english_title_translation_regex = r'\(.*?\)'
 # TODO load from file
 title_ascii_special_negative_cases = [
-    # 'short',
     'da ba dee',
-    # 'jp ver.',
     'gotta catch em all',
-    # 'nightcore',
-    # 'chipmunk ver.',
     'me',
     'you',
     'ski-ba-bop-ba-dop-bop',
-    # 'neuro ver.',
-    # 'evil ver.',
     '2023', '2024', '2025',
-    # 'birthday ver.',
-    # 'bread',
-    # 'karaoke ver.',
-    # 'sad cat ver.',
     'what about us',
-    # 'lets lament',
     'i believe in you',
     '500 miles',
     'o',
-    # 'acoustic',
     'number one victory royale',
     'ive had',
     'dont fear',
     'out your eyes then drown you to death',
-    # 'christmas version',
     'what youve given me',
 ]
 
 def split_title_and_identify(title_and_identify: str):
-    # print("")
-    # print(title_and_identify)
     title_identify_regex = r'^(?P<title>.*) \((?P<identify>.*)\)$'
     matched = re.match(title_identify_regex, title_and_identify)
     if matched is None:
-        # print("matched is None")
         title = title_and_identify
         identify = "None"
     elif replace_non_ascii_chars(remove_accents(matched.group('identify'))).lower() not in title_ascii_special_negative_cases:
-        # print("not a false positive")
         title = matched.group('title')
         identify = matched.group('identify')
     else:
-        # print("false positive")
         title = title_and_identify
         identify = "None"
 
-    # print(f"split_title_and_identify: input: {title_and_identify}")
-    # if matched is not None:
-        # print(f"title: {title}\nidentify: {identify}\n")
-    # else:
-        # print(f"title: {title}\n")
 
     return title, identify
 
@@ -562,8 +359,6 @@ ascii_character_replacement_mapping = {
 non_ascii_char_regex = r'[^a-zA-Z0-9\-\,\. ]'
 
 def replace_non_ascii_chars(s: str) -> str:
-    # TODO why doesn't this work
-    # return s.translate(ascii_character_replacement_mapping)
 
     for key in ascii_character_replacement_mapping.keys():
         s = s.replace(key, ascii_character_replacement_mapping[key])
@@ -602,12 +397,6 @@ def get_artist_ascii(artist: str) -> str:
     return replace_non_ascii_chars(remove_accents(artist))
 
 def do_songs_match(s1: SongEntry, s2: SongEntry, ignore_date: bool = False) -> bool:
-    # print()
-    # print('do_songs_match')
-    # print()
-    # print(s1)
-    # print(s2)
-    # print()
     
     artists_match = get_song_artists_match_count(s1['Artist'], s2['Artist']) > 0 or get_song_artists_match_count(s2['Artist'], s1['Artist']) > 0
     titles_match = do_song_titles_match(s1['Title'], s2['Title']) or do_song_titles_match(s2['Title'], s1['Title'])
@@ -616,11 +405,6 @@ def do_songs_match(s1: SongEntry, s2: SongEntry, ignore_date: bool = False) -> b
     cover_artists_match = s1['Cover Artist'] == s2['Cover Artist']
     final_result = artists_match and titles_match and dates_match and cover_artists_match and identifys_match
 
-    # print(f'artists match: {artists_match}')
-    # print(f'titles match: {titles_match}')
-    # print(f'dates match: {dates_match}')
-    # print(f'cover artists match: {cover_artists_match}')
-    # print(f'final result: {final_result}')
 
     return final_result
 
@@ -631,14 +415,10 @@ def get_matching_songs_from_list(song: SongEntry, lst: list[SongEntry], ignore_d
             matches.append(entry)
     return matches
 
-# TODO improve song match detection to fix Colorful Array duplicate not getting marked as being in the database already
 def does_matching_song_exist_in_list(song: SongEntry, lst: list[SongEntry], ignore_dates: bool = False) -> int:
     """returns count of matching songs in list"""
     match_count = 0
     for entry in lst:
-        # print(song)
-        # print(entry)
-        # print()
         if do_songs_match(song, entry, ignore_dates):
             match_count += 1
     return match_count

@@ -335,7 +335,7 @@ mp3gain = false
 name = "ZVV Unused v3"
 include-flags = ["unused", "v3"]
 include-type = "and"
-exclude-false = []
+exclude-flags = []
 path = "zvv_sort/Unused_v3"
 mp3gain = false
 
@@ -343,7 +343,7 @@ mp3gain = false
 name = "ZVV Unused v2"
 include-flags = ["unused", "v2"]
 include-type = "and"
-exclude-false = []
+exclude-flags = []
 path = "zvv_sort/Unused_v2"
 mp3gain = false
 
@@ -351,6 +351,6 @@ mp3gain = false
 name = "ZVV Unused v1"
 include-flags = ["unused", "v1"]
 include-type = "and"
-exclude-false = []
+exclude-flags = []
 path = "zvv_sort/Unused_v1"
 mp3gain = false

@@ -2,12 +2,42 @@
 
 from functools import reduce
 from pathlib import Path
-from typing import Optional
+from typing import Callable, Optional
 
 import polars as pl
 
 from neuro import DATES_CSV, ROOT_DIR, SONGS_CSV, SONGS_DB
 from neuro.utils import MP3GainMode, MP3ModeTuple
+
+# --- result caching ---
+_cache: dict[str, tuple[float, pl.DataFrame]] = {}
+
+
+def _get_or_load(key: str, filepath: Path, loader: Callable[[], pl.DataFrame]) -> pl.DataFrame:
+    """Return a cached DataFrame if the underlying file is unchanged, otherwise reload it.
+
+    Args:
+        key (str): Unique cache key (e.g. "songs:db" or "dates:csv").
+        filepath (Path): File whose mtime is used for invalidation.
+        loader (Callable[[], pl.DataFrame]): Function to (re)load the DataFrame.
+
+    Returns:
+        pl.DataFrame: Cached or freshly loaded DataFrame.
+    """
+    mtime = filepath.stat().st_mtime
+    if key in _cache:
+        cached_mtime, df = _cache[key]
+        if cached_mtime == mtime:
+            return df
+    df = loader()
+    _cache[key] = (mtime, df)
+    return df
+
+
+def clear_cache() -> None:
+    """Invalidate all cached DataFrames."""
+    _cache.clear()
+# --- end result caching ---
 
 songs_schema = {
     'id': pl.Int64,
@@ -87,27 +117,30 @@ def load_db(as_db: bool = True, root: Path = ROOT_DIR) -> pl.DataFrame:
     Returns:
         pl.DataFrame: A polars DataFrame, regardless of the storage format.
     """
-    if as_db:
-        REQ = "SELECT * FROM Songs"
-        return pl.read_database_uri(REQ, f"sqlite://{root / SONGS_DB}")
-    else:
-        return pl.read_csv(root / SONGS_CSV, schema=songs_schema)
+    filepath = root / (SONGS_DB if as_db else SONGS_CSV)
+    key = f"songs:{'db' if as_db else 'csv'}:{root}"
+    return _get_or_load(key, filepath, lambda: (
+        pl.read_database_uri("SELECT * FROM Songs", f"sqlite://{root / SONGS_DB}") if as_db
+        else pl.read_csv(root / SONGS_CSV, schema=songs_schema)
+    ))
 
 
-def load_dates(as_db: bool = True) -> pl.DataFrame:
+def load_dates(as_db: bool = True, root: Path = ROOT_DIR) -> pl.DataFrame:
     """Same as `load_db`. Loads dates database regardless of format.
 
     Args:
         as_db (bool, optional): Loads from a `.db` file or not. Defaults to True.
+        root (Path, optional): Root dir to search the database from. Defaults to ROOT_DIR.
 
     Returns:
         pl.DataFrame: Polars DataFrame with dates.
     """
-    if as_db:
-        REQ = "SELECT * FROM Dates"
-        return pl.read_database_uri(REQ, f"sqlite://{SONGS_DB}")
-    else:
-        return pl.read_csv(DATES_CSV)
+    filepath = root / (SONGS_DB if as_db else DATES_CSV)
+    key = f"dates:{'db' if as_db else 'csv'}:{root}"
+    return _get_or_load(key, filepath, lambda: (
+        pl.read_database_uri("SELECT * FROM Dates", f"sqlite://{root / SONGS_DB}") if as_db
+        else pl.read_csv(root / DATES_CSV)
+    ))
 
 
 PresetDict = dict[str, bool | str | list[str]]

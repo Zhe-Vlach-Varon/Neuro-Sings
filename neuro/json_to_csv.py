@@ -293,6 +293,11 @@ def get_most_recent_version(song: dict, json_data: neutils.SongJSON, encore: boo
         if fl not in flags:
             flags += f'{fl};'
 
+    if song['Cover Artist'] == 'Neuro & Evil' and 'original' in flags:
+            flags = flags.replace('neuro;', '').replace('evil;', '')
+            if 'duet;' not in flags:
+                flags += 'duet;'
+
     if filtered_songs.height > 0 and latest_version == latest_db_version:
         new_duplicate_song = pl.DataFrame(
         {

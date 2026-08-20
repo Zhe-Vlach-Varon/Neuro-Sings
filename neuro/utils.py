@@ -541,5 +541,10 @@ def get_flags(song: SongEntry) -> str:
         flags += 'duet;'
     elif ('Neuro ' in cover_artist and ' & ' in cover_artist and 'Evil' not in cover_artist) or 'Evil & ' in cover_artist or 'Neuro, Evil, ' in cover_artist:
         flags += 'collab;'
+
+    if song['Cover Artist'] == 'Neuro & Evil' and 'original' in flags:
+        flags = flags.replace('neuro;', '').replace('evil;', '')
+        if 'duet;' not in flags:
+            flags += 'duet;'
     
     return flags

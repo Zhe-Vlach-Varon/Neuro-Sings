@@ -808,16 +808,54 @@ def extract_all() -> neutils.SongJSON:
 
     return out
 
+def _is_twin_duet_stream(album_name: str, songs: list) -> bool:
+    """Mirrors the `twin_duet_stream` detection in json_to_csv.update_db:
+    an album is a twin duet stream when it is a karaoke album (i.e. not one of the
+    non-karaoke setlist stems) and every song in it is covered by 'Neuro & Evil'."""
+    if album_name in neutils.get_non_karaoke_album_names():
+        return False
+    return all(song['Cover Artist'] == 'Neuro & Evil' for song in songs)
+
+
+def _expected_flags(song: dict, is_twin_duet_stream: bool = False) -> str:
+    """Compute the flags a setlist song is expected to carry in the database,
+    replicating the flag logic in json_to_csv.update_db:
+        get_flags + copyright issue + additional flags,
+        then the twin-duet stripping of the neuro/evil flags,
+        then the 'Neuro & Evil' + 'original' duet handling.
+    """
+    flags = neutils.get_flags(song)
+    if neutils.is_copyright_issue(song['Title'], song['Artist']):
+        flags += 'copyright_issues;'
+    flags += song['additional flags']
+
+    if is_twin_duet_stream:
+        flags = flags.replace('evil;', '').replace('neuro;', '')
+
+    if song['Cover Artist'] == 'Neuro & Evil' and 'original' in flags:
+        flags = flags.replace('neuro;', '').replace('evil;', '')
+        if 'duet;' not in flags:
+            flags += 'duet;'
+
+    return flags
+
+
+def _flag_set(flags: str | None) -> set:
+    """Split a semicolon-separated flags string into a set of individual flags."""
+    return {f for f in (flags or '').split(';') if f}
+
+
 def check_missing_setlist_entries() -> list[dict]:
     """Checks the song database for the following cases:
             songs in setlist files not in database
             songs in database not in setlist files
             albums in database not in setlist files
             track number mismatches between album in database and album in setlist
+            flag mismatches between the setlist-derived expectation and the database
         keeping in mind that setlists can contain multiple instances of a song with different track numbers :IMPORTANT: this is intended, as sometimes a song will be repeated as an encore and will thus be in the setlist multiple times with different track numbers
-        
+
         builds a list of found discrepencies containing dicts of with the following fields:
-            'Type': 'Missing'|'Extra'|'Mismatch'|'Album'    where Missing means track missing from DB, 'Extra' means unexpected track in DB, 'Mismatch' means track number mismatch between setlist and DB, and 'Album' means that this album exists in the database but not in any setlists
+            'Type': 'Missing'|'Extra'|'Mismatch'|'Flags'|'Album'    where Missing means track missing from DB, 'Extra' means unexpected track in DB, 'Mismatch' means track number mismatch between setlist and DB, 'Flags' means the DB flags differ from the setlist-derived expectation, and 'Album' means that this album exists in the database but not in any setlists
             'Source_Setlist': str|None                      the filepath of a setlist file, or none if only present in DB
             'Album': str
             'Date': str
@@ -826,10 +864,11 @@ def check_missing_setlist_entries() -> list[dict]:
             'Identify': str
             'Cover Artist': str
             'Track_ID': int
+        when 'Type' is 'Flags' also include 'Missing_Flags' and 'Extra_Flags' (lists)
         when 'Type' is 'Album' only include 'Type' and 'Album'
 
         logs found errors using the following format:
-            if 'Missing', 'Extra', or 'Mismatch':
+            if 'Missing', 'Extra', 'Mismatch', or 'Flags':
                 issue-type: song info, setlist_file if not None
             if 'Album':
                 issue-type: album name
@@ -868,7 +907,8 @@ def check_missing_setlist_entries() -> list[dict]:
                     'Identify': db_song['Identify'],
                     'Cover Artist': db_song['Cover Artist'],
                     'Date': db_song['Date'],
-                    'Album': db_song['Album']
+                    'Album': db_song['Album'],
+                    'Flags': db_song['Flags']
                 } for db_song in db_songs]
             
             setlist_tracks = [
@@ -882,13 +922,13 @@ def check_missing_setlist_entries() -> list[dict]:
                     'Album': album_name
                 } for sl_song in songs]
             
-            matched_pairs = []  # List of (sl_track, db_track)
+            matched_pairs = []  # List of (sl_track, db_track, raw_sl_song)
             unmatched_setlist = []
             unmatched_db = []
 
             # Match setlist tracks to DB tracks
             used_db_indices = set()
-            for sl_track in setlist_tracks:
+            for sl_idx, sl_track in enumerate(setlist_tracks):
                 matched_idx = None
                 for j, db_track in enumerate(db_tracks):
                     if j in used_db_indices:
@@ -896,9 +936,9 @@ def check_missing_setlist_entries() -> list[dict]:
                     if neutils.do_songs_match(sl_track, db_track, ignore_date=True):
                         matched_idx = j
                         break
-                
+
                 if matched_idx is not None:
-                    matched_pairs.append((sl_track, db_tracks[matched_idx]))
+                    matched_pairs.append((sl_track, db_tracks[matched_idx], songs[sl_idx]))
                     used_db_indices.add(matched_idx)
                 else:
                     unmatched_setlist.append(sl_track)
@@ -908,8 +948,13 @@ def check_missing_setlist_entries() -> list[dict]:
                 if j not in used_db_indices:
                     unmatched_db.append(db_track)
 
-            # Check for mismatches among matched tracks
-            for sl_track, db_track in matched_pairs:
+            # Check for track number mismatches and flag discrepancies among matched tracks
+            is_twin_duet = _is_twin_duet_stream(album_name, songs)
+            # 'duplicate'/'encore' are structural markers added to encore entries in
+            # update_db; they are not part of the musical content flags, so ignore them
+            structural = {'duplicate', 'encore'}
+
+            for sl_track, db_track, raw_sl_song in matched_pairs:
                 if sl_track['Track_No'] != db_track['Track_No']:
                     discrepencies.append({
                         'Type': 'Mismatch',
@@ -922,6 +967,26 @@ def check_missing_setlist_entries() -> list[dict]:
                         'Cover Artist': sl_track['Cover Artist'],
                         'Setlist_ID': sl_track['Track_No'],
                         'DB_ID': db_track['Track_No'],
+                    })
+
+                # Verify the song's flags against the setlist-derived expectation
+                expected_flags = _flag_set(_expected_flags(raw_sl_song, is_twin_duet)) - structural
+                actual_flags = _flag_set(db_track['Flags']) - structural
+                missing_flags = expected_flags - actual_flags
+                extra_flags = actual_flags - expected_flags
+                if missing_flags or extra_flags:
+                    discrepencies.append({
+                        'Type': 'Flags',
+                        'Source_Setlist': str(file),
+                        'Album': album_name,
+                        'Date': sl_track['Date'],
+                        'Artist': sl_track['Artist'],
+                        'Title': sl_track['Title'],
+                        'Identify': sl_track['Identify'],
+                        'Cover Artist': sl_track['Cover Artist'],
+                        'Track_ID': sl_track['Track_No'],
+                        'Missing_Flags': sorted(missing_flags),
+                        'Extra_Flags': sorted(extra_flags),
                     })
 
             # Add missing tracks (in setlist but not DB)
@@ -971,6 +1036,8 @@ def check_missing_setlist_entries() -> list[dict]:
                 logger.warning(f"  Track Mismatch: {entry['Album']} ({entry['Date']}) - Setlist: {entry['Setlist_ID']}, DB: {entry['DB_ID']}. {entry['Artist']} - {entry['Title']}")
             elif entry['Type'] == 'Extra':
                 logger.warning(f"  Extra in DB: {entry['Album']} ({entry['Date']}) - {entry['Track_ID']}. {entry['Artist']} - {entry['Title']}")
+            elif entry['Type'] == 'Flags':
+                logger.warning(f"  Flag Mismatch: {entry['Album']} ({entry['Date']}) - {entry['Track_ID']}. {entry['Artist']} - {entry['Title']}. Missing: {entry['Missing_Flags']}, Extra: {entry['Extra_Flags']}")
             elif entry['Type'] == 'Album':
                 logger.warning(f"  Unexpected Album: {entry['Album']}")
     else:

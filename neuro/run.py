@@ -2,7 +2,9 @@ import os
 import tomllib as toml
 from pathlib import Path
 from time import time
+from typing import Optional
 
+import polars as pl
 from loguru import logger
 
 from neuro import DRIVE_DIR, CUSTOM_DIR, UNOFFICIALV3_DIR, LOG_DIR, SONG_ROOT_DIR, UNOFFV3_EXTRA, UNOFFV3_DISC66, COPYRIGHT_ISSUES_DIR
@@ -26,13 +28,15 @@ def new_batch_detection() -> None:
     export_json(out)  # Writing into JSON
 
 
-def generate_from_preset(preset: Preset, dates_dict: DateDict, create_placeholders: bool = False, make_links: bool = False) -> None:
+def generate_from_preset(preset: Preset, dates_dict: DateDict, create_placeholders: bool = False, make_links: bool = False, songs_df: Optional[pl.DataFrame] = None) -> None:
     """Generates all songs from a preset, filters songs that respect filters.
 
     Args:
         preset (Preset): Preset configuration.
         dates_dict (DateDict): Date dict to pass to drive song constructor.
+        create_placeholders (bool): If True, create placeholder files for official songs.
         make_links (bool): If True, create symlinks to album files instead of copying.
+        songs_df (Optional[pl.DataFrame]): Pre-loaded songs DataFrame to avoid repeated DB reads.
     """
 
     global g_hash_to_file_dict
@@ -41,7 +45,7 @@ def generate_from_preset(preset: Preset, dates_dict: DateDict, create_placeholde
         g_hash_to_file_dict = get_audio_hash_to_file_mapping(SONG_ROOT_DIR)
 
     t = time()
-    songs_filtered = preset.get_filtered_df()
+    songs_filtered = preset.get_filtered_df(songs_df)
     N_SONGS = 0  # Avoids error if no songs are found
     for i, song_dict in enumerate(songs_filtered.iter_rows(named=True)):
         N_SONGS = len(songs_filtered)
@@ -132,10 +136,13 @@ def generate_songs(create_placeholders: bool = False) -> None:
     # Easier data format to deal with
     dates_dict: DateDict = {k["Date"]: k for k in load_dates().iter_rows(named=True)}
 
+    # Load the songs DB once and share it across all presets
+    songs_df = load_db()
+
     for preset in config["Presets"]:
         logger.info(f"[GEN] Generating preset '{preset['name']}'")
         preset_obj = Preset(preset, mp3gain, OUT_ROOT)
-        generate_from_preset(preset_obj, dates_dict, create_placeholders, make_links)
+        generate_from_preset(preset_obj, dates_dict, create_placeholders, make_links, songs_df)
 
     logger.success(f"[GEN] Generated all presets in {time_format(time() - t)} !")
 

@@ -204,13 +204,18 @@ class Preset:
             self.path = root / path
 
 
-    def get_filtered_df(self) -> pl.DataFrame:
+    def get_filtered_df(self, songs_df: Optional[pl.DataFrame] = None) -> pl.DataFrame:
         """Applies filters defined in a preset to get a filtered version of the database.
+
+        Args:
+            songs_df (Optional[pl.DataFrame]): Pre-loaded songs DataFrame to filter.
+                If None, loads from disk via `load_db()`.
 
         Returns:
             pl.DataFrame: Filtered DB that only has rows that check the conditions.
         """
-        songs_df = load_db()
+        if songs_df is None:
+            songs_df = load_db()
 
         assert (self.include_type == "and") | (self.include_type == "or")
 

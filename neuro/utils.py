@@ -460,40 +460,45 @@ def sanitize_filename(filename: str) -> str:
 
     return filename
 
+_copyright_entries = []
+
+def _load_copyright_entries() -> list:
+    """Load and cache copyright_issues.csv entries (loaded once per process)."""
+    if not _copyright_entries:
+        copyright_file = DATA_DIR / "copyright_issues.csv"
+        if copyright_file.exists():
+            with open(copyright_file, 'r', encoding='utf-8') as f:
+                reader = csv.DictReader(f, delimiter='|')
+                for row in reader:
+                    _copyright_entries.append({
+                        'title': row.get('title', '').strip(),
+                        'artist': row.get('artist', '').strip(),
+                    })
+    return _copyright_entries
+
 def is_copyright_issue(title: Optional[str], artist: Optional[str]) -> bool:
     """Checks if a song matches any entry in copyright_issues.csv.
-    
+
     Uses do_song_titles_match and get_song_artists_match_count for matching.
-    
+
     Args:
         title: Song title to check.
         artist: Song artist to check.
-    
+
     Returns:
         bool: True if the song matches any copyright issue entry.
     """
     if title is None or artist is None:
         return False
-    
-    copyright_file = DATA_DIR / "copyright_issues.csv"
-    
-    # Load copyright issues once (could be cached if called many times)
-    copyright_entries = []
-    if copyright_file.exists():
-        with open(copyright_file, 'r', encoding='utf-8') as f:
-            reader = csv.DictReader(f, delimiter='|')
-            for row in reader:
-                copyright_entries.append({
-                    'title': row.get('title', '').strip(),
-                    'artist': row.get('artist', '').strip(),
-                })
-    
+
+    copyright_entries = _load_copyright_entries()
+
     for entry in copyright_entries:
         title_match = do_song_titles_match(title, entry['title'])
         artist_match = get_song_artists_match_count(artist, entry['artist']) > 0
         if title_match and artist_match:
             return True
-    
+
     return False
 
 def get_flags(song: SongEntry) -> str:

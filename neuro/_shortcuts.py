@@ -73,28 +73,39 @@ PRIVATE_DEST = f"{PRIVATE_DRIVE_NAME}:" if not TR else f"{LOCAL_TEST_DIR}/"
 PUBLIC_DIR = f"{LOCAL_PUBLIC_DIR}/" if TR else ""
 PRIVATE_DIR = f"{LOCAL_PRIVATE_DIR}/" if TR else ""
 
+RCLONE_BACKEND_COMMAND = f"rclone backend shortcut{V}{DR}"
+
+
+def _rclone(command: str, error_label: str) -> None:
+    """Run an rclone command, logging it and exiting on failure."""
+    logger.info(command)
+    if os.system(command):
+        logger.error(error_label)
+        exit(1)
+
+
+def _create_drive_shortcuts(out_dir: Path, dest: str, dir_prefix: str, error_label: str) -> None:
+    """Create GDrive shortcuts for all symlinked .mp3 files under out_dir."""
+    for file in [f for f in out_dir.resolve().rglob("*.mp3") if f.is_symlink()]:
+        source_drive_path = file.resolve().relative_to(out_dir.resolve())
+        shortcut_drive_path = file.relative_to(out_dir.resolve())
+        cmd = f"{RCLONE_BACKEND_COMMAND} {dest}{dir_prefix} \"{REMOTE_OUT_PREFIX / source_drive_path}\" \"{REMOTE_OUT_PREFIX / shortcut_drive_path}\""
+        _rclone(cmd, error_label)
+
+
 def setlists_pull() -> None:
     setlist_pull_command = f"{DRIVE_RCLONE_COMMAND} {PUBLIC_DRIVE_NAME}:{REMOTE_INPUT_PREFIX}/{SETLISTS_DIR} {SETLISTS_DIR}"
-    logger.info(setlist_pull_command)
-    if os.system(setlist_pull_command):
-        logger.error("setlists pull failed")
-        exit(1)
+    _rclone(setlist_pull_command, "setlists pull failed")
 
 
 def setlists_push() -> None:
     setlist_push_command = f"{DRIVE_RCLONE_COMMAND} {SETLISTS_DIR} {PUBLIC_DEST}{PUBLIC_DIR}{REMOTE_INPUT_PREFIX}/{SETLISTS_DIR}"
-    logger.info(setlist_push_command)
-    if os.system(setlist_push_command):
-        logger.error("setlists push failed")
-        exit(1)
+    _rclone(setlist_push_command, "setlists push failed")
 
 
 def drive_pull() -> None:
     drive_pull_command = f"{DRIVE_RCLONE_COMMAND} {UNOFFICIAL_V3_DRIVE_NAME}: temp/{UNOFFICIALV3_DIR.name}"
-    logger.info(drive_pull_command)
-    if os.system(drive_pull_command):
-        logger.error("drive pull failed")
-        exit(1)
+    _rclone(drive_pull_command, "drive pull failed")
 
 # TODO command to apply my changes to unofficial archive metadata
 
@@ -102,54 +113,16 @@ def inputs_pull() -> None:
     # public input files
     setlists_pull()
 
-    drive_pull_data_command = f"{DRIVE_RCLONE_COMMAND} {PUBLIC_DRIVE_NAME}:{REMOTE_INPUT_PREFIX}/{DATA_DIR} {DATA_DIR}"
-    logger.info(drive_pull_data_command)
-    if os.system(drive_pull_data_command):
-        logger.error("drive pull failed: data")
-        exit(1)
-
-    drive_pull_images_command = f"{DRIVE_RCLONE_COMMAND} {PUBLIC_DRIVE_NAME}:{REMOTE_INPUT_PREFIX}/{IMAGES_ROOT_DIR} {IMAGES_ROOT_DIR}"
-    logger.info(drive_pull_images_command)
-    if os.system(drive_pull_images_command):
-        logger.error("drive pull failed: images")
-        exit(1)
-
-    drive_pull_custom_command = f"{DRIVE_RCLONE_COMMAND} {PUBLIC_DRIVE_NAME}:{REMOTE_INPUT_PREFIX}/{CUSTOM_DIR} {CUSTOM_DIR}"
-    logger.info(drive_pull_custom_command)
-    if os.system(drive_pull_custom_command):
-        logger.error("drive pull failed: custom")
-        exit(1)
-
-    drive_pull_unoffv3_in_command = f"{DRIVE_RCLONE_COMMAND} {PUBLIC_DRIVE_NAME}:{REMOTE_INPUT_PREFIX}/{UNOFFICIALV3_DIR} {UNOFFICIALV3_DIR}"
-    logger.info(drive_pull_unoffv3_in_command)
-    if os.system(drive_pull_unoffv3_in_command):
-        logger.error("drive pull failed: unofficialV3")
-        exit(1)
+    _rclone(f"{DRIVE_RCLONE_COMMAND} {PUBLIC_DRIVE_NAME}:{REMOTE_INPUT_PREFIX}/{DATA_DIR} {DATA_DIR}", "drive pull failed: data")
+    _rclone(f"{DRIVE_RCLONE_COMMAND} {PUBLIC_DRIVE_NAME}:{REMOTE_INPUT_PREFIX}/{IMAGES_ROOT_DIR} {IMAGES_ROOT_DIR}", "drive pull failed: images")
+    _rclone(f"{DRIVE_RCLONE_COMMAND} {PUBLIC_DRIVE_NAME}:{REMOTE_INPUT_PREFIX}/{CUSTOM_DIR} {CUSTOM_DIR}", "drive pull failed: custom")
+    _rclone(f"{DRIVE_RCLONE_COMMAND} {PUBLIC_DRIVE_NAME}:{REMOTE_INPUT_PREFIX}/{UNOFFICIALV3_DIR} {UNOFFICIALV3_DIR}", "drive pull failed: unofficialV3")
 
     # private input files
-    drive_pull_official_in_command = f"{DRIVE_RCLONE_COMMAND} {PRIVATE_DRIVE_NAME}:{REMOTE_INPUT_PREFIX}/{OFFICIAL_RELEASE_DIR} {OFFICIAL_RELEASE_DIR}"
-    logger.info(drive_pull_official_in_command)
-    if os.system(drive_pull_official_in_command):
-        logger.error("drive pull failed: official releases")
-        exit(1)
-
-    drive_pull_copyright_issue_command = f"{DRIVE_RCLONE_COMMAND} {PRIVATE_DRIVE_NAME}:{REMOTE_INPUT_PREFIX}/{COPYRIGHT_ISSUES_DIR} {COPYRIGHT_ISSUES_DIR}"
-    logger.info(drive_pull_copyright_issue_command)
-    if os.system(drive_pull_copyright_issue_command):
-        logger.error("drive pull failed: copyright issues")
-        exit(1)
-
-    drive_pull_fonts_command = f"{DRIVE_RCLONE_COMMAND} {PRIVATE_DRIVE_NAME}:{REMOTE_INPUT_PREFIX}/{FONTS_DIR} {FONTS_DIR}"
-    logger.info(drive_pull_fonts_command)
-    if os.system(drive_pull_fonts_command):
-        logger.error("drive pull failed: fonts")
-        exit(1)
-
-    drive_pull_dot_vscode_command = f"{DRIVE_RCLONE_COMMAND} {PRIVATE_DRIVE_NAME}:{REMOTE_INPUT_PREFIX}/{DOT_VSCODE_DIR} {DOT_VSCODE_DIR}"
-    logger.info(drive_pull_dot_vscode_command)
-    if os.system(drive_pull_dot_vscode_command):
-        logger.error("drive pull failed: .vscode")
-        exit(1)
+    _rclone(f"{DRIVE_RCLONE_COMMAND} {PRIVATE_DRIVE_NAME}:{REMOTE_INPUT_PREFIX}/{OFFICIAL_RELEASE_DIR} {OFFICIAL_RELEASE_DIR}", "drive pull failed: official releases")
+    _rclone(f"{DRIVE_RCLONE_COMMAND} {PRIVATE_DRIVE_NAME}:{REMOTE_INPUT_PREFIX}/{COPYRIGHT_ISSUES_DIR} {COPYRIGHT_ISSUES_DIR}", "drive pull failed: copyright issues")
+    _rclone(f"{DRIVE_RCLONE_COMMAND} {PRIVATE_DRIVE_NAME}:{REMOTE_INPUT_PREFIX}/{FONTS_DIR} {FONTS_DIR}", "drive pull failed: fonts")
+    _rclone(f"{DRIVE_RCLONE_COMMAND} {PRIVATE_DRIVE_NAME}:{REMOTE_INPUT_PREFIX}/{DOT_VSCODE_DIR} {DOT_VSCODE_DIR}", "drive pull failed: .vscode")
 
     logger.success("finished downloading input files from gdrive")
 
@@ -159,88 +132,26 @@ def drive_push() -> None:
     # public input files
     setlists_push()
 
-    drive_push_data_command = f"{DRIVE_RCLONE_COMMAND} {DATA_DIR} {PUBLIC_DEST}{PUBLIC_DIR}{REMOTE_INPUT_PREFIX}/{DATA_DIR}"
-    logger.info(drive_push_data_command)
-    if os.system(drive_push_data_command):
-        logger.error("drive push failed: data")
-        exit(1)
-
-    drive_push_images_command = f"{DRIVE_RCLONE_COMMAND} {IMAGES_ROOT_DIR} {PUBLIC_DEST}{PUBLIC_DIR}{REMOTE_INPUT_PREFIX}/{IMAGES_ROOT_DIR}"
-    logger.info(drive_push_images_command)
-    if os.system(drive_push_images_command):
-        logger.error("drive push failed: images")
-        exit(1)
-
-    drive_push_custom_command = f"{DRIVE_RCLONE_COMMAND} {CUSTOM_DIR} {PUBLIC_DEST}{PUBLIC_DIR}{REMOTE_INPUT_PREFIX}/{CUSTOM_DIR}"
-    logger.info(drive_push_custom_command)
-    if os.system(drive_push_custom_command):
-        logger.error("drive push failed: custom")
-        exit(1)
-
-    drive_push_unoffv3_in_command = f"{DRIVE_RCLONE_COMMAND} {UNOFFICIALV3_DIR} {PUBLIC_DEST}{PUBLIC_DIR}{REMOTE_INPUT_PREFIX}/{UNOFFICIALV3_DIR}"
-    logger.info(drive_push_unoffv3_in_command)
-    if os.system(drive_push_unoffv3_in_command):
-        logger.error("drive push failed: unofficialV3")
-        exit(1)
+    _rclone(f"{DRIVE_RCLONE_COMMAND} {DATA_DIR} {PUBLIC_DEST}{PUBLIC_DIR}{REMOTE_INPUT_PREFIX}/{DATA_DIR}", "drive push failed: data")
+    _rclone(f"{DRIVE_RCLONE_COMMAND} {IMAGES_ROOT_DIR} {PUBLIC_DEST}{PUBLIC_DIR}{REMOTE_INPUT_PREFIX}/{IMAGES_ROOT_DIR}", "drive push failed: images")
+    _rclone(f"{DRIVE_RCLONE_COMMAND} {CUSTOM_DIR} {PUBLIC_DEST}{PUBLIC_DIR}{REMOTE_INPUT_PREFIX}/{CUSTOM_DIR}", "drive push failed: custom")
+    _rclone(f"{DRIVE_RCLONE_COMMAND} {UNOFFICIALV3_DIR} {PUBLIC_DEST}{PUBLIC_DIR}{REMOTE_INPUT_PREFIX}/{UNOFFICIALV3_DIR}", "drive push failed: unofficialV3")
 
     # private input files
-    drive_push_official_in_command = f"{DRIVE_RCLONE_COMMAND} {OFFICIAL_RELEASE_DIR} {PRIVATE_DEST}{PRIVATE_DIR}{REMOTE_INPUT_PREFIX}/{OFFICIAL_RELEASE_DIR}"
-    logger.info(drive_push_official_in_command)
-    if os.system(drive_push_official_in_command):
-        logger.error("drive push failed: official releases")
-        exit(1)
-
-    drive_push_copyright_issue_command = f"{DRIVE_RCLONE_COMMAND} {COPYRIGHT_ISSUES_DIR} {PRIVATE_DEST}{PRIVATE_DIR}{REMOTE_INPUT_PREFIX}/{COPYRIGHT_ISSUES_DIR}"
-    logger.info(drive_push_copyright_issue_command)
-    if os.system(drive_push_copyright_issue_command):
-        logger.error("drive push failed: copyright issues")
-        exit(1)
-
-    drive_push_fonts_command = f"{DRIVE_RCLONE_COMMAND} {FONTS_DIR} {PRIVATE_DEST}{PRIVATE_DIR}{REMOTE_INPUT_PREFIX}/{FONTS_DIR}"
-    logger.info(drive_push_fonts_command)
-    if os.system(drive_push_fonts_command):
-        logger.error("drive push failed: fonts")
-        exit(1)
-
-    drive_push_dot_vscode_command = f"{DRIVE_RCLONE_COMMAND} {DOT_VSCODE_DIR} {PRIVATE_DEST}{PRIVATE_DIR}{REMOTE_INPUT_PREFIX}/{DOT_VSCODE_DIR}"
-    logger.info(drive_push_dot_vscode_command)
-    if os.system(drive_push_dot_vscode_command):
-        logger.error("drive push failed: .vscode")
-        exit(1)
-
-    RCLONE_BACKEND_COMMAND = f"rclone backend shortcut{V}{DR}"
+    _rclone(f"{DRIVE_RCLONE_COMMAND} {OFFICIAL_RELEASE_DIR} {PRIVATE_DEST}{PRIVATE_DIR}{REMOTE_INPUT_PREFIX}/{OFFICIAL_RELEASE_DIR}", "drive push failed: official releases")
+    _rclone(f"{DRIVE_RCLONE_COMMAND} {COPYRIGHT_ISSUES_DIR} {PRIVATE_DEST}{PRIVATE_DIR}{REMOTE_INPUT_PREFIX}/{COPYRIGHT_ISSUES_DIR}", "drive push failed: copyright issues")
+    _rclone(f"{DRIVE_RCLONE_COMMAND} {FONTS_DIR} {PRIVATE_DEST}{PRIVATE_DIR}{REMOTE_INPUT_PREFIX}/{FONTS_DIR}", "drive push failed: fonts")
+    _rclone(f"{DRIVE_RCLONE_COMMAND} {DOT_VSCODE_DIR} {PRIVATE_DEST}{PRIVATE_DIR}{REMOTE_INPUT_PREFIX}/{DOT_VSCODE_DIR}", "drive push failed: .vscode")
 
     # public out files
-    drive_push_public_out_command = f"{DRIVE_RCLONE_COMMAND} {OUT_UNOFFICIAL_DIR} {PUBLIC_DEST}{PUBLIC_DIR}{REMOTE_OUT_PREFIX}{LINK_OPTIONS}"
-    logger.info(drive_push_public_out_command)
-    if os.system(drive_push_public_out_command):
-        logger.error("drive push failed: public out files")
-        exit(1)
+    _rclone(f"{DRIVE_RCLONE_COMMAND} {OUT_UNOFFICIAL_DIR} {PUBLIC_DEST}{PUBLIC_DIR}{REMOTE_OUT_PREFIX}{LINK_OPTIONS}", "drive push failed: public out files")
     if remote_links:
-        for file in [f for f in OUT_UNOFFICIAL_DIR.resolve().rglob("*.mp3") if f.is_symlink()]:
-            source_drive_path = file.resolve().relative_to(OUT_UNOFFICIAL_DIR.resolve())
-            shortcut_drive_path = file.relative_to(OUT_UNOFFICIAL_DIR.resolve())
-            public_gdrive_link_command = f"{RCLONE_BACKEND_COMMAND} {PUBLIC_DEST}{PUBLIC_DIR} \"{REMOTE_OUT_PREFIX / source_drive_path}\" \"{REMOTE_OUT_PREFIX / shortcut_drive_path}\""
-            logger.info(public_gdrive_link_command)
-            if os.system(public_gdrive_link_command):
-                logger.error("drive push failed: public out make GDrive shortcuts")
-                exit(1)
+        _create_drive_shortcuts(OUT_UNOFFICIAL_DIR, PUBLIC_DEST, PUBLIC_DIR, "drive push failed: public out make GDrive shortcuts")
 
     # private out files
-    drive_push_private_out_command = f"{DRIVE_RCLONE_COMMAND} {OUT_OFFICIAL_DIR} {PRIVATE_DEST}{PRIVATE_DIR}{REMOTE_OUT_PREFIX}{LINK_OPTIONS}"
-    logger.info(drive_push_private_out_command)
-    if os.system(drive_push_private_out_command):
-        logger.error("drive push failed: private out files")
-        exit(1)
+    _rclone(f"{DRIVE_RCLONE_COMMAND} {OUT_OFFICIAL_DIR} {PRIVATE_DEST}{PRIVATE_DIR}{REMOTE_OUT_PREFIX}{LINK_OPTIONS}", "drive push failed: private out files")
     if remote_links:
-        for file in [f for f in OUT_OFFICIAL_DIR.resolve().rglob("*.mp3") if f.is_symlink()]:
-            source_drive_path = file.resolve().relative_to(OUT_OFFICIAL_DIR.resolve())
-            shortcut_drive_path = file.relative_to(OUT_OFFICIAL_DIR.resolve())
-            private_gdrive_link_command = f"{RCLONE_BACKEND_COMMAND} {PRIVATE_DEST}{PRIVATE_DIR} \"{REMOTE_OUT_PREFIX / source_drive_path}\" \"{REMOTE_OUT_PREFIX / shortcut_drive_path}\""
-            logger.info(private_gdrive_link_command)
-            if os.system(private_gdrive_link_command):
-                logger.error("drive push failed: private out make GDrive shortcuts")
-                exit(1)
+        _create_drive_shortcuts(OUT_OFFICIAL_DIR, PRIVATE_DEST, PRIVATE_DIR, "drive push failed: private out make GDrive shortcuts")
 
     logger.success("finished uploading to gdrive")
 

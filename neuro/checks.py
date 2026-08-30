@@ -2,9 +2,7 @@
 
 import os
 import tomllib as toml
-from itertools import chain
 from pathlib import Path
-from string import ascii_letters, digits
 
 from loguru import logger
 from tqdm import tqdm
@@ -13,25 +11,6 @@ from neuro import LOG_DIR, ROOT_DIR
 from neuro.polars_utils import load_db
 from neuro.utils import format_logger, get_audio_hash
 from neuro.detection import check_missing_setlist_entries
-
-
-def check_ascii() -> None:
-    """Checks if the artists and titles are properly sanitized regarding
-    characters by displaying them in the console."""
-    ALPHANUM = set(ascii_letters + digits)
-
-    songs = load_db()
-    no_ascii = songs.get_column("Title").to_list() + songs.get_column("Artist").to_list()
-    ascii = songs.get_column("Title_ASCII").to_list() + songs.get_column("Artist_ASCII").to_list()
-
-    no_ascii_ok = set(chain.from_iterable(no_ascii)) - ALPHANUM
-    ascii_ok = set(chain.from_iterable(ascii)) - ALPHANUM
-
-    def pp(s: set) -> str:
-        return ", ".join(map(repr, sorted(s, key=ord)))
-
-    logger.info(f"No ASCII only: {pp(no_ascii_ok - ascii_ok)}")
-    logger.info(f"   ASCII only: {pp(ascii_ok)}")
 
 
 def check_hash() -> None:

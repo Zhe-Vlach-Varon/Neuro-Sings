@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import os
 import sys
 import re
 from datetime import datetime
@@ -14,17 +13,15 @@ from typing import Optional
 
 import xxhash
 
-import hashlib
 from mutagen.id3 import ID3, ID3NoHeaderError
 
 import tinytag
-import json
 import csv
 
 import loguru
 from loguru import logger
 
-from neuro import DATA_DIR, LOG_DIR, OFFICIAL_RELEASE_DIR, UNOFFICIALV3_DIR, CUSTOM_DIR, DRIVE_DIR, SETLISTS_DIR, UNOFFV3_EXTRA, UNOFFV3_DISC66
+from neuro import LOG_DIR, SETLISTS_DIR, COPYRIGHT_ISSUES_CSV
 
 SongEntry = dict[str, Optional[str]]
 """Dictionary representing a song in the JSON, containing fields like "Title", "Artist", etc..."""
@@ -299,8 +296,6 @@ def get_song_artists_match_count(existing_song_artists: str, new_song_artists: s
 def remove_accents(s):
    return ''.join(c for c in unicodedata.normalize('NFD', s) if unicodedata.category(c) != 'Mn')
 
-english_title_translation_regex = r'\(.*?\)'
-# TODO load from file
 title_ascii_special_negative_cases = [
     'da ba dee',
     'gotta catch em all',
@@ -335,19 +330,6 @@ def split_title_and_identify(title_and_identify: str):
 
     return title, identify
 
-# TODO move special cases into separate files
-
-title_ascii_special_replace_cases = {
-    '/ / // / /': 'Slash Slash Slash',
-    'S!CK': 'SICK',
-    'デビルじゃないもん ((Not) A Devil)': '(Not) A Devil',
-    '真夜中のドア〜Stay With Me': 'Stay With Me',
-    '学猫叫 (Xue Miao Jiao)': 'Xue Miao Jiao (Learn To Meow)',
-    '炜WARD ROMANCE': 'WEIWARD ROMANCE',
-    '4nim0sity(99.999999999%)': '4nim0sity',
-    'ニア (Near) (Birthday ver.)': 'Near (Birthday ver.)'
-}
-
 ascii_character_replacement_mapping = {
     '’': '\'',
     '＊': '*',
@@ -365,37 +347,6 @@ def replace_non_ascii_chars(s: str) -> str:
     s = re.sub(non_ascii_char_regex, '', s)
     return s
 
-def extract_english_title_translation(title: str) -> (str | None):
-    if title in title_ascii_special_replace_cases.keys():
-        return title_ascii_special_replace_cases[title]
-
-    title_ascii_search_result = re.search(english_title_translation_regex, title)
-    if title_ascii_search_result is not None:
-        title_ascii = str(title_ascii_search_result.group())[1:-1]
-        title_ascii = replace_non_ascii_chars(remove_accents(title_ascii))
-        if title_ascii.lower() in title_ascii_special_negative_cases:
-            title_ascii = None
-    else:
-        title_ascii = None
-
-    if title == 'Secret Base 君がくれたもの (Kimi ga Kureta Mono)':
-        title_ascii = 'Secret Base Kimi ga Kureta Mono'
-
-    return title_ascii
-
-# TODO load from file
-artist_ascii_special_cases_mapping = {
-    "μ's": "muse",
-    "DECO*27": "DECO 27",
-    "K/DA": "KDA",
-}
-
-def get_artist_ascii(artist: str) -> str:
-    for key in artist_ascii_special_cases_mapping:
-        artist = artist.replace(key, artist_ascii_special_cases_mapping[key])
-
-    return replace_non_ascii_chars(remove_accents(artist))
-
 def do_songs_match(s1: SongEntry, s2: SongEntry, ignore_date: bool = False) -> bool:
     
     artists_match = get_song_artists_match_count(s1['Artist'], s2['Artist']) > 0 or get_song_artists_match_count(s2['Artist'], s1['Artist']) > 0
@@ -407,13 +358,6 @@ def do_songs_match(s1: SongEntry, s2: SongEntry, ignore_date: bool = False) -> b
 
 
     return final_result
-
-def get_matching_songs_from_list(song: SongEntry, lst: list[SongEntry], ignore_dates: bool = False):
-    matches = []
-    for entry in lst:
-        if do_songs_match(song, entry, ignore_dates):
-            matches.append(entry)
-    return matches
 
 def does_matching_song_exist_in_list(song: SongEntry, lst: list[SongEntry], ignore_dates: bool = False) -> int:
     """returns count of matching songs in list"""
@@ -465,7 +409,7 @@ _copyright_entries = []
 def _load_copyright_entries() -> list:
     """Load and cache copyright_issues.csv entries (loaded once per process)."""
     if not _copyright_entries:
-        copyright_file = DATA_DIR / "copyright_issues.csv"
+        copyright_file = COPYRIGHT_ISSUES_CSV
         if copyright_file.exists():
             with open(copyright_file, 'r', encoding='utf-8') as f:
                 reader = csv.DictReader(f, delimiter='|')

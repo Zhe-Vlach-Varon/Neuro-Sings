@@ -6,7 +6,7 @@ from typing import Literal, Optional
 import polars as pl
 from loguru import logger
 
-from neuro import SONG_ROOT_DIR, ROOT_DIR, DATES_CSV, LOG_DIR, SETLISTS_DIR, SONGS_CSV, SONGS_DB, SONGS_JSON, OFFICIAL_RELEASE_DIR
+from neuro import DATES_CSV, LOG_DIR, SONGS_CSV, SONGS_DB, SONGS_JSON
 from neuro.polars_utils import load_dates, load_db, songs_schema, dates_schema
 import neuro.utils as neutils
 
@@ -177,7 +177,7 @@ def update_db() -> None:
                     "Tempo (1/4 beat)": None,
                     "Version": song["Version"],
                     "Special": song["Special"],
-                    "Comment": song["Comment"]
+                    "Comment": song["Comment"] if not song["Comment"] == "" else None 
                 }
             )
             if song["duplicate"]:
@@ -320,7 +320,7 @@ def get_most_recent_version(song: dict, json_data: neutils.SongJSON, encore: boo
                "Tempo (1/4 beat)": latest_version["Tempo (1/4 beat)"],
                "Version": latest_version["Version"],
                "Special": latest_version["Special"],
-               "Comment": latest_version["Comment"],
+               "Comment": latest_version["Comment"] if not latest_version["Comment"] == "" else None,
             }
         )
     elif len(filtered_json_songs) > 0 and latest_version == latest_json_version:
@@ -345,7 +345,7 @@ def get_most_recent_version(song: dict, json_data: neutils.SongJSON, encore: boo
                "Tempo (1/4 beat)": song["Tempo (1/4 beat)"],
                "Version": latest_version["Version"],
                "Special": latest_version["Special"],
-               "Comment": latest_version["Comment"],
+               "Comment": latest_version["Comment"] if not latest_version["Comment"] == "" else None,
             }
         )
     else:

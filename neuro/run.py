@@ -7,7 +7,7 @@ from typing import Optional
 import polars as pl
 from loguru import logger
 
-from neuro import DRIVE_DIR, CUSTOM_DIR, UNOFFICIALV3_DIR, LOG_DIR, SONG_ROOT_DIR, UNOFFV3_EXTRA, UNOFFV3_DISC66, COPYRIGHT_ISSUES_DIR
+from neuro import DRIVE_DIR, UNOFFICIALV3_DIR, LOG_DIR, SONG_ROOT_DIR, UNOFFV3_EXTRA, UNOFFV3_DISC66, COPYRIGHT_ISSUES_DIR
 from neuro.checks import check_are_dbs_identical
 from neuro.detection import export_json, extract_all
 from neuro.file_tags import CustomSong, DriveSong

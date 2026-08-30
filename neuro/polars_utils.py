@@ -75,9 +75,10 @@ def flag_expr(flag: str) -> pl.Expr:
         flag (str): Which flag to consider.
 
     Returns:
-        pl.Expr: An expression representing the rows that contain the given flag in the "Flags" column.
+        pl.Expr: An expression representing the rows that have the given flag in the "Flags" column.
+            Uses exact match: the Flags string is split on ";" and the flag must equal one element.
     """
-    return pl.col("Flags").str.contains(flag)
+    return pl.col("Flags").str.split(";").list.contains(flag)
 
 
 def stack_or(flag_list: list[str]) -> pl.Expr:

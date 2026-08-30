@@ -234,7 +234,7 @@ def get_most_recent_version(song: dict, json_data: neutils.SongJSON, encore: boo
         (pl.col("Title").map_elements(lambda x: neutils.do_song_titles_match(x, song['Title']), return_dtype=pl.Boolean)) &
         (pl.col("Cover Artist") == song["Cover Artist"]) &
         (pl.col("Date") <= song["Date"]) &
-        (~pl.col("Flags").str.contains("duplicate"))
+        (~pl.col("Flags").str.split(";").list.contains("duplicate"))
     ).sort(pl.col("Date"), descending=True)
 
     filtered_json_songs = []

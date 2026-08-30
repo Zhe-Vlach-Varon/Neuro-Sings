@@ -12,6 +12,7 @@ dependencies = [
     "pillow>=11.2.1",
     "polars>=1.30.0",
     "pyarrow>=20.0.0",
+    "python-dateutil>=2.8",
     "sqlalchemy>=2.0.41",
     "tqdm>=4.67.1",
     "tinytag>=2.2.0",

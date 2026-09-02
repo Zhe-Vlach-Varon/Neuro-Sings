@@ -223,6 +223,28 @@ def extract_arg(files: list[Path], out: neutils.SongJSON = {}) -> neutils.SongJS
 
     return out
 
+def _make_song_entry(artist: str, cover_artist: str, title: str, file: Path, date: str, song_id: int, lead_singer: str, version: str) -> neutils.SongEntry:
+    return {
+        'Cover Artist': cover_artist,
+        'Artist': artist,
+        'ArtistOG': "None",
+        'Title': title,
+        'TitleOG': "None",
+        'Identify': "None",
+        'File_IN': str(file),
+        'id': song_id,
+        'Date': date,
+        'Lead Singer': lead_singer,
+        'additional flags': "",
+        'Version': version,
+        'Special': '1',
+        'Hash_IN': neutils.get_audio_hash(Path(file)),
+        'duplicate': False,
+        'encore': False,
+        'Comment': ''
+    }
+
+
 def extract_official(files: list[Path], out: neutils.SongJSON ={}) -> neutils.SongJSON:
     # load original_songs.csv and official_covers.csv
     # search files for each song
@@ -257,25 +279,7 @@ def extract_official(files: list[Path], out: neutils.SongJSON ={}) -> neutils.So
                     version = '2'
                 else:
                     version = '1'
-                data = {
-                    'Cover Artist' : cover_artist,
-                    'Artist' : artist,
-                    'ArtistOG' : "None",
-                    'Title' : title,
-                    'TitleOG' : "None",
-                    'Identify' : "None",
-                    'File_IN' : str(file),
-                    'id' : id,
-                    'Date' : date,
-                    'Lead Singer': lead_singer,
-                    'additional flags': "",
-                    'Version': version,
-                    'Special': '1',
-                    'Hash_IN': neutils.get_audio_hash(Path(file)),
-                    'duplicate': False,
-                    'encore': False,
-                    'Comment': ''
-                    }
+                data = _make_song_entry(artist, cover_artist, title, file, date, id, lead_singer, version)
                 if 'custom' in out.keys():
                     out['custom'].append(data)
                 else:
@@ -289,28 +293,9 @@ def extract_official(files: list[Path], out: neutils.SongJSON ={}) -> neutils.So
                 continue
             if neutils.do_song_titles_match(file.stem, song['Title']) or neutils.do_song_titles_match(song['Title'], file.stem):
                 artist = song['Artist']
-                cover_artist = artist
                 title = song['Title']
                 date = song['Date']
-                data = {
-                    'Cover Artist' : cover_artist,
-                    'Artist' : artist,
-                    'ArtistOG' : "None",
-                    'Title' : title,
-                    'TitleOG' : "None",
-                    'Identify' : "None",
-                    'File_IN' : str(file),
-                    'id' : id,
-                    'Date' : date,
-                    'Lead Singer': artist,
-                    'additional flags': "",
-                    'Version': '1',
-                    'Special': '1',
-                    'Hash_IN': neutils.get_audio_hash(Path(file)),
-                    'duplicate': False,
-                    'encore': False,
-                    'Comment': ''
-                    }
+                data = _make_song_entry(artist, artist, title, file, date, id, artist, '1')
                 if 'custom' in out.keys():
                     out['custom'].append(data)
                 else:
@@ -462,19 +447,7 @@ def parse_setlist(p: Path) -> tuple[neutils.SongJSON, list[str]]:
             songs[album].append(data)
             seen_songs.append(data)
 
-    non_karaoke_albums = neutils.get_non_karaoke_album_names()
-    if album not in non_karaoke_albums:
-        twin_duet_stream = True
-    else:
-        twin_duet_stream = False
-
-    if twin_duet_stream:
-        for song in songs[album]:
-            twin_duet_stream = twin_duet_stream and song['Cover Artist'] == 'Neuro & Evil'
-            if not twin_duet_stream:
-                break
-    
-    if twin_duet_stream:
+    if is_twin_duet_stream(album, songs[album]):
         twin_album_stream_title = album.replace('Neuro', 'Twins').replace('Evil', 'Twins')
         songs[twin_album_stream_title] = songs.pop(album)
 
@@ -653,7 +626,7 @@ def extract_all() -> neutils.SongJSON:
 
     return out
 
-def _is_twin_duet_stream(album_name: str, songs: list) -> bool:
+def is_twin_duet_stream(album_name: str, songs: list) -> bool:
     """Mirrors the `twin_duet_stream` detection in json_to_csv.update_db:
     an album is a twin duet stream when it is a karaoke album (i.e. not one of the
     non-karaoke setlist stems) and every song in it is covered by 'Neuro & Evil'."""
@@ -674,15 +647,7 @@ def _expected_flags(song: dict, is_twin_duet_stream: bool = False) -> str:
         flags += 'copyright_issues;'
     flags += song['additional flags']
 
-    if is_twin_duet_stream:
-        flags = flags.replace('evil;', '').replace('neuro;', '')
-
-    if song['Cover Artist'] == 'Neuro & Evil' and 'original' in flags:
-        flags = flags.replace('neuro;', '').replace('evil;', '')
-        if 'duet;' not in flags:
-            flags += 'duet;'
-
-    return flags
+    return neutils.post_process_flags(flags, song['Cover Artist'], is_twin_duet=is_twin_duet_stream)
 
 
 def _flag_set(flags: str | None) -> set:
@@ -794,7 +759,7 @@ def check_missing_setlist_entries() -> list[dict]:
                     unmatched_db.append(db_track)
 
             # Check for track number mismatches and flag discrepancies among matched tracks
-            is_twin_duet = _is_twin_duet_stream(album_name, songs)
+            is_twin_duet = is_twin_duet_stream(album_name, songs)
             # 'duplicate'/'encore' are structural markers added to encore entries in
             # update_db; they are not part of the musical content flags, so ignore them
             structural = {'duplicate', 'encore'}

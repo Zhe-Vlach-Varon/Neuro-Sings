@@ -10,7 +10,7 @@ from neuro import DATES_CSV, LOG_DIR, SONGS_CSV, SONGS_DB, SONGS_JSON
 from neuro.polars_utils import load_dates, load_db, songs_schema, dates_schema
 import neuro.utils as neutils
 
-from neuro.detection import check_missing_setlist_entries
+from neuro.detection import check_missing_setlist_entries, is_twin_duet_stream
 
 from tqdm import tqdm
 
@@ -36,8 +36,6 @@ def update_db() -> None:
     songs_df = load_db()
     dates_df = load_dates()
 
-    non_karaoke_albums = neutils.get_non_karaoke_album_names()
-
     if songs_df.height == 0:
         songs_df = pl.DataFrame({}, schema=songs_schema)
     
@@ -53,16 +51,7 @@ def update_db() -> None:
 
     for album, songs in json_data.items():
 
-        if album not in non_karaoke_albums:
-            twin_duet_stream = True
-        else:
-            twin_duet_stream = False
-        
-        if twin_duet_stream:
-            for song in songs:
-                twin_duet_stream = twin_duet_stream and song['Cover Artist'] == 'Neuro & Evil'
-                if not twin_duet_stream:
-                    break
+        twin_duet_stream = is_twin_duet_stream(album, songs)
 
         # get date from song JSON object
         for song in songs:
@@ -145,16 +134,7 @@ def update_db() -> None:
 
             flags += song['additional flags']
 
-            if twin_duet_stream:
-                pre_replace_flags = flags
-                flags = flags.replace('evil;', '').replace('neuro;', '')
-                if 'evil;' in pre_replace_flags or 'neuro;' in pre_replace_flags:
-                    assert pre_replace_flags != flags
-
-            if song['Cover Artist'] == 'Neuro & Evil' and 'original' in flags:
-                flags = flags.replace('neuro;', '').replace('evil;', '')
-                if 'duet;' not in flags:
-                    flags += 'duet;'
+            flags = neutils.post_process_flags(flags, song['Cover Artist'], is_twin_duet=twin_duet_stream)
 
             df = pl.DataFrame(
                 {
@@ -293,10 +273,7 @@ def get_most_recent_version(song: dict, json_data: neutils.SongJSON, encore: boo
         if fl not in flags:
             flags += f'{fl};'
 
-    if song['Cover Artist'] == 'Neuro & Evil' and 'original' in flags:
-            flags = flags.replace('neuro;', '').replace('evil;', '')
-            if 'duet;' not in flags:
-                flags += 'duet;'
+    flags = neutils.post_process_flags(flags, song['Cover Artist'])
 
     if filtered_songs.height > 0 and latest_version == latest_db_version:
         new_duplicate_song = pl.DataFrame(

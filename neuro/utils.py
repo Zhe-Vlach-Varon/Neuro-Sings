@@ -491,9 +491,21 @@ def get_flags(song: SongEntry) -> str:
     elif ('Neuro ' in cover_artist and ' & ' in cover_artist and 'Evil' not in cover_artist) or 'Evil & ' in cover_artist or 'Neuro, Evil, ' in cover_artist:
         flags += 'collab;'
 
-    if song['Cover Artist'] == 'Neuro & Evil' and 'original' in flags:
+    return post_process_flags(flags, song['Cover Artist'])
+
+
+def post_process_flags(flags: str, cover_artist: str, is_twin_duet: bool = False) -> str:
+    """Apply post-processing transformations to a flags string.
+
+    1. If is_twin_duet: remove 'evil;' and 'neuro;' (twin-duet streams don't get per-voice flags).
+    2. If cover_artist is 'Neuro & Evil' and 'original' is in flags: remove 'neuro;'/`evil;`, ensure 'duet;' is present.
+    """
+    if is_twin_duet:
+        flags = flags.replace('evil;', '').replace('neuro;', '')
+
+    if cover_artist == 'Neuro & Evil' and 'original' in flags:
         flags = flags.replace('neuro;', '').replace('evil;', '')
         if 'duet;' not in flags:
             flags += 'duet;'
-    
+
     return flags

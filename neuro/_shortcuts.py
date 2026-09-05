@@ -1,4 +1,5 @@
 import os
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 from loguru import logger
@@ -76,21 +77,75 @@ PRIVATE_DIR = f"{LOCAL_PRIVATE_DIR}/" if TR else ""
 RCLONE_BACKEND_COMMAND = f"rclone backend shortcut{V}{DR}"
 
 
+def _rclone_command(command: str) -> int:
+    """Run an rclone command, logging it. Returns the process exit code."""
+    logger.info(command)
+    return os.system(command)
+
+
 def _rclone(command: str, error_label: str) -> None:
     """Run an rclone command, logging it and exiting on failure."""
-    logger.info(command)
-    if os.system(command):
+    if _rclone_command(command):
         logger.error(error_label)
         exit(1)
 
 
-def _create_drive_shortcuts(out_dir: Path, dest: str, dir_prefix: str, error_label: str) -> None:
-    """Create GDrive shortcuts for all symlinked .mp3 files under out_dir."""
-    for file in [f for f in out_dir.resolve().rglob("*.mp3") if f.is_symlink()]:
-        source_drive_path = file.resolve().relative_to(out_dir.resolve())
-        shortcut_drive_path = file.relative_to(out_dir.resolve())
-        cmd = f"{RCLONE_BACKEND_COMMAND} {dest}{dir_prefix} \"{REMOTE_OUT_PREFIX / source_drive_path}\" \"{REMOTE_OUT_PREFIX / shortcut_drive_path}\""
-        _rclone(cmd, error_label)
+# Each shortcut is one network round-trip to GDrive; keep the pool modest to avoid quota pressure.
+SHORTCUT_MAX_WORKERS = 4
+
+
+def _create_drive_shortcuts(out_dir: Path, dest: str, dir_prefix: str, error_label: str, max_workers: int = SHORTCUT_MAX_WORKERS) -> None:
+    """Create GDrive shortcuts for all symlinked .mp3 files under out_dir.
+
+    The calls are independent → run through a small thread pool instead of sequentially
+    (thousands of symlinks would otherwise mean thousands of serial round-trips).
+    Fails fast like before: the first rclone error cancels the pending ones and exits 1.
+
+    Args:
+        out_dir (Path): Local output dir containing the symlinked .mp3 files.
+        dest (str): Remote destination prefix (e.g. "DriveName:" or "./").
+        dir_prefix (str): Extra local path prefix for TR test runs.
+        error_label (str): Error message logged before exiting on failure.
+        max_workers (int, optional): Concurrent shortcut creations. Defaults to SHORTCUT_MAX_WORKERS.
+
+    Raises:
+        SystemExit: If any rclone call fails (exit code 1), after cancelling pending work.
+    """
+    base = out_dir.resolve()
+    commands: list[tuple[Path, str]] = []
+    for file in [f for f in base.rglob("*.mp3") if f.is_symlink()]:
+        source_drive_path = file.resolve().relative_to(base)
+        shortcut_drive_path = file.relative_to(base)
+        cmd = (
+            f"{RCLONE_BACKEND_COMMAND} {dest}{dir_prefix}"
+            f" \"{REMOTE_OUT_PREFIX / source_drive_path}\""
+            f" \"{REMOTE_OUT_PREFIX / shortcut_drive_path}\""
+        )
+        commands.append((file, cmd))
+
+    if not commands:
+        return
+
+    def _run(item: tuple[Path, str]) -> tuple[Path, int]:
+        file, cmd = item
+        # os.system is fork+exec → safe to call from multiple threads (loguru too)
+        return file, _rclone_command(cmd)
+
+    failed_file: Path | None = None
+    executor = ThreadPoolExecutor(max_workers=max_workers, thread_name_prefix="shortcut")
+    try:
+        for file, code in executor.map(_run, commands):
+            if code != 0:
+                logger.error(f"rclone shortcut creation failed for {file} (exit code {code})")
+                failed_file = file
+                break
+    finally:
+        # Stop scheduling the rest; the ≤ max_workers calls already in flight finish on their own
+        executor.shutdown(wait=False, cancel_futures=True)
+
+    if failed_file is not None:
+        logger.error(error_label)
+        exit(1)
 
 
 def setlists_pull() -> None:

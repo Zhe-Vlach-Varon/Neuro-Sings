@@ -2,7 +2,7 @@
 
 from functools import reduce
 from pathlib import Path
-from typing import Callable, Optional
+from typing import Callable
 
 import polars as pl
 
@@ -166,13 +166,13 @@ class Preset:
         else:
             return []
 
-    def __init__(self, preset_dict: PresetDict, mp3gain_config: MP3ModeTuple, root: Optional[Path] = None) -> None:
+    def __init__(self, preset_dict: PresetDict, mp3gain_config: MP3ModeTuple, root: Path | None = None) -> None:
         """Preset constructor.
 
         Args:
             preset_dict (PresetDict): Dict from the TOML loading.
             mp3gain_config (MP3ModeTuple): Configuration of mp3gain.
-            root (Optional[Path], optional): Root path from outside of the Preset part, if None\
+            root (Path | None, optional): Root path from outside of the Preset part, if None\
                 then the path in preset is the full path, otherwise they use the root path\
                 as a common folder for all presets. Defaults to None.
         """
@@ -205,11 +205,11 @@ class Preset:
             self.path = root / path
 
 
-    def get_filtered_df(self, songs_df: Optional[pl.DataFrame] = None) -> pl.DataFrame:
+    def get_filtered_df(self, songs_df: pl.DataFrame | None = None) -> pl.DataFrame:
         """Applies filters defined in a preset to get a filtered version of the database.
 
         Args:
-            songs_df (Optional[pl.DataFrame]): Pre-loaded songs DataFrame to filter.
+            songs_df (pl.DataFrame | None): Pre-loaded songs DataFrame to filter.
                 If None, loads from disk via `load_db()`.
 
         Returns:
@@ -227,9 +227,13 @@ class Preset:
             
         assert (self.exclude_type == "and") | (self.exclude_type == "or")
 
-        if self.exclude_type == "and":
+        if not self.exclude:
+            # Empty exclusion list means no exclusion. Without this guard, exclude-type="and"
+            # would reduce to lit(True) and .not_() would filter out every single song.
+            excludes = pl.lit(False)
+        elif self.exclude_type == "and":
             excludes = stack_and(self.exclude)  # exclude#1 & exclude#2 ...
-        elif self.exclude_type == "or":
+        else:
             excludes = stack_or(self.exclude)  # exclude#1 | exclude#2 ...
 
         # Has one of the include flags and none of the exclude

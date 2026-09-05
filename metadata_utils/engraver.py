@@ -131,7 +131,7 @@ def engrave_payload(path: str, song_data: str) -> None:
 
     tags.add(COMM(encoding=3, lang='ved', desc='', text=[song_data]))
     
-    tags.save(path)
+    tags.save(path, v2_version="3", v1="2")
 
 def get_raw_json(path: Path | str) -> str:
 

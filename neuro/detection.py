@@ -2,6 +2,7 @@
 
 import json
 import re
+
 from datetime import datetime
 from dateutil.parser import parse
 from pathlib import Path
@@ -16,15 +17,15 @@ import neuro.utils as neutils
 
 song_line_regex = r'^\d{1,} *\|'
 
-def get_files(songs: pl.DataFrame) -> dict[str, list[Path]]:
-    """Gets filenames from expected directories. Skips files that are already in the database.\
-        Check the function code to see which directories are searched through.
 
+def get_files(songs: pl.DataFrame) -> dict[str, list[Path]]:
+    """Gets filenames from expected directories. Skips files that are already in the database.
+    
     Args:
         songs (pl.DataFrame): Songs database, here to check the current existing files.
-
+        
     Returns:
-        dict[str, list[Path]]: Audio files filtered by directories.\
+        dict[str, list[Path]]: Audio files filtered by directories.
             Keys: "Neuro", "Evil", "Duets", "V1", "V2", "Custom".
     """
     # Set of all files already treated and registered
@@ -56,17 +57,15 @@ def get_files(songs: pl.DataFrame) -> dict[str, list[Path]]:
 
 
 def extract_custom(files: list[Path], out: neutils.SongJSON = {}) -> neutils.SongJSON:
-    """Function on the same level as `extract_list`, but specialized for treatment of \
-        custom files.
+    """Function on the same level as `extract_list`, but specialized for treatment of 
+    custom files.
 
     Args:
         files (list[Path]): List of files.
-        out (SongJSON, optional): Same as for `extract_list`. Dictionary created or completed\
-            with files' data. Defaults to {}.
+        out (SongJSON, optional): Same as for `extract_list`. Dictionary created or completed with files' data. Defaults to {}.
 
     Returns:
-        SongJSON: Dictionary with at least these files' information.
-    """
+        SongJSON: Dictionary with at least these files' information."""
 
     # there are a lot less custom songs, since most of the ones that were are included in the Unofficial Archive that is the new source for mp3 files
     for file in files:
@@ -76,7 +75,7 @@ def extract_custom(files: list[Path], out: neutils.SongJSON = {}) -> neutils.Son
         title = fields[1]
         cover_artist = fields[2] if len(fields) > 2 else ""
         album = fields[3] if len(fields) > 3 else ""
-        
+
         # TODO print reminder to check artist, title, identify for custom songs
         data = {
             "Artist": artist,
@@ -100,25 +99,23 @@ def extract_custom(files: list[Path], out: neutils.SongJSON = {}) -> neutils.Son
             out[album] = [data]
 
 
-    return out
-
 def extract_unofficialV3(files: list[Path], out: neutils.SongJSON = {}) -> neutils.SongJSON:
     """extract files from the Unofficial Neuro Karaoke Archvie v3
-    
+
     Args:
         files (list[Path]): List of files.
-        out (SongJSON, optional): Same as for `extract_list`. Dictionary created or completed\
-            with files' data. Defaults to {}.
-            
+        out (SongJSON, optional): Same as for `extract_list`. Dictionary created or completed with files' data. Defaults to {}.
+
     Returns:
-        SongJSON: Dictionary with at least these files' information.
-    """
+        SongJSON: Dictionary with at least these files' information."""
 
     songs_df = load_db()
 
     id = 1
     for file in files:
-        if neutils.get_audio_hash(file) in songs_df.get_column('Hash_IN'):
+        # hash once and reuse the result both here (DB membership check) and as 'Hash_IN' below
+        file_hash = neutils.get_audio_hash(file)
+        if file_hash in songs_df.get_column('Hash_IN'):
             continue
         data = {}
         date = ""
@@ -176,7 +173,7 @@ def extract_unofficialV3(files: list[Path], out: neutils.SongJSON = {}) -> neuti
             'Lead Singer': cover_artist,
             'additional flags': "",
             'Version': version,
-            'Hash_IN': neutils.get_audio_hash(Path(file)),
+            'Hash_IN': file_hash,
             'Special': special,
             'Comment': trackJSon['Comment'],
         }
@@ -188,26 +185,26 @@ def extract_unofficialV3(files: list[Path], out: neutils.SongJSON = {}) -> neuti
 
     return out
 
-def extract_arg(files: list[Path], out: neutils.SongJSON = {}) -> neutils.SongJSON:
+
+def extract_arg(files: list[Path], out: neutils.SongJSON ={}) -> neutils.SongJSON:
     id = 1
     for file in files:
         title = file.stem[4:]
         artist = 'Study-sama'
-        duplicate = False
         trackInfo = tinytag.TinyTag.get(file)
         date = trackInfo.comment
 
         data = {
-            'Cover Artist' : artist,
-            'Artist' : artist,
-            'ArtistOG' : "None",
-            'Title' : title,
-            'TitleOG' : "None",
-            'Identify' : "None",
-            'File_IN' : str(file),
-            'id' : id,
-            'duplicate' : duplicate,
-            'Date' : date,
+            'Cover Artist': artist,
+            'Artist': artist,
+            'ArtistOG': "None",
+            'Title': title,
+            'TitleOG': "None",
+            'Identify': "None",
+            'File_IN': str(file),
+            'id': id,
+            'duplicate': False,
+            'Date': date,
             'Lead Singer': artist,
             'additional flags': "",
             'Version': '66',
@@ -222,6 +219,7 @@ def extract_arg(files: list[Path], out: neutils.SongJSON = {}) -> neutils.SongJS
         id += 1
 
     return out
+
 
 def _make_song_entry(artist: str, cover_artist: str, title: str, file: Path, date: str, song_id: int, lead_singer: str, version: str) -> neutils.SongEntry:
     return {
@@ -285,7 +283,7 @@ def extract_official(files: list[Path], out: neutils.SongJSON ={}) -> neutils.So
                 else:
                     out['custom'] = [data]
                 id += 1
-        # TODO print reminder to check title, artist, identify for official songs
+                break  # Fix #7: break after first match
 
     for song in original_songs_csv:
         for file in files:
@@ -301,8 +299,10 @@ def extract_official(files: list[Path], out: neutils.SongJSON ={}) -> neutils.So
                 else:
                     out['custom'] = [data]
                 id += 1
+                break  # Fix #7: break after first match
 
     return out
+
 
 def get_default_album_name(album_song_count: int, singer:str, date: str) -> str:
     if album_song_count < 15:
@@ -312,6 +312,7 @@ def get_default_album_name(album_song_count: int, singer:str, date: str) -> str:
 
     return album
 
+
 def parse_setlist(p: Path) -> tuple[neutils.SongJSON, list[str]]:
     with open(p, 'r') as file:
         lines = file.readlines()
@@ -319,7 +320,6 @@ def parse_setlist(p: Path) -> tuple[neutils.SongJSON, list[str]]:
     logger.info(f'parsing setlist {p.name}')
 
     songs: neutils.SongJSON = {}
-
 
     is_singer_change_line = False
     is_song_line = False
@@ -363,7 +363,6 @@ def parse_setlist(p: Path) -> tuple[neutils.SongJSON, list[str]]:
         else:
             is_song_line = False
 
-        
         if is_album_info_line:
             input_date = parse(fields[0])
             date = input_date.strftime(date_format)
@@ -392,7 +391,7 @@ def parse_setlist(p: Path) -> tuple[neutils.SongJSON, list[str]]:
                     album_art = fields[3]
                 found_album_line = True
                 continue
-        
+
         if is_singer_change_line and found_album_line:
             lead_singer = fields[0]
             continue
@@ -408,7 +407,7 @@ def parse_setlist(p: Path) -> tuple[neutils.SongJSON, list[str]]:
                 cover_artist = lead_singer
             dupe = False
             encore = False
-            
+
             if len(fields) >= 5 and not fields[4] == '':
                 song_art = fields[4]
             else:
@@ -426,7 +425,7 @@ def parse_setlist(p: Path) -> tuple[neutils.SongJSON, list[str]]:
                 'TitleOG': "",
                 'Identify': identify,
                 'Cover Artist': cover_artist, # all singers on song
-                'Lead Singer' : lead_singer, # the lead singer of the karaoke stream, used for assigning cover art for duets
+                'Lead Singer': lead_singer, # the lead singer of the karaoke stream, used for assigning cover art for duets
                 'Image': song_art,
                 'Date': date,
                 'id': id, # TODO unify Album_ID and id to instead be labeled Track_No or something to avoid confusion with database entry id
@@ -447,7 +446,7 @@ def parse_setlist(p: Path) -> tuple[neutils.SongJSON, list[str]]:
             songs[album].append(data)
             seen_songs.append(data)
 
-    if is_twin_duet_stream(album, songs[album]):
+    if is_twin_duet_stream(album, songs.get(album, [])):
         twin_album_stream_title = album.replace('Neuro', 'Twins').replace('Evil', 'Twins')
         songs[twin_album_stream_title] = songs.pop(album)
 
@@ -458,6 +457,7 @@ def song_entry_sort_by_id(e):
     if e['id'] is None:
         return 999999
     return e['id']
+
 
 def get_setlist_files() -> list[Path]:
     files = list(SETLISTS_DIR.glob(f"**/*"))
@@ -593,13 +593,12 @@ def fill_in_setlists(out: neutils.SongJSON | None = None) -> neutils.SongJSON:
 
     return out
 
+
 def extract_all() -> neutils.SongJSON:
     """Runs all the extraction functions on all defined patterns.
 
     Returns:
-        SongJSON: Output dictionary containg all files that are not yet in the database.\
-            They are grouped by date, or category if no date was provided in filename.
-    """
+        SongJSON: Output dictionary containg all files that are not yet in the database.They are grouped by date, or category if no date was provided in filename."""
     songs_db = load_db()
     files = get_files(songs_db)
 
@@ -623,8 +622,8 @@ def extract_all() -> neutils.SongJSON:
     # fill in duplicates
     fill_in_setlists(out)
 
-
     return out
+
 
 def is_twin_duet_stream(album_name: str, songs: list) -> bool:
     """Mirrors the `twin_duet_stream` detection in json_to_csv.update_db:
@@ -657,50 +656,40 @@ def _flag_set(flags: str | None) -> set:
 
 def check_missing_setlist_entries() -> list[dict]:
     """Checks the song database for the following cases:
-            songs in setlist files not in database
-            songs in database not in setlist files
-            albums in database not in setlist files
-            track number mismatches between album in database and album in setlist
-            flag mismatches between the setlist-derived expectation and the database
+        songs in setlist files not in database
+        songs in database not in setlist files
+        albums in database not in setlist files
+        track number mismatches between album in database and album in setlist
+        flag mismatches between the setlist-derived expectation and the database
         keeping in mind that setlists can contain multiple instances of a song with different track numbers :IMPORTANT: this is intended, as sometimes a song will be repeated as an encore and will thus be in the setlist multiple times with different track numbers
 
         builds a list of found discrepencies containing dicts of with the following fields:
             'Type': 'Missing'|'Extra'|'Mismatch'|'Flags'|'Album'    where Missing means track missing from DB, 'Extra' means unexpected track in DB, 'Mismatch' means track number mismatch between setlist and DB, 'Flags' means the DB flags differ from the setlist-derived expectation, and 'Album' means that this album exists in the database but not in any setlists
-            'Source_Setlist': str|None                      the filepath of a setlist file, or none if only present in DB
-            'Album': str
-            'Date': str
-            'Artist': str
-            'Title': str
-            'Identify': str
-            'Cover Artist': str
-            'Track_ID': int
-        when 'Type' is 'Flags' also include 'Missing_Flags' and 'Extra_Flags' (lists)
-        when 'Type' is 'Album' only include 'Type' and 'Album'
 
         logs found errors using the following format:
             if 'Missing', 'Extra', 'Mismatch', or 'Flags':
                 issue-type: song info, setlist_file if not None
             if 'Album':
                 issue-type: album name
-
-        """
+    """
     songs_df = load_db()
     discrepencies = []
-    
+
     sorted_setlist_files = get_setlist_files()
 
     total_setlist_song_count = 0
     setlist_albums = set()
     setlist_album_to_file_mapping = {}
 
+
     for file in sorted_setlist_files:
         if file.name == 'Setlists.md' or file.is_dir():
             continue
-            
+
         albums, dates = parse_setlist(file)
         if not albums:
             continue
-            
+
         for album_name, songs in albums.items():
             setlist_albums.add(album_name)
             setlist_album_to_file_mapping[album_name] = file
@@ -720,7 +709,7 @@ def check_missing_setlist_entries() -> list[dict]:
                     'Album': db_song['Album'],
                     'Flags': db_song['Flags']
                 } for db_song in db_songs]
-            
+
             setlist_tracks = [
                 {
                     'Track_No': sl_song['id'],
@@ -731,7 +720,7 @@ def check_missing_setlist_entries() -> list[dict]:
                     'Date': sl_song['Date'],
                     'Album': album_name
                 } for sl_song in songs]
-            
+
             matched_pairs = []  # List of (sl_track, db_track, raw_sl_song)
             unmatched_setlist = []
             unmatched_db = []
@@ -827,7 +816,6 @@ def check_missing_setlist_entries() -> list[dict]:
                     'Track_ID': db_track['Track_No'],
                 })
 
-
     # Check for albums in DB without setlist
     db_albums = set(songs_df.get_column('Album').unique().to_list())
     missing_albums = db_albums - setlist_albums
@@ -836,7 +824,7 @@ def check_missing_setlist_entries() -> list[dict]:
             'Type': 'Missing Setlist',
             'Album': album_name,
         })
-                    
+
     if discrepencies:
         logger.warning(f"Found {len(discrepencies)} issues with setlist entries in the database.")
         for entry in discrepencies:
@@ -854,19 +842,16 @@ def check_missing_setlist_entries() -> list[dict]:
                 logger.warning(f"  Missing Setlist: {entry['Album']}")
     else:
         logger.info("All setlist entries match the database.")
-        
+
     return discrepencies
+
 
 def run_setlist_check() -> int:
     return len(check_missing_setlist_entries()) == 0
 
+
 def export_json(all_songs: neutils.SongJSON) -> None:
-    """Takes an existing result of new files search and exports it in a json file.
-
-    Args:
-        all_songs (SongJSON): Dictionary with lists of files grouped by date.
-    """
-
+    """Takes an existing result of new files search and exports it in a json file."""
 
     all_keys = sorted(all_songs)
 
@@ -874,7 +859,7 @@ def export_json(all_songs: neutils.SongJSON) -> None:
         if len(all_songs[key]) == 0:
             all_songs.pop(key)
             all_keys.remove(key)
-    
+
     for key, songs in all_songs.items():
         if not key == 'custom':
             for song in songs:
@@ -887,8 +872,10 @@ def export_json(all_songs: neutils.SongJSON) -> None:
     assert 'custom' not in dated_songs.keys()
     sorted_songs = dict(sorted(dated_songs.items(), key=lambda item: item[1][0]['Date']))
 
-
     with open(SONGS_JSON, "w") as f:
-        # print(sorted_songs)
         json.dump(sorted_songs, f, indent=2, ensure_ascii=False)
         f.write("\n")
+
+
+if __name__ == "__main__":
+    pass

@@ -1,8 +1,9 @@
 import os
+import shlex
+import subprocess
 import tomllib as toml
 from pathlib import Path
 from time import time
-from typing import Optional
 
 import polars as pl
 from loguru import logger
@@ -23,7 +24,7 @@ def new_batch_detection() -> None:
     """Re-runs the song detection based on regex. Adds songs that aren't already in\
         the database in a JSON file for them to be reviewed.
     """
-    format_logger(verbosity=5, log_file=LOG_DIR / "batches.log")
+    format_logger(log_file=LOG_DIR / "batches.log")
     # These 3 lines could be one call, but it would just make the code less clear
     out = extract_all()  # Extracts data
     export_json(out)  # Writing into JSON
@@ -105,7 +106,7 @@ def resolve_output_paths(song: Song, root: Path | None, subdir: str) -> dict[str
     }
 
 
-def generate_from_preset(preset: Preset, dates_dict: DateDict, create_placeholders: bool = False, make_links: bool = False, songs_df: Optional[pl.DataFrame] = None) -> None:
+def generate_from_preset(preset: Preset, dates_dict: DateDict, create_placeholders: bool = False, make_links: bool = False, songs_df: pl.DataFrame | None = None) -> None:
     """Generates all songs from a preset, filters songs that respect filters.
 
     Args:
@@ -113,7 +114,7 @@ def generate_from_preset(preset: Preset, dates_dict: DateDict, create_placeholde
         dates_dict (DateDict): Date dict to pass to drive song constructor.
         create_placeholders (bool): If True, create placeholder files for official songs.
         make_links (bool): If True, create symlinks to album files instead of copying.
-        songs_df (Optional[pl.DataFrame]): Pre-loaded songs DataFrame to avoid repeated DB reads.
+        songs_df (pl.DataFrame | None): Pre-loaded songs DataFrame to avoid repeated DB reads.
     """
 
     global g_hash_to_file_dict
@@ -123,20 +124,29 @@ def generate_from_preset(preset: Preset, dates_dict: DateDict, create_placeholde
 
     t = time()
     songs_filtered = preset.get_filtered_df(songs_df)
-    N_SONGS = 0  # Avoids error if no songs are found
-    for i, song_dict in enumerate(songs_filtered.iter_rows(named=True)):
-        N_SONGS = len(songs_filtered)
+    N_SONGS = len(songs_filtered)  # computed once before the loop (was re-read on every iteration)
 
+    # os.makedirs is a syscall even with exist_ok=True, so remember dirs already created this run.
+    made_dirs: set[Path] = set()
+    def ensure_dir(d: Path) -> None:
+        if d not in made_dirs:
+            os.makedirs(d, exist_ok=True)
+            made_dirs.add(d)
+
+    for i, song_dict in enumerate(songs_filtered.iter_rows(named=True)):
         s = classify_song(song_dict, dates_dict)
 
         final_out_paths = resolve_output_paths(s, preset.root, preset.subdir)
 
-        os.makedirs(final_out_paths['song_files'], exist_ok=True)
+        ensure_dir(final_out_paths['song_files'])
         if s.hash_in in g_hash_to_file_dict.keys():
             if make_links:
-                # Use the album path that generate_albums would use as the source
+                # Use the album path that generate_albums would use as the source.
+                # preset.root is None when use-root = false: fall back to CWD like resolve_output_paths() does,
+                # instead of building a literal "None" directory.
                 release_dir = "unofficial_releases" if not is_official_release(s) else "official_releases"
-                album_song_dir = Path(str(preset.root)) / release_dir / 'albums' / s.album
+                root_base = preset.root if preset.root is not None else Path(".")
+                album_song_dir = root_base / release_dir / 'albums' / s.album
                 existing_path = album_song_dir / f"{s.file_name(s.flags.as_custom, numberedFiles=False)}.mp3" if isinstance(s, DriveSong) else album_song_dir / f"{s.file_name(not s.flags.as_drive, numberedFiles=False)}{s.file.suffix}"
                 created = s.create_file_link(create=False, out_dir=final_out_paths['song_files'], existing_path=existing_path)
             else:
@@ -145,7 +155,7 @@ def generate_from_preset(preset: Preset, dates_dict: DateDict, create_placeholde
                     s.apply_tags(True)
             logger.debug(f"[GEN] [{preset.name}] [{i + 1:3d}/{N_SONGS}] {'Generated' if created else 'Skipped'} {song_dict['Title']}")
             if create_placeholders and is_official_release(s):
-                os.makedirs(final_out_paths['metadata_files'], exist_ok=True)
+                ensure_dir(final_out_paths['metadata_files'])
                 s.create_placeholder_files(out_dir=final_out_paths['metadata_files'])
         elif is_official_release(s):
             logger.warning(f"[GEN] [{preset.name}] [{i + 1:3d}/{N_SONGS}] Skipped {song_dict['Title']} official song file not found: {song_dict['File_IN']}")
@@ -229,22 +239,29 @@ def generate_albums(create_placeholders: bool = False) -> None:
 
     dates_dict: DateDict = {k["Date"]: k for k in load_dates().iter_rows(named=True)}
 
-    for i, song_dict in enumerate(songDB.iter_rows(named=True)):
-        N_SONGS = len(songDB)
+    N_SONGS = len(songDB)  # computed once before the loop (was re-read on every iteration)
 
+    # os.makedirs is a syscall even with exist_ok=True, so remember dirs already created this run.
+    made_dirs: set[Path] = set()
+    def ensure_dir(d: Path) -> None:
+        if d not in made_dirs:
+            os.makedirs(d, exist_ok=True)
+            made_dirs.add(d)
+
+    for i, song_dict in enumerate(songDB.iter_rows(named=True)):
         s = classify_song(song_dict, dates_dict)
 
         album = s.album
         final_out_paths = resolve_output_paths(s, OUT_ROOT, f"albums/{album}")
 
-        os.makedirs(final_out_paths['song_files'], exist_ok=True)
+        ensure_dir(final_out_paths['song_files'])
         if s.hash_in in g_hash_to_file_dict.keys():
             created = s.create_out_file(create=False, out_dir=final_out_paths['song_files'])
             if created:
                 s.apply_tags(True)
             logger.debug(f"[GEN] [{i+1:4d}/{N_SONGS}] [{album}] {'Generated' if created else 'Skipped'} {song_dict['Title']}")
             if create_placeholders and is_official_release(s):
-                os.makedirs(final_out_paths['metadata_files'], exist_ok=True)
+                ensure_dir(final_out_paths['metadata_files'])
                 s.create_placeholder_files(out_dir=final_out_paths['metadata_files'])
         elif is_official_release(s):
             logger.warning(f"[GEN] [{i+1:4d}/{N_SONGS}] [{album}] Skipped {song_dict['Title']} official song file not found: {song_dict['File_IN']}")
@@ -304,26 +321,47 @@ def run_mp3gain(preset: Preset) -> None:
     """
     if preset.mp3gain is MP3GainMode.OFF:
         return
-    logger.info(f"[GEN] Running mp3gain for preset {preset.name}")
-    options = ""
-    if preset.mp3gain is MP3GainMode.GAIN:
-        options = "-r -k"
-    OUT_LOG = Path(LOG_DIR / "mpgain.log")
-    os.system(f"mp3gain {options} {preset.path}/*.mp3 > {OUT_LOG}")
+
+    # Skip presets with an empty/missing output dir instead of letting mp3gain fail on an unexpanded glob
+    mp3s = list(preset.path.glob("*.mp3"))
+    if not mp3s:
+        logger.debug(f"[MP3G] Skipping preset '{preset.name}': no mp3 files in {preset.path}")
+        return
+
+    logger.info(f"[GEN] Running mp3gain for preset {preset.name} ({len(mp3s)} files)")
+    options = "-r -k" if preset.mp3gain is MP3GainMode.GAIN else ""
+    # One log per preset, so every run's output survives instead of being truncated by the next one
+    OUT_LOG = LOG_DIR / f"mpgain_{preset.name}.log"
+    cmd = f"mp3gain {options} {shlex.quote(str(preset.path))}/*.mp3 > {shlex.quote(str(OUT_LOG))} 2>&1"
+    # check=False on purpose: a nonzero exit is expected and reported via the log, not raised
+    result = subprocess.run(cmd, shell=True, check=False)
+    if result.returncode != 0:
+        logger.error(f"[MP3G] mp3gain failed for preset '{preset.name}' (exit code {result.returncode}), see {OUT_LOG}")
 
 
 def mp3gain_standalone() -> None:
-    """Runs mp3gain on all presets without creating the files"""
+    """Runs mp3gain on all presets without creating the files.
+
+    Bypasses the per-preset `mp3gain` booleans: this command exists to apply the configured\
+        gain type over every existing preset output, so a preset's own boolean must not disable it.
+    """
     format_logger(log_file=LOG_DIR / "generation.log")
-    logger.info("[MP3G] Starting generation batch")
+    logger.info("[MP3G] Starting mp3gain batch")
 
     config, OUT_ROOT = load_config()
 
     mp3gain = parse_mp3gain(config)
+    if mp3gain[1] not in (MP3GainMode.GAIN, MP3GainMode.TAG):
+        logger.error("[MP3G] No valid mp3gain type configured: add 'mp3gain' to [features].activated and set "
+                     "[features.mp3gain].type to 'gain' or 'tag'")
+        exit(1)
+
+    # Force ON_ALL so the per-preset booleans (currently all false) don't disable everything
+    preset_mp3gain = (MP3GainMode.ON_ALL, mp3gain[1])
 
     for preset in config["Presets"]:
-        logger.info(f"[MP3G] Generating preset '{preset['name']}'")
-        preset_obj = Preset(preset, mp3gain, OUT_ROOT)
+        logger.info(f"[MP3G] Running preset '{preset['name']}'")
+        preset_obj = Preset(preset, preset_mp3gain, OUT_ROOT)
         run_mp3gain(preset_obj)
 
 

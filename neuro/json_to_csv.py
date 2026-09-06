@@ -10,8 +10,6 @@ from neuro import get_project
 from neuro.detection import check_missing_setlist_entries, is_twin_duet_stream
 from neuro.polars_utils import load_dates, load_db, songs_schema, dates_schema
 import neuro.utils as neutils
-
-
 def clear_db() -> None:
     project = get_project()
     songs_df = pl.DataFrame({}, schema=songs_schema)
@@ -67,11 +65,12 @@ def update_db() -> None:
                 date = album
                 named_album = False
             singer = song['Cover Artist']
-            if singer == 'Neuro & Evil':
-                singer = "Twins"
+            if singer == project.duet_cover_artist():
+                singer = project.duet_group_name
             lead_singer = song['Lead Singer']
 
-            if date[0] == "2" and date not in date_set and date > "2023-06-08" and song['Cover Artist'] in ['Neuro', 'Evil', 'Neuro & Evil']:
+            valid_cover_artists = set(project.singer_names()) | {project.duet_cover_artist()}
+            if date[0] == "2" and date not in date_set and date > "2023-06-08" and song['Cover Artist'] in valid_cover_artists:
                 if date >= '2025-03-25':
                     duet_format = 'v2'
                 elif date >= '2024-12-19':
@@ -81,7 +80,7 @@ def update_db() -> None:
                 df = pl.DataFrame(
                     {
                         "Date": date,
-                        "Singer": lead_singer if not twin_duet_stream else 'Twins',
+                        "Singer": lead_singer if not twin_duet_stream else project.duet_group_name,
                         "Duet Format": duet_format,
                     }
                 )
@@ -133,7 +132,7 @@ def update_db() -> None:
                 # Only stale if the file changed on disk since detection (acceptable).
                 in_hash = song.get("Hash_IN") or neutils.get_audio_hash(file)
 
-            flags = neutils.get_flags(song)
+            flags = neutils.get_flags(song, project)
             assert flags is not None
 
             if neutils.is_copyright_issue(song['Title'], song['Artist']):
@@ -141,7 +140,7 @@ def update_db() -> None:
 
             flags += song['additional flags']
 
-            flags = neutils.post_process_flags(flags, song['Cover Artist'], is_twin_duet=twin_duet_stream)
+            flags = neutils.post_process_flags(flags, song['Cover Artist'], project=project, is_twin_duet=twin_duet_stream)
 
             df = pl.DataFrame(
                 {
@@ -216,6 +215,7 @@ def update_db() -> None:
 def get_most_recent_version(song: dict, json_data: neutils.SongJSON, encore: bool, lead_singer: str) -> pl.DataFrame:
     # if json for song has duplicate true, search database for most recent version of song with same singer
     # either detect singer from existing data, or add cover_artist field to database
+    project = get_project()
     songDB = load_db()
 
     latest_version = None
@@ -244,7 +244,7 @@ def get_most_recent_version(song: dict, json_data: neutils.SongJSON, encore: boo
         db_flags = latest_db_version["Flags"]
     if len(filtered_json_songs) > 0:
         latest_json_version = sorted_filtered_json_songs[0]
-        json_flags = neutils.get_flags(latest_json_version)
+        json_flags = neutils.get_flags(latest_json_version, project)
 
     if not latest_db_version is None:
         if not latest_json_version is None:
@@ -273,17 +273,19 @@ def get_most_recent_version(song: dict, json_data: neutils.SongJSON, encore: boo
     if encore:
         flags += 'encore;'
 
-    if lead_singer == 'Neuro':
-        flags = flags.replace('evil', 'neuro')
-    if lead_singer == 'Evil':
-        flags = flags.replace('neuro', 'evil')
+    # Replace any non-lead-singer flag with the lead singer's flag (the duplicate inherits the lead's voice).
+    if lead_singer in project.singer_names():
+        lead_flag = project.flag_for(lead_singer)
+        for a in project.artists:
+            if a.flag != lead_flag and a.flag + ';' in flags:
+                flags = flags.replace(a.flag + ';', lead_flag + ';')
 
     entry_flags = song['Flags'].split(';')
     for fl in entry_flags:
         if fl not in flags:
             flags += f'{fl};'
 
-    flags = neutils.post_process_flags(flags, song['Cover Artist'])
+    flags = neutils.post_process_flags(flags, song['Cover Artist'], project=project)
 
     # Both branches build the same row; only File_IN/Hash_IN/Key/Tempo come from different sources.
     if filtered_songs.height > 0 and latest_version == latest_db_version:

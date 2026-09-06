@@ -78,8 +78,8 @@ def classify_song(song_dict: dict, dates_dict: DateDict) -> DriveSong | CustomSo
         or (file_in.is_relative_to(unofficialv3_dir) and not file_in.is_relative_to(unofficialv3_dir / UNOFFV3_EXTRA / UNOFFV3_DISC66))
         or file_in.is_relative_to(project.song_root / "copyright_issues")
     ):
-        return DriveSong(song_dict, dates_dict.get(song_dict["Date"], {}))
-    return CustomSong(song_dict)
+        return DriveSong(song_dict, dates_dict.get(song_dict["Date"], {}), project)
+    return CustomSong(song_dict, project=project)
 
 
 def resolve_output_paths(song: Song, root: Path | None, subdir: str) -> dict[str, Path | None]:

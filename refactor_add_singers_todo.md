@@ -291,7 +291,7 @@ Each phase is independently shippable and backward-compatible.
 **Goal:** Replace all hardcoded `"Neuro"`/`"Evil"`/`"Neuro & Evil"` string checks with lookups
 through `project.artists`. This is the core of the refactoring.
 
-- [ ] **3a. `neuro/utils.py` — `get_flags()`:**
+- [x] **3a. `neuro/utils.py` — `get_flags()`:**
 
   ```python
   # BEFORE
@@ -359,7 +359,7 @@ through `project.artists`. This is the core of the refactoring.
   `init_flags()` populates `singer_flags` from `project.artists` in addition to the
   existing fields.
 
-- [ ] **3d. `neuro/file_tags.py` — `who` property:**
+- [x] **3d. `neuro/file_tags.py` — `who` property:**
 
   ```python
   # BEFORE
@@ -380,7 +380,7 @@ through `project.artists`. This is the core of the refactoring.
       return self._who_fallback
   ```
 
-- [ ] **3e. `neuro/file_tags.py` — `name_tag`:**
+- [x] **3e. `neuro/file_tags.py` — `name_tag`:**
 
   ```python
   # BEFORE
@@ -408,7 +408,7 @@ through `project.artists`. This is the core of the refactoring.
       raise ValueError(f"Song '{self.file}' has no singer flags!")
   ```
 
-- [ ] **3f. `neuro/file_tags.py` — `album_artist`:**
+- [x] **3f. `neuro/file_tags.py` — `album_artist`:**
 
   ```python
   # BEFORE
@@ -429,11 +429,11 @@ through `project.artists`. This is the core of the refactoring.
       return self._project.artists[0].album_artist
   ```
 
-- [ ] **3g. `neuro/file_tags.py` — `get_vorbis_frames()` and `CustomSong.apply_id3()`:**
+- [x] **3g. `neuro/file_tags.py` — `get_vorbis_frames()` and `CustomSong.apply_id3()`:**
 
   Replace `"Neuro-Sama/Evil Neuro"` with `self._project.artists[0].album_artist`.
 
-- [ ] **3h. `neuro/detection.py` — `parse_setlist()`:**
+- [x] **3h. `neuro/detection.py` — `parse_setlist()`:**
 
   ```python
   # BEFORE (line 330)
@@ -448,7 +448,7 @@ through `project.artists`. This is the core of the refactoring.
   if not is_album_info_line and any(fields[0].startswith(s) for s in singer_names):
   ```
 
-- [ ] **3i. `neuro/detection.py` — `is_twin_duet_stream()`:**
+- [x] **3i. `neuro/detection.py` — `is_twin_duet_stream()`:**
 
   ```python
   # BEFORE
@@ -475,7 +475,7 @@ through `project.artists`. This is the core of the refactoring.
       twin_album_stream_title = twin_album_stream_title.replace(a.name, project.duet_group_name)
   ```
 
-- [ ] **3j. `neuro/detection.py` — `extract_official()`:**
+- [x] **3j. `neuro/detection.py` — `extract_official()`:**
 
   ```python
   # BEFORE
@@ -494,7 +494,7 @@ through `project.artists`. This is the core of the refactoring.
       raise ValueError(f"Cannot infer lead singer from '{cover_artist}'")
   ```
 
-- [ ] **3k. `neuro/json_to_csv.py` — `update_db()`:**
+- [x] **3k. `neuro/json_to_csv.py` — `update_db()`:**
 
   ```python
   # BEFORE (line 67)
@@ -511,7 +511,7 @@ through `project.artists`. This is the core of the refactoring.
   if ... song['Cover Artist'] in valid_cover_artists:
   ```
 
-- [ ] **3l. `neuro/json_to_csv.py` — `get_most_recent_version()`:**
+- [x] **3l. `neuro/json_to_csv.py` — `get_most_recent_version()`:**
 
   ```python
   # BEFORE (lines 273-276)
@@ -527,7 +527,7 @@ through `project.artists`. This is the core of the refactoring.
           flags = flags.replace(a.flag + ';', lead_flag + ';')
   ```
 
-- [ ] **3m. `neuro/thumbnails.py` — `check_stream()`, `singer_match()`, `generate_main()`:**
+- [x] **3m. `neuro/thumbnails.py` — `check_stream()`, `singer_match()`, `generate_main()`:**
 
   ```python
   # BEFORE
@@ -549,7 +549,7 @@ through `project.artists`. This is the core of the refactoring.
   ```
   `singer_match()` becomes a lookup into these project-configured lists.
 
-- [ ] **3n. `Song.__init__` — store the project reference:**
+- [x] **3n. `Song.__init__` — store the project reference:**
 
   Add `self._project: Project = project` to `Song.__init__`, passed from `classify_song()`
   in `run.py` (which already has the project in scope).

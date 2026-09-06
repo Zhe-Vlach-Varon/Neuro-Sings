@@ -123,33 +123,41 @@ def generate_oldge() -> None:
     logger.success(f"[THUMB] [{N_COVERS}/{N_COVERS}] successfully generated in {time_format(time() - t)}")
 
 
-def check_stream(stream: dict[str, str]) -> None:
+def check_stream(stream: dict[str, str], project=None) -> None:
     """Checks if the data matches the expectations
 
     Args:
         stream (dict[str, str]): Row from the dates csv
+        project: The active project (defaults to get_project()).
 
     Raises:
         ValueError: If one of these conditions isn't fulfilled:
-        - Singer isn't Neuro or Evil
+        - Singer isn't a project singer or the duet group name
         - Duet format isn't v1, v2v1 or v2
     """
-    if stream["Singer"] not in ["Neuro", "Evil", "Twins"]:
+    if project is None:
+        from neuro import get_project
+        project = get_project()
+    valid_singers = set(project.singer_names()) | {project.duet_group_name}
+    if stream["Singer"] not in valid_singers:
         raise ValueError(f"Wrong singer {stream['Singer']}")
 
     if stream["Duet Format"] not in ["v1", "v2v1", "v2"]:
         raise ValueError(f"Wrong duet version {stream['Duet Format']}")
 
 
-Singer: TypeAlias = Literal["Neuro", "Evil"]
+Singer: TypeAlias = str
 DuetVersion: TypeAlias = Literal["v1", "v2v1", "v2"]
 
 
 def singer_match(singer: Singer, version: DuetVersion) -> tuple[int, int]:
     """Returns solo and duet images indices in their lists.
 
+    NOTE: This is project-specific image index mapping. For a different project,
+    the index values and singer names would need to be adjusted.
+
     Args:
-        singer (str): Who is singing, should be "Neuro" or "Evil".
+        singer (str): Who is singing, should be one of the project's singer names.
         version (str): Version for duets, should be "v1", "v2" or "v1v2".
 
     Returns:
@@ -212,10 +220,10 @@ def generate_main() -> None:
     i_total = 0
 
     for stream in dates.iter_rows(named=True):
-        check_stream(stream)
+        check_stream(stream, project)
         date = stream["Date"]
 
-        for who in ['Neuro', 'Evil']: # TODO temp fix to generate cover images for both singers for each date
+        for who in project.singer_names():  # generate cover images for each project singer
             version = stream["Duet Format"]
 
             # print(who)

@@ -13,6 +13,7 @@ from loguru import logger
 
 from neuro import LOG_DIR, ROOT_DIR, UNOFFV3_EXTRA, UNOFFV3_DISC66
 from neuro import get_project
+from neuro.artists import Project
 from neuro.polars_utils import load_db
 import neuro.utils as neutils
 
@@ -27,7 +28,7 @@ def get_files(songs: pl.DataFrame) -> dict[str, list[Path]]:
         
     Returns:
         dict[str, list[Path]]: Audio files filtered by directories.
-            Keys: "Neuro", "Evil", "Duets", "V1", "V2", "Custom".
+            Keys: "Custom", "UnofficialV3", "ARG", "Official", "Copyright".
     """
     project = get_project()
 
@@ -113,6 +114,8 @@ def extract_unofficialV3(files: list[Path], out: neutils.SongJSON = {}) -> neuti
         SongJSON: Dictionary with at least these files' information."""
 
     songs_df = load_db()
+    project = get_project()
+    first_artist_name = project.artists[0].name
 
     id = 1
     for file in files:
@@ -155,12 +158,12 @@ def extract_unofficialV3(files: list[Path], out: neutils.SongJSON = {}) -> neuti
         cover_artist = trackJSon['CoverArtist']
         version = trackJSon['Version']
         special = trackJSon['Special']
-        if cover_artist.startswith('Neuro') and (not cover_artist.startswith('Neuro &')) and version.startswith('1'):
-            cover_artist = 'Neuro [v1]'
-        elif cover_artist.startswith('Neuro') and (not cover_artist.startswith('Neuro &')) and version.startswith('2'):
-            cover_artist = 'Neuro [v2]'
-        if 'Neuro' in cover_artist and 'Annytf' in cover_artist and 'Seishun Complex' in title:
-            cover_artist = 'Neuro [v2] & Annytf'
+        if cover_artist.startswith(first_artist_name) and (not cover_artist.startswith(first_artist_name + ' &')) and version.startswith('1'):
+            cover_artist = f'{first_artist_name} [v1]'
+        elif cover_artist.startswith(first_artist_name) and (not cover_artist.startswith(first_artist_name + ' &')) and version.startswith('2'):
+            cover_artist = f'{first_artist_name} [v2]'
+        if first_artist_name in cover_artist and 'Annytf' in cover_artist and 'Seishun Complex' in title:
+            cover_artist = f'{first_artist_name} [v2] & Annytf'
         data = {
             'Cover Artist' : cover_artist,
             'Artist' : artist,
@@ -267,15 +270,14 @@ def extract_official(files: list[Path], out: neutils.SongJSON ={}) -> neutils.So
                 cover_artist = song['Cover Artist']
                 title = song['Title']
                 date = song['Date']
-                # a lot of the code assumes that Neuro and Evil are the only singers, and only one, so for now one of them needs to be the lead singer
-                if 'Neuro' in song['Cover Artist'] and 'Evil' in song['Cover Artist']:
-                    lead_singer = 'Neuro'
-                elif 'Neuro' in song['Cover Artist']:
-                    lead_singer = 'Neuro'
-                elif 'Evil' in song['Cover Artist']:
-                    lead_singer = 'Evil'
-                else:
-                    logger.error(f"how did we get here: neuro/detection.py: unexpected Cover Artist")
+                # a lot of the code assumes that one of the project artists is the lead singer
+                lead_singer = None
+                for a in project.artists:
+                    if a.name in cover_artist:
+                        lead_singer = a.name
+                        break
+                if lead_singer is None:
+                    logger.error(f"how did we get here: neuro/detection.py: unexpected Cover Artist '{cover_artist}'")
                     exit(1)
                 if title == 'Chinatown Blues':
                     version = '2'
@@ -318,6 +320,7 @@ def get_default_album_name(album_song_count: int, singer:str, date: str) -> str:
 
 
 def parse_setlist(p: Path) -> tuple[neutils.SongJSON, list[str]]:
+    project = get_project()
     with open(p, 'r') as file:
         lines = file.readlines()
 
@@ -331,13 +334,15 @@ def parse_setlist(p: Path) -> tuple[neutils.SongJSON, list[str]]:
     found_album_line = False
     album = ''
 
-    lead_singer = "Neuro"
+    lead_singer = project.artists[0].name
     album_art = None
 
     album_song_count = 0
 
     seen_songs = []
     dates = []
+
+    singer_names = project.singer_names()
 
     for line in lines:
         if re.match(song_line_regex, line) is not None:
@@ -356,8 +361,8 @@ def parse_setlist(p: Path) -> tuple[neutils.SongJSON, list[str]]:
             is_album_info_line = False
 
 
-        # checking if starts with "Neuro" because 2026-04-01 April Fools karaoke included a song using v1 voice
-        if not is_album_info_line and (fields[0].startswith("Neuro") or fields[0] == "Evil"):
+        # checking if starts with a project singer name (e.g. "Neuro" might appear as "Neuro [v1]")
+        if not is_album_info_line and any(fields[0].startswith(s) for s in singer_names):
             is_singer_change_line = True
         else:
             is_singer_change_line = False
@@ -450,8 +455,10 @@ def parse_setlist(p: Path) -> tuple[neutils.SongJSON, list[str]]:
             songs[album].append(data)
             seen_songs.append(data)
 
-    if is_twin_duet_stream(album, songs.get(album, [])):
-        twin_album_stream_title = album.replace('Neuro', 'Twins').replace('Evil', 'Twins')
+    if is_twin_duet_stream(album, songs.get(album, []), project):
+        twin_album_stream_title = album
+        for a in project.artists:
+            twin_album_stream_title = twin_album_stream_title.replace(a.name, project.duet_group_name)
         songs[twin_album_stream_title] = songs.pop(album)
 
     return songs, dates
@@ -630,13 +637,15 @@ def extract_all() -> neutils.SongJSON:
     return out
 
 
-def is_twin_duet_stream(album_name: str, songs: list) -> bool:
-    """Mirrors the `twin_duet_stream` detection in json_to_csv.update_db:
-    an album is a twin duet stream when it is a karaoke album (i.e. not one of the
-    non-karaoke setlist stems) and every song in it is covered by 'Neuro & Evil'."""
+def is_twin_duet_stream(album_name: str, songs: list, project: Project | None = None) -> bool:
+    """An album is a twin duet stream when it is a karaoke album (i.e. not one of the
+    non-karaoke setlist stems) and every song in it is covered by the project duet name."""
+    if project is None:
+        project = get_project()
     if album_name in neutils.get_non_karaoke_album_names():
         return False
-    return all(song['Cover Artist'] == 'Neuro & Evil' for song in songs)
+    duet_name = project.duet_cover_artist()
+    return all(song['Cover Artist'] == duet_name for song in songs)
 
 
 def _expected_flags(song: dict, is_twin_duet_stream: bool = False) -> str:
@@ -646,12 +655,13 @@ def _expected_flags(song: dict, is_twin_duet_stream: bool = False) -> str:
         then the twin-duet stripping of the neuro/evil flags,
         then the 'Neuro & Evil' + 'original' duet handling.
     """
-    flags = neutils.get_flags(song)
+    project = get_project()
+    flags = neutils.get_flags(song, project)
     if neutils.is_copyright_issue(song['Title'], song['Artist']):
         flags += 'copyright_issues;'
     flags += song['additional flags']
 
-    return neutils.post_process_flags(flags, song['Cover Artist'], is_twin_duet=is_twin_duet_stream)
+    return neutils.post_process_flags(flags, song['Cover Artist'], project=project, is_twin_duet=is_twin_duet_stream)
 
 
 def _flag_set(flags: str | None) -> set:
@@ -754,6 +764,7 @@ def check_missing_setlist_entries() -> list[dict]:
 
             # Check for track number mismatches and flag discrepancies among matched tracks
             is_twin_duet = is_twin_duet_stream(album_name, songs)
+            # 'duplicate'/'encore' are structural markers added to encore entries in
             # 'duplicate'/'encore' are structural markers added to encore entries in
             # update_db; they are not part of the musical content flags, so ignore them
             structural = {'duplicate', 'encore'}

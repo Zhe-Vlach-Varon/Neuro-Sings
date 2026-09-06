@@ -18,7 +18,8 @@ import loguru
 import xxhash
 from mutagen.id3 import ID3, ID3NoHeaderError
 
-from neuro import COPYRIGHT_ISSUES_CSV, LOG_DIR, SETLISTS_DIR
+from neuro import COPYRIGHT_ISSUES_CSV, LOG_DIR, SETLISTS_DIR, get_project
+from neuro.artists import Project
 
 logger = loguru.logger
 
@@ -493,10 +494,10 @@ def is_copyright_issue(title: str | None, artist: str | None) -> bool:
 
     return False
 
-def get_flags(song: SongEntry) -> str:
+def get_flags(song: SongEntry, project: Project | None = None) -> str:
 
     """ Singing voice version: 'v1', 'v2', 'v3', ''
-        Lead singer: 'neuro', 'evil'
+        Lead singer: singer flag from project (e.g. 'neuro', 'evil')
         Duet: 'duet', ''
         Duplicate: 'duplicate', ''
         Encore: 'encore', ''
@@ -513,6 +514,9 @@ def get_flags(song: SongEntry) -> str:
         ARG: 'arg', ''
         arg songs have only the arg flag"""
 
+    if project is None:
+        project = get_project()
+
     flags: str = ""
 
     cover_artist = song['Cover Artist']
@@ -523,36 +527,42 @@ def get_flags(song: SongEntry) -> str:
     if lead_singer == 'Study-sama':
         return 'arg;'
 
+    first_artist_flag = project.artists[0].flag
     if '[v1]' in cover_artist:
-        flags = 'v1;neuro;'
+        flags = f'v1;{first_artist_flag};'
     elif '[v2]' in cover_artist:
-        flags = 'v2;neuro;'
+        flags = f'v2;{first_artist_flag};'
     else:
         flags = 'v3;'
-
-        if lead_singer == 'Neuro':
-            flags += 'neuro;'
-        if lead_singer == 'Evil':
-            flags += 'evil;'
-    if cover_artist == 'Neuro & Evil':
+        if lead_singer in project.singer_names():
+            flags += project.flag_for(lead_singer) + ';'
+    if cover_artist == project.duet_cover_artist():
         flags += 'duet;'
-    elif ('Neuro ' in cover_artist and ' & ' in cover_artist and 'Evil' not in cover_artist) or 'Evil & ' in cover_artist or 'Neuro, Evil, ' in cover_artist:
+    elif any(s in cover_artist for s in project.singer_names()) and (
+        (' & ' in cover_artist or ', ' in cover_artist) and cover_artist != project.duet_cover_artist()
+    ):
         flags += 'collab;'
 
-    return post_process_flags(flags, song['Cover Artist'])
+    return post_process_flags(flags, song['Cover Artist'], project=project)
 
 
-def post_process_flags(flags: str, cover_artist: str, is_twin_duet: bool = False) -> str:
+def post_process_flags(flags: str, cover_artist: str, *, project: Project | None = None, is_twin_duet: bool = False) -> str:
     """Apply post-processing transformations to a flags string.
 
-    1. If is_twin_duet: remove 'evil;' and 'neuro;' (twin-duet streams don't get per-voice flags).
-    2. If cover_artist is 'Neuro & Evil' and 'original' is in flags: remove 'neuro;'/`evil;`, ensure 'duet;' is present.
+    1. If is_twin_duet: remove all singer flags (twin-duet streams don't get per-voice flags).
+    2. If cover_artist is the project duet name and 'original' is in flags: remove singer flags, ensure 'duet;' is present.
     """
-    if is_twin_duet:
-        flags = flags.replace('evil;', '').replace('neuro;', '')
+    if project is None:
+        project = get_project()
 
-    if cover_artist == 'Neuro & Evil' and 'original' in flags:
-        flags = flags.replace('neuro;', '').replace('evil;', '')
+    singer_flags = project.all_singer_flags()  # e.g. ('neuro;', 'evil;')
+    if is_twin_duet:
+        for sf in singer_flags:
+            flags = flags.replace(sf, '')
+
+    if cover_artist == project.duet_cover_artist() and 'original' in flags:
+        for sf in singer_flags:
+            flags = flags.replace(sf, '')
         if 'duet;' not in flags:
             flags += 'duet;'
 

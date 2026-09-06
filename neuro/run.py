@@ -8,7 +8,8 @@ from time import time
 import polars as pl
 from loguru import logger
 
-from neuro import DRIVE_DIR, UNOFFICIALV3_DIR, LOG_DIR, SONG_ROOT_DIR, UNOFFV3_EXTRA, UNOFFV3_DISC66, COPYRIGHT_ISSUES_DIR
+from neuro import LOG_DIR, UNOFFV3_EXTRA, UNOFFV3_DISC66
+from neuro import get_project
 from neuro.checks import check_are_dbs_identical, check_all_group_coverage, check_group_coverage
 from neuro.detection import export_json, extract_all
 from neuro.file_tags import CustomSong, DriveSong, Song
@@ -69,11 +70,13 @@ def classify_song(song_dict: dict, dates_dict: DateDict) -> DriveSong | CustomSo
     Returns:
         DriveSong | CustomSong: The appropriate Song subclass instance.
     """
+    project = get_project()
     file_in = Path(song_dict["File_IN"])
+    unofficialv3_dir = project.song_root / "unofficialV3"
     if (
-        file_in.is_relative_to(DRIVE_DIR)
-        or (file_in.is_relative_to(UNOFFICIALV3_DIR) and not file_in.is_relative_to(UNOFFICIALV3_DIR / UNOFFV3_EXTRA / UNOFFV3_DISC66))
-        or file_in.is_relative_to(COPYRIGHT_ISSUES_DIR)
+        file_in.is_relative_to(project.song_root / "drive")
+        or (file_in.is_relative_to(unofficialv3_dir) and not file_in.is_relative_to(unofficialv3_dir / UNOFFV3_EXTRA / UNOFFV3_DISC66))
+        or file_in.is_relative_to(project.song_root / "copyright_issues")
     ):
         return DriveSong(song_dict, dates_dict.get(song_dict["Date"], {}))
     return CustomSong(song_dict)
@@ -94,14 +97,17 @@ def resolve_output_paths(song: Song, root: Path | None, subdir: str) -> dict[str
     Returns:
         dict[str, Path | None]: Dictionary with 'song_files' and 'metadata_files' paths.
     """
+    project = get_project()
     base = root if root is not None else Path(".")
+    official_name = project.out_official.name   # "official_releases"
+    unofficial_name = project.out_unofficial.name  # "unofficial_releases"
     if is_official_release(song):
         return {
-            "song_files": base / "official_releases" / subdir,
-            "metadata_files": base / "unofficial_releases" / subdir,
+            "song_files": base / official_name / subdir,
+            "metadata_files": base / unofficial_name / subdir,
         }
     return {
-        "song_files": base / "unofficial_releases" / subdir,
+        "song_files": base / unofficial_name / subdir,
         "metadata_files": None,
     }
 
@@ -120,7 +126,7 @@ def generate_from_preset(preset: Preset, dates_dict: DateDict, create_placeholde
     global g_hash_to_file_dict
 
     if not len(g_hash_to_file_dict):
-        g_hash_to_file_dict = get_audio_hash_to_file_mapping(SONG_ROOT_DIR)
+        g_hash_to_file_dict = get_audio_hash_to_file_mapping(get_project().song_root)
 
     t = time()
     songs_filtered = preset.get_filtered_df(songs_df)
@@ -144,7 +150,8 @@ def generate_from_preset(preset: Preset, dates_dict: DateDict, create_placeholde
                 # Use the album path that generate_albums would use as the source.
                 # preset.root is None when use-root = false: fall back to CWD like resolve_output_paths() does,
                 # instead of building a literal "None" directory.
-                release_dir = "unofficial_releases" if not is_official_release(s) else "official_releases"
+                project = get_project()
+                release_dir = project.out_unofficial.name if not is_official_release(s) else project.out_official.name
                 root_base = preset.root if preset.root is not None else Path(".")
                 album_song_dir = root_base / release_dir / 'albums' / s.album
                 existing_path = album_song_dir / f"{s.file_name(s.flags.as_custom, numberedFiles=False)}.mp3" if isinstance(s, DriveSong) else album_song_dir / f"{s.file_name(not s.flags.as_drive, numberedFiles=False)}{s.file.suffix}"
@@ -275,7 +282,7 @@ def generate_albums(create_placeholders: bool = False) -> None:
     global g_hash_to_file_dict
 
     if not len(g_hash_to_file_dict):
-        g_hash_to_file_dict = get_audio_hash_to_file_mapping(SONG_ROOT_DIR)
+        g_hash_to_file_dict = get_audio_hash_to_file_mapping(get_project().song_root)
 
     format_logger(log_file=LOG_DIR / "generation.log")
     logger.info("[GEN] Starting generation batch")

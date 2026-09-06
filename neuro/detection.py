@@ -11,7 +11,8 @@ import tinytag
 import polars as pl
 from loguru import logger
 
-from neuro import LOG_DIR, CUSTOM_DIR, ROOT_DIR, SONGS_JSON, UNOFFICIALV3_DIR, UNOFFV3_EXTRA, UNOFFV3_DISC66, OFFICIAL_RELEASE_DIR, COPYRIGHT_ISSUES_DIR, SETLISTS_DIR, OFFICIAL_CSV, ORIGINAL_CSV
+from neuro import LOG_DIR, ROOT_DIR, UNOFFV3_EXTRA, UNOFFV3_DISC66
+from neuro import get_project
 from neuro.polars_utils import load_db
 import neuro.utils as neutils
 
@@ -28,6 +29,8 @@ def get_files(songs: pl.DataFrame) -> dict[str, list[Path]]:
         dict[str, list[Path]]: Audio files filtered by directories.
             Keys: "Neuro", "Evil", "Duets", "V1", "V2", "Custom".
     """
+    project = get_project()
+
     # Set of all files already treated and registered
     # TODO add error checking for if a empty entry was accidentally added to the DB
     # TODO switch to using audio hash to check if song is already in database
@@ -41,11 +44,11 @@ def get_files(songs: pl.DataFrame) -> dict[str, list[Path]]:
             logger.warning(f"no files found in {p} of filetype {filetype}")
         return filtered_files
 
-    custom_dir = CUSTOM_DIR
-    unofficialV3_dir = UNOFFICIALV3_DIR
-    arg_dir = UNOFFICIALV3_DIR / UNOFFV3_EXTRA / UNOFFV3_DISC66
-    official_dir = OFFICIAL_RELEASE_DIR
-    copyright_issues_dir = COPYRIGHT_ISSUES_DIR
+    custom_dir = project.song_root / "custom"
+    unofficialV3_dir = project.song_root / "unofficialV3"
+    arg_dir = unofficialV3_dir / UNOFFV3_EXTRA / UNOFFV3_DISC66
+    official_dir = project.song_root / "officially_released_songs"
+    copyright_issues_dir = project.song_root / "copyright_issues"
 
     return {
         "Custom": get_audios(custom_dir) + get_audios(custom_dir, filetype="flac"),
@@ -246,8 +249,9 @@ def _make_song_entry(artist: str, cover_artist: str, title: str, file: Path, dat
 def extract_official(files: list[Path], out: neutils.SongJSON ={}) -> neutils.SongJSON:
     # load original_songs.csv and official_covers.csv
     # search files for each song
-    official_songs_csv = pl.read_csv(OFFICIAL_CSV, separator='|').to_dicts()
-    original_songs_csv = pl.read_csv(ORIGINAL_CSV).to_dicts()
+    project = get_project()
+    official_songs_csv = pl.read_csv(project.data_dir / "official_covers.csv", separator='|').to_dicts()
+    original_songs_csv = pl.read_csv(project.data_dir / "original_songs.csv").to_dicts()
 
     songs_db = load_db()
 
@@ -460,7 +464,8 @@ def song_entry_sort_by_id(e):
 
 
 def get_setlist_files() -> list[Path]:
-    files = list(SETLISTS_DIR.glob(f"**/*"))
+    project = get_project()
+    files = list(project.setlists_dir.glob(f"**/*"))
     karaoke_setlists = [f for f in files if 'non-karaoke' not in f.parts and not f.is_dir()]
     non_karaoke_setlists = [f for f in files if 'non-karaoke' in f.parts and not f.is_dir()]
     karaoke_setlists.sort()
@@ -853,6 +858,7 @@ def run_setlist_check() -> int:
 
 def export_json(all_songs: neutils.SongJSON) -> None:
     """Takes an existing result of new files search and exports it in a json file."""
+    project = get_project()
 
     all_keys = sorted(all_songs)
 
@@ -873,7 +879,7 @@ def export_json(all_songs: neutils.SongJSON) -> None:
     assert 'custom' not in dated_songs.keys()
     sorted_songs = dict(sorted(dated_songs.items(), key=lambda item: item[1][0]['Date']))
 
-    with open(SONGS_JSON, "w") as f:
+    with open(project.songs_json, "w") as f:
         json.dump(sorted_songs, f, indent=2, ensure_ascii=False)
         f.write("\n")
 

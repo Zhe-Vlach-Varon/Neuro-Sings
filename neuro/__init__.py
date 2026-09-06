@@ -6,6 +6,12 @@ from pathlib import Path
 
 ROOT_DIR = Path(".")
 
+# ── Deprecated path constants ─────────────────────────────────────────────────
+# These are kept for backward compatibility. New code should use
+# `neuro.get_project()` to obtain the active project and read paths from it.
+# They will be removed in a future major version.
+# ──────────────────────────────────────────────────────────────────────────────
+
 DATA_DIR = ROOT_DIR / Path("data")
 
 SONGS_JSON = DATA_DIR / "songs_new.json"

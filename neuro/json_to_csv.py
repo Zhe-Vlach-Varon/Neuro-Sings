@@ -5,28 +5,31 @@ from pathlib import Path
 import polars as pl
 from loguru import logger
 
-from neuro import DATES_CSV, LOG_DIR, SONGS_CSV, SONGS_DB, SONGS_JSON
+from neuro import LOG_DIR
+from neuro import get_project
 from neuro.detection import check_missing_setlist_entries, is_twin_duet_stream
 from neuro.polars_utils import load_dates, load_db, songs_schema, dates_schema
 import neuro.utils as neutils
 
 
 def clear_db() -> None:
+    project = get_project()
     songs_df = pl.DataFrame({}, schema=songs_schema)
     dates_df = pl.DataFrame({}, schema=dates_schema)
 
-    songs_df.write_csv(SONGS_CSV)
-    dates_df.write_csv(DATES_CSV)
+    songs_df.write_csv(project.songs_csv)
+    dates_df.write_csv(project.dates_csv)
     
-    songs_df.write_database("Songs", f"sqlite:///{SONGS_DB}", if_table_exists="replace")
-    dates_df.write_database("Dates", f"sqlite:///{SONGS_DB}", if_table_exists="replace")
+    songs_df.write_database("Songs", f"sqlite:///{project.songs_db}", if_table_exists="replace")
+    dates_df.write_database("Dates", f"sqlite:///{project.songs_db}", if_table_exists="replace")
 
 
 def update_db() -> None:
     """Updates the song database, adding songs from the JSON file that aren't yet in it
     The Date CSV/Table is also updated for each new stream"""
+    project = get_project()
     neutils.format_logger(log_file=LOG_DIR / "json.log")
-    with open(SONGS_JSON, "r") as f:
+    with open(project.songs_json, "r") as f:
         json_data: neutils.SongJSON = json.load(f)
 
     songs_df = load_db()
@@ -187,7 +190,7 @@ def update_db() -> None:
         logger.info(f"All songs from {album} treated, removed stream")
 
     # Updates JSON file with treated songs removed
-    with open(SONGS_JSON, "w") as f:
+    with open(project.songs_json, "w") as f:
         json.dump(json_data, f, indent=2, ensure_ascii=False)
         f.write("\n")
 
@@ -201,11 +204,11 @@ def update_db() -> None:
     sorted_songs_df = sorted_songs_df.with_columns(pl.int_range(0, pl.len(), dtype = pl.Int64).alias('id'))
 
     # Write modifications if both CSVs
-    sorted_songs_df.write_csv(SONGS_CSV)
-    sorted_dates_df.write_csv(DATES_CSV)
+    sorted_songs_df.write_csv(project.songs_csv)
+    sorted_dates_df.write_csv(project.dates_csv)
     # Write modifications if DBs
-    sorted_songs_df.write_database("Songs", f"sqlite:///{SONGS_DB}", if_table_exists="replace")
-    sorted_dates_df.write_database("Dates", f"sqlite:///{SONGS_DB}", if_table_exists="replace")
+    sorted_songs_df.write_database("Songs", f"sqlite:///{project.songs_db}", if_table_exists="replace")
+    sorted_dates_df.write_database("Dates", f"sqlite:///{project.songs_db}", if_table_exists="replace")
 
     check_missing_setlist_entries()
 

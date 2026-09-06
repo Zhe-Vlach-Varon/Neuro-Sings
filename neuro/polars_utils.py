@@ -6,7 +6,8 @@ from typing import Callable
 
 import polars as pl
 
-from neuro import DATES_CSV, ROOT_DIR, SONGS_CSV, SONGS_DB
+from neuro import get_project
+from neuro.artists import Project
 from neuro.utils import MP3GainMode, MP3ModeTuple
 
 # --- result caching ---
@@ -107,40 +108,44 @@ def stack_and(flag_list: list[str]) ->pl.Expr:
     """start with True and AND with truth of each flag being present"""
 
 
-def load_db(as_db: bool = True, root: Path = ROOT_DIR) -> pl.DataFrame:
+def load_db(as_db: bool = True, project: Project | None = None) -> pl.DataFrame:
     """Wrapper to loader the songs DB regardless of the backend format.
 
     Args:
         as_db (bool, optional): If True, will look for a `.db` database, otherwise \
             looks for a CSV file. Defaults to True.
-        root (Path, optional): Root dir to search the database from.Defaults to ROOT_DIR.
+        project (Project | None, optional): The project to load from. Defaults to the \
+            active project (obtained via `get_project()`).
 
     Returns:
         pl.DataFrame: A polars DataFrame, regardless of the storage format.
     """
-    filepath = root / (SONGS_DB if as_db else SONGS_CSV)
-    key = f"songs:{'db' if as_db else 'csv'}:{root}"
+    proj = project if project is not None else get_project()
+    filepath = proj.songs_db if as_db else proj.songs_csv
+    key = f"songs:{proj.name}:{'db' if as_db else 'csv'}"
     return _get_or_load(key, filepath, lambda: (
-        pl.read_database_uri("SELECT * FROM Songs", f"sqlite://{root / SONGS_DB}") if as_db
-        else pl.read_csv(root / SONGS_CSV, schema=songs_schema)
+        pl.read_database_uri("SELECT * FROM Songs", f"sqlite://{proj.songs_db}") if as_db
+        else pl.read_csv(proj.songs_csv, schema=songs_schema)
     ))
 
 
-def load_dates(as_db: bool = True, root: Path = ROOT_DIR) -> pl.DataFrame:
+def load_dates(as_db: bool = True, project: Project | None = None) -> pl.DataFrame:
     """Same as `load_db`. Loads dates database regardless of format.
 
     Args:
         as_db (bool, optional): Loads from a `.db` file or not. Defaults to True.
-        root (Path, optional): Root dir to search the database from. Defaults to ROOT_DIR.
+        project (Project | None, optional): The project to load from. Defaults to the \
+            active project (obtained via `get_project()`).
 
     Returns:
         pl.DataFrame: Polars DataFrame with dates.
     """
-    filepath = root / (SONGS_DB if as_db else DATES_CSV)
-    key = f"dates:{'db' if as_db else 'csv'}:{root}"
+    proj = project if project is not None else get_project()
+    filepath = proj.songs_db if as_db else proj.dates_csv
+    key = f"dates:{proj.name}:{'db' if as_db else 'csv'}"
     return _get_or_load(key, filepath, lambda: (
-        pl.read_database_uri("SELECT * FROM Dates", f"sqlite://{root / SONGS_DB}") if as_db
-        else pl.read_csv(root / DATES_CSV)
+        pl.read_database_uri("SELECT * FROM Dates", f"sqlite://{proj.songs_db}") if as_db
+        else pl.read_csv(proj.dates_csv)
     ))
 
 

@@ -244,37 +244,37 @@ Each phase is independently shippable and backward-compatible.
 
 **Goal:** Replace all module-level path constants with `Project` attributes. Mechanical but wide-reaching.
 
-- [ ] **`neuro/__init__.py`:** Keep existing constants for backward compat (marked deprecated).
+- [x] **`neuro/__init__.py`:** Keep existing constants for backward compat (marked deprecated).
       Add `get_project()` accessor.
 
-- [ ] **`neuro/polars_utils.py`:**
+- [x] **`neuro/polars_utils.py`:**
   - `load_db(as_db=True, root=ROOT_DIR)` → `load_db(as_db=True, project: Project | None = None)`
   - `load_dates(as_db=True, root=ROOT_DIR)` → `load_dates(as_db=True, project: Project | None = None)`
   - Cache key includes `project.name` to avoid cross-project cache pollution.
 
-- [ ] **`neuro/detection.py`:**
+- [x] **`neuro/detection.py`:**
   - `get_files(songs)` → use `project.song_root` subdirs instead of `DRIVE_DIR`, `CUSTOM_DIR`, etc.
   - `extract_all()` → thread `project` to all `extract_*` calls.
   - `export_json(out)` → use `project.songs_json` instead of `SONGS_JSON`.
 
-- [ ] **`neuro/json_to_csv.py`:**
+- [x] **`neuro/json_to_csv.py`:**
   - `clear_db()` → use `project.songs_csv`, `project.songs_db`, `project.dates_csv`.
   - `update_db()` → same, plus `project.songs_json`.
 
-- [ ] **`neuro/checks.py`:**
+- [x] **`neuro/checks.py`:**
   - All `check_*` functions → use `get_project()` for paths.
   - `check_are_dbs_identical()` → compare the project's CSV vs SQLite.
 
-- [ ] **`neuro/run.py`:**
+- [x] **`neuro/run.py`:**
   - `load_config()` → return `(config_dict, project)` instead of `(config_dict, OUT_ROOT)`.
   - `generate_from_preset()` → use `project.out_unofficial` / `project.out_official` instead of
     the hardcoded `"unofficial_releases"` / `"official_releases"` strings in `resolve_output_paths()`.
 
-- [ ] **`neuro/_shortcuts.py`:**
+- [x] **`neuro/_shortcuts.py`:**
   - Drive names → `project.drive_public`, `project.drive_private`, `project.drive_source`.
   - All rclone path constructions → use `project` paths.
 
-- [ ] **`neuro/thumbnails.py`:**
+- [x] **`neuro/thumbnails.py`:**
   - `IMAGES_BG_DIR`, `IMAGES_COVERS_DIR`, `IMAGES_CUSTOM_DIR` → `project.images_bg_dir`, etc.
   - `FONT_PATH` → `project.fonts_dir / "First Coffee.ttf"`.
 

@@ -16,6 +16,8 @@ found_song_files.txt
 fonts/First Coffee.otf
 fonts/First Coffee.ttf
 temp
+temp_public
+temp_private
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

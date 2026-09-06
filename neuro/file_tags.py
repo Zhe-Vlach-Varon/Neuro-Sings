@@ -508,7 +508,7 @@ class DriveSong(Song):
                                self.cover_artist, self.version, self.album, "1", track_n,
                                self.comment, self.special, self.hash_in)
         id3.add(COMM(encoding=3, lang="ved", desc="", text=[payload_data]))
-        id3.save(v2_version="3", v1="2")
+        id3.save(v2_version=3, v1=2)
 
 
 class CustomSong(Song):
@@ -602,7 +602,7 @@ class CustomSong(Song):
                                self.cover_artist, self.version, self.album, "1", track_n,
                                self.comment, self.special, self.hash_in)
         id3.add(COMM(encoding=3, lang="ved", desc="", text=[payload_data]))
-        id3.save(v2_version="3", v1="2")
+        id3.save(v2_version=3, v1=2)
 
     def get_flac_pic(self) -> Picture:
         """Generates a picture for a FLAC file's cover. This very particular method works, so\

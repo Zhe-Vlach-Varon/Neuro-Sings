@@ -52,7 +52,7 @@ remote_links = True
 local_links = True
 LINK_OPTIONS =  " --skip-links" if remote_links and local_links else (" --copy-links" if local_links else "")
 
-verb = True
+verb = False
 V = " -v" if verb else ""
 
 dryrun = False
@@ -64,12 +64,14 @@ TR = False
 # rclone complete commands
 DRIVE_RCLONE_COMMAND = f"{RCLONE_SYNC}{COMMON_OPTIONS}{DRIVE_OPTIONS}{V}{DR}"
 
-LOCAL_TEST_DIR = Path("temp")
+LOCAL_TEST_IN_DIR = Path("temp")
+LOCAL_TEST_OUT_PUB_DIR = Path("temp_public")
+LOCAL_TEST_OUT_PRV_DIR = Path("temp_private")
 LOCAL_PUBLIC_DIR = Path(PUBLIC_DRIVE_NAME)
 LOCAL_PRIVATE_DIR = Path(PRIVATE_DRIVE_NAME)
 
-PUBLIC_DEST = f"{PUBLIC_DRIVE_NAME}:" if not TR else f"{LOCAL_TEST_DIR}/"
-PRIVATE_DEST = f"{PRIVATE_DRIVE_NAME}:" if not TR else f"{LOCAL_TEST_DIR}/"
+PUBLIC_DEST = f"{PUBLIC_DRIVE_NAME}:" if not TR else f"{LOCAL_TEST_OUT_PUB_DIR}/"
+PRIVATE_DEST = f"{PRIVATE_DRIVE_NAME}:" if not TR else f"{LOCAL_TEST_OUT_PRV_DIR}/"
 
 PUBLIC_DIR = f"{LOCAL_PUBLIC_DIR}/" if TR else ""
 PRIVATE_DIR = f"{LOCAL_PRIVATE_DIR}/" if TR else ""
@@ -149,22 +151,26 @@ def _create_drive_shortcuts(out_dir: Path, dest: str, dir_prefix: str, error_lab
 
 
 def setlists_pull() -> None:
+    format_logger(log_file=LOG_DIR / "sync.log")
     setlist_pull_command = f"{DRIVE_RCLONE_COMMAND} {PUBLIC_DRIVE_NAME}:{REMOTE_INPUT_PREFIX}/{SETLISTS_DIR} {SETLISTS_DIR}"
     _rclone(setlist_pull_command, "setlists pull failed")
 
 
 def setlists_push() -> None:
+    format_logger(log_file=LOG_DIR / "sync.log")
     setlist_push_command = f"{DRIVE_RCLONE_COMMAND} {SETLISTS_DIR} {PUBLIC_DEST}{PUBLIC_DIR}{REMOTE_INPUT_PREFIX}/{SETLISTS_DIR}"
     _rclone(setlist_push_command, "setlists push failed")
 
 
 def drive_pull() -> None:
-    drive_pull_command = f"{DRIVE_RCLONE_COMMAND} {UNOFFICIAL_V3_DRIVE_NAME}: temp/{UNOFFICIALV3_DIR.name}"
+    format_logger(log_file=LOG_DIR / "sync.log")
+    drive_pull_command = f"{DRIVE_RCLONE_COMMAND} {UNOFFICIAL_V3_DRIVE_NAME}: {LOCAL_TEST_IN_DIR}/{UNOFFICIALV3_DIR.name}"
     _rclone(drive_pull_command, "drive pull failed")
 
 # TODO command to apply my changes to unofficial archive metadata
 
 def inputs_pull() -> None:
+    format_logger(log_file=LOG_DIR / "sync.log")
     # public input files
     setlists_pull()
 
@@ -183,6 +189,7 @@ def inputs_pull() -> None:
 
 
 def drive_push() -> None:
+    format_logger(log_file=LOG_DIR / "sync.log")
 
     # public input files
     setlists_push()

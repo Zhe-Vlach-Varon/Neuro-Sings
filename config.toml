@@ -126,21 +126,21 @@ mp3gain = false
 #v3 neuro only
 name = "Neuro"
 include-flags = ["neuro"]
-exclude-flags = ["duet", "evil", "v1", "v2", "duplicate", "collab", "christmas", "halloween", "original", "official", "quarantine", "zvv_quarantine", "unused"]
+exclude-flags = ["duet", "evil", "v1", "v2", "duplicate", "collab", "christmas", "halloween", "originals", "official", "quarantine", "zvv_quarantine", "unused"]
 path = "zvv_sort/Neuro"
 mp3gain = false
 
 [[Presets]]
 name = "Evil"
 include-flags = ["evil"]
-exclude-flags = ["duet", "neuro", "v1", "v2", "duplicate", "collab", "christmas", "halloween", "original", "official", "quarantine", "zvv_quarantine", "unused"]
+exclude-flags = ["duet", "neuro", "v1", "v2", "duplicate", "collab", "christmas", "halloween", "originals", "official", "quarantine", "zvv_quarantine", "unused"]
 path = "zvv_sort/Evil"
 mp3gain = false
 
 [[Presets]]
 name = "Duets Neuro Lead"
 include-flags = ["duet", "neuro"]
-exclude-flags = ["duplicate", "collab", "christmas", "halloween", "original", "official", "quarantine", "zvv_quarantine", "unused", "mashup"]
+exclude-flags = ["duplicate", "collab", "christmas", "halloween", "originals", "official", "quarantine", "zvv_quarantine", "unused", "mashup"]
 path = "zvv_sort/Duets_Neuro_Lead"
 mp3gain = false
 include-type = "and"
@@ -148,7 +148,7 @@ include-type = "and"
 [[Presets]]
 name = "Duets Neuro Lead"
 include-flags = ["duet", "evil"]
-exclude-flags = ["duplicate", "collab", "christmas", "halloween", "original", "official", "quarantine", "zvv_quarantine", "unused", "mashup"]
+exclude-flags = ["duplicate", "collab", "christmas", "halloween", "originals", "official", "quarantine", "zvv_quarantine", "unused", "mashup"]
 path = "zvv_sort/Duets_Evil_Lead"
 mp3gain = false
 include-type = "and"
@@ -156,13 +156,13 @@ include-type = "and"
 [[Presets]]
 name = "Twin Duet Streams"
 include-flags = ["duet"]
-exclude-flags = ["neuro", "evil", "duplicate", "christmas", "halloween", "original", "official", "quarantine", "zvv_quarantine", "unused", "mashup"]
+exclude-flags = ["neuro", "evil", "duplicate", "christmas", "halloween", "originals", "official", "quarantine", "zvv_quarantine", "unused", "mashup"]
 path = "zvv_sort/Duets_Twins"
 mp3gain = false
 
 [[Presets]]
 name = "Neuro Originals"
-include-flags = ["original", "neuro"]
+include-flags = ["originals", "neuro"]
 exclude-flags = ["duplicate"]
 path = "zvv_sort/Neuro_Originals"
 mp3gain = false
@@ -170,7 +170,7 @@ include-type = "and"
 
 [[Presets]]
 name = "Evil Originals"
-include-flags = ["original", "evil"]
+include-flags = ["originals", "evil"]
 exclude-flags = ["duplicate"]
 path = "zvv_sort/Evil_Originals"
 mp3gain = false
@@ -178,7 +178,7 @@ include-type = "and"
 
 [[Presets]]
 name = "Duet Originals"
-include-flags = ["original", "duet"]
+include-flags = ["originals", "duet"]
 exclude-flags = ["duplicate"]
 path = "zvv_sort/Duet_Originals"
 mp3gain = false

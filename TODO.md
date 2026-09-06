@@ -3,16 +3,13 @@
 ## Current Plans
 
 - [x] take list of songs from a file, and auto detect duplicates based on presence of file in list of new files
-- [ ] make it so that the officially released songs will be skipped if not present
-  - [ ] generate place-holder text files, and include the cover art in a folder with the name of the mp3 file that would have been made for officially released songs
-- [ ] switch to hashing audio data instead of whole file
+- [x] make it so that the officially released songs will be skipped if not present
+  - [x] generate place-holder text files, and include the cover art in a folder with the name of the mp3 file that would have been made for officially released songs
+- [x] switch to hashing audio data instead of whole file
   - [x] switch to checking for song presence in DB based on hash of audio data instead of file hash
   - [ ] detect when file metadata doesn't match the database and print a list of issues
   - [x] when generating songs, create a dictionary mapping audio hashes to file names
 - [ ] Update cover image generation system
-  - [ ] create and use texture atlas or individual images of each possible character used in date strings
-    - [x] first pass text atlases
-    - [ ] figure out how to straighten up date segments so they line up better
   - [x] add system to handle split karaoke streams like the 2025 Christmas Karaoke (by split I mean one twin did first half, and the other twin did the second half)
   - [ ] add configurable base image sources
     - [ ] add more background images
@@ -44,17 +41,18 @@
           - [ ] Evil New Mic Neuro Old Mic
           - [ ] Both twins New Mics
   - [x] fix image system so that "as_drive" flag will tell it to take the default cover image for the song's date
-  - [ ] add support for more image file types
+  - [ ] add support for more image file types (e.g. webp, tiff)
+- [ ] add support for more input audio types (e.g. .wav)
 - [ ] Add more error checking
   - [ ] Check for and remove empty rows in DB/CSV
   - [ ] Check for and handle fields that are empty string instead of Null
-- [ ] Add Debug Mode Print Statements for easier debugging when something goes wrong
+- [ ] Add Debug Mode logger statements for easier debugging when something goes wrong
 - [ ] update Songlist.md
 - [ ] find and add credits for new cover arts
 - [ ] check and update database
-- [ ] fix tagging of albums so songs are grouped correctly in media players that expect all songs in an album to be tagged a certain way
-- [ ] for generate albums, consider adding track numbers to start of file name
-- [ ] generate zvv sort and original sort presets seperately
+- [~] fix tagging of albums so songs are grouped correctly in media players that expect all songs in an album to be tagged a certain way (TALB/TPE2 set; still need to handle full-duet-stream flag stripping)
+- [~] for generate albums, consider adding track numbers to start of file name (numberedFiles support exists in file_name() but is not enabled in generate_albums)
+- [~] generate zvv sort and original sort presets separately (both sorts exist in config.toml; needs preset grouping functionality for completeness)
   - [ ] add preset grouping to preset config file
 - [ ] Code Cleanup and Refactoring
   - [ ] find duplicated code and move into separate functions
@@ -63,7 +61,7 @@
 - [ ] find better cover image for 2024-12-30 version of blinding lights
 - [ ] find glorp alien Neuro and Evil art for Alien Alien covers
 - [x] attempt to automatically get ASCII song titles by finding sets of characters inside parantheses and striping non-alphanumeric characters from that
-- [ ] update to use the new metadata format from Unofficial Archive that separates english and original language titles and artist names, and splits out the song version identifiers (Neuro Ver., Evil Ver., etc)
+- [x] update to use the new metadata format from Unofficial Archive that separates english and original language titles and artist names, and splits out the song version identifiers (Neuro Ver., Evil Ver., etc)
 - [ ] get list of all output files, and remove all files in out folder not in the list prior to generating
 - [ ] add function that can update the database based on the output of the setlist check
 
@@ -76,7 +74,7 @@
 - [ ] add support for metadata customizer presets
 - [ ] automatically update duplicates.md
 - [ ] replace os.system calls with the preferred way to call other programs
-- [ ] lint the codebase
+- [x] lint the codebase (ruff configured in pyproject.toml)
 
 
 # Old TODOS

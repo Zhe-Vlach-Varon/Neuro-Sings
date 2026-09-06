@@ -58,7 +58,7 @@ def rotation_fn(_msg: loguru.Message, file_opened: TextIO) -> bool:
     return is_old or is_big
 
 
-def format_logger(*, log_file: Path = LOG_DIR / "neuro.log", verbosity: int = 4) -> None:
+def format_logger(*, log_file: Path = LOG_DIR / "neuro.log", verbosity: int = 5) -> None:
     """Formats a loguru logger, can be called from anywhere to set it up.
 
     Args:

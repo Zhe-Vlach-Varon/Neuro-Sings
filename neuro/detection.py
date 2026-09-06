@@ -11,7 +11,7 @@ import tinytag
 import polars as pl
 from loguru import logger
 
-from neuro import CUSTOM_DIR, ROOT_DIR, SONGS_JSON, UNOFFICIALV3_DIR, UNOFFV3_EXTRA, UNOFFV3_DISC66, OFFICIAL_RELEASE_DIR, COPYRIGHT_ISSUES_DIR, SETLISTS_DIR, OFFICIAL_CSV, ORIGINAL_CSV
+from neuro import LOG_DIR, CUSTOM_DIR, ROOT_DIR, SONGS_JSON, UNOFFICIALV3_DIR, UNOFFV3_EXTRA, UNOFFV3_DISC66, OFFICIAL_RELEASE_DIR, COPYRIGHT_ISSUES_DIR, SETLISTS_DIR, OFFICIAL_CSV, ORIGINAL_CSV
 from neuro.polars_utils import load_db
 import neuro.utils as neutils
 
@@ -847,6 +847,7 @@ def check_missing_setlist_entries() -> list[dict]:
 
 
 def run_setlist_check() -> int:
+    neutils.format_logger(log_file=LOG_DIR / "setlist-check.log")
     return len(check_missing_setlist_entries()) == 0
 
 

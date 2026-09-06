@@ -46,3 +46,26 @@ OUT_OFFICIAL_DIR = OUT_ROOT_DIR / "official_releases"
 
 FONTS_DIR = Path("fonts")
 FONT_PATH = FONTS_DIR / "First Coffee.ttf"
+
+# ── Project abstraction (multi-project cover-artist support) ─────────────
+# Re-exported so callers can `from neuro import Project, get_project`. These are
+# imported *after* the path constants above so the backward-compat path in
+# `neuro.config` can read them once the package has finished loading.
+from neuro.artists import CoverArtist as CoverArtist
+from neuro.artists import Project as Project
+from neuro.config import load_project as load_project
+
+_project: Project | None = None
+
+
+def get_project() -> Project:
+    """Return the active :class:`Project`, loading and caching it on first use.
+
+    The project is read from ``config.toml`` in the current working directory (see
+    :func:`neuro.config.load_project`), so selecting a project is simply a matter of
+    ``cd``-ing into that project's directory.
+    """
+    global _project
+    if _project is None:
+        _project = load_project()
+    return _project

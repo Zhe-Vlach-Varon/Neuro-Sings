@@ -1,3 +1,33 @@
+# ── project identity ──────────────────────────────────────────────
+# Who sings in this project. `name` is the canonical singer name used in the DB,
+# `flag` is the DB flag token, `display-name` is the ID3 tag name, `cover-suffix`
+# is the token in cover-image filenames, and `album-artist` is the TPE2/TSO2 value.
+[project]
+name = "neuro"
+display-name = "Neuro Twins"
+voice-versions = ["v1", "v2", "v3"]
+duet-group-name = "Twins"
+
+[[project.artists]]
+name = "Neuro"
+flag = "neuro"
+display-name = "Neuro-Sama"
+cover-suffix = "neuro"
+album-artist = "Neuro-Sama/Evil Neuro"
+
+[[project.artists]]
+name = "Evil"
+flag = "evil"
+display-name = "Evil Neuro"
+cover-suffix = "evil"
+album-artist = "Neuro-Sama/Evil Neuro"
+
+# ── drive (rclone remote names) ───────────────────────────────────
+[drive]
+public = "Neuro-Sings-ZVV"
+private = "Neuro-Sings-ZVV-official-releases"
+source = "unofficialV3"
+
 [output]
 # If disabled, the path in presets are directly applied, relative or absolute
 # If enabled, the paths in presets must be relative

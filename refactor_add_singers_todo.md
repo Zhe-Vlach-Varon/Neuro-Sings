@@ -206,9 +206,9 @@ Each phase is independently shippable and backward-compatible.
 
 **Goal:** Define the types, load them from config, and make them available everywhere. No behavior changes.
 
-- [ ] **Create `neuro/artists.py`** with `CoverArtist` and `Project` dataclasses (sketch above).
+- [x] **Create `neuro/artists.py`** with `CoverArtist` and `Project` dataclasses (sketch above).
 
-- [ ] **Create `neuro/config.py`** with:
+- [x] **Create `neuro/config.py`** with:
   ```python
   def load_project(config_path: Path = Path("config.toml")) -> Project:
       """Parse config.toml and return a Project instance."""
@@ -219,7 +219,7 @@ Each phase is independently shippable and backward-compatible.
   If `[project]` section is absent, synthesize a `Project` from the existing module-level
   constants with `artists = (Neuro, Evil)` for backward compat.
 
-- [ ] **Add a `get_project()` accessor** in `neuro/__init__.py`:
+- [x] **Add a `get_project()` accessor** in `neuro/__init__.py`:
   ```python
   from neuro.config import load_project
   _project: Project | None = None
@@ -231,7 +231,7 @@ Each phase is independently shippable and backward-compatible.
       return _project
   ```
 
-- [ ] **Add the `[project]` section to `config.toml`** with the current Neuro Twins values,
+- [x] **Add the `[project]` section to `config.toml`** with the current Neuro Twins values,
       so the new config path is exercised.
 
 **Files touched:** `neuro/artists.py` (new), `neuro/config.py` (new), `neuro/__init__.py`, `config.toml`.

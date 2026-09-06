@@ -25,6 +25,7 @@ license-files = ["LICENSE-APACHE", "LICENSE-MIT"]
 # WHEN ADDING A COMMAND HERE, run 'pdm install' after for it to be added to path
 [project.scripts] # Shortcuts, have a command for main run so that it emulates a "real" run
 songs-generate = "neuro.run:generate_songs"
+songs-generate-group = "neuro.run:generate_songs_group"
 albums-generate = "neuro.run:generate_albums"
 update-json = "neuro.run:new_batch_detection"
 thumbnails-generate = "neuro.thumbnails:generate_main"
@@ -32,6 +33,7 @@ thumbnails-old = "neuro.thumbnails:generate_oldge"
 update-db = "neuro.json_to_csv:update_db"
 clear-db = "neuro.json_to_csv:clear_db"
 db-check = "neuro.checks:all_tests"
+check-group = "neuro.run:check_group"
 inputs-pull = "neuro._shortcuts:inputs_pull"
 setlists-pull = "neuro._shortcuts:setlists_pull"
 setlists-push = "neuro._shortcuts:setlists_push"

@@ -144,7 +144,7 @@ def load_dates(as_db: bool = True, root: Path = ROOT_DIR) -> pl.DataFrame:
     ))
 
 
-PresetDict = dict[str, bool | str | list[str]]
+PresetDict = dict[str, bool | str | list[str]]  # may also contain "group" (str) for grouping
 
 
 class Preset:
@@ -177,6 +177,7 @@ class Preset:
                 as a common folder for all presets. Defaults to None.
         """
         self.name = preset_dict["name"]
+        self.group = preset_dict.get("group", "default")
         self.dict = preset_dict
         self.include = self.get_list_assert("include-flags")
         self.exclude = self.get_list_assert("exclude-flags")
@@ -195,6 +196,13 @@ class Preset:
 
         path = preset_dict["path"]
         assert type(path) is str
+
+        # The preset's group (when explicitly set) is the parent directory of its
+        # output, so the final path is "<group>/<path>". Presets without a group
+        # (implicit "default") keep their path as-is, unchanged.
+        explicit_group = preset_dict.get("group")
+        if explicit_group:
+            path = f"{explicit_group}/{path}"
 
         self.root = root
         self.subdir = path

@@ -52,8 +52,9 @@
 - [ ] check and update database
 - [~] fix tagging of albums so songs are grouped correctly in media players that expect all songs in an album to be tagged a certain way (TALB/TPE2 set; still need to handle full-duet-stream flag stripping)
 - [~] for generate albums, consider adding track numbers to start of file name (numberedFiles support exists in file_name() but is not enabled in generate_albums)
-- [~] generate zvv sort and original sort presets separately (both sorts exist in config.toml; needs preset grouping functionality for completeness)
-  - [ ] add preset grouping to preset config file
+- [x] generate zvv sort and original sort presets separately (both sorts exist in config.toml; needs preset grouping functionality for completeness)
+  - [x] add preset grouping to preset config file (each preset's `group` is its parent output dir; `songs-generate-group <name>` generates one group)
+  - [x] add a check that a preset group contains each song in the database exactly once, reporting missing/duplicate songs (`check-group [group]`)
 - [ ] Code Cleanup and Refactoring
   - [ ] find duplicated code and move into separate functions
   - [ ] find non-pythonic code and refactor it to be more pythonic
@@ -95,8 +96,8 @@
 
 ## Mid-prio
 - [ ] Replace github screenshots with poweramp?
-- [ ] Preset prefix/suffix (pass preset to Song)
-- [ ] More complex flag selection with AND/OR
+- [x] Preset prefix/suffix (pass preset to Song)
+- [x] More complex flag selection with AND/OR
   - [x] Maybe at first just an option in the preset to tell include-type = "AND" | "OR" (same for exclude). Write stack_and function and check for option in preset.
   - [ ] Or have a "complex mode" flag, tell if it's AND->OR or OR->AND. And put conditions in arrays of arrays and apply operation 1 between level1 arrays...
 - [x] Find where "fnaf.mp3" is from -> unused

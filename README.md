@@ -89,6 +89,8 @@ So even if the audio files are identical, it is possible to generate those "dupl
 All the scripts can be run with `pdm run <script-name>` after you ran `pdm install`.
 #### Generation
 - `songs-generate`: Generates all presets of songs. Main script! (When `make-links` is on, it symlinks into the albums tree, so run `albums-generate` first.)
+- `songs-generate-group <group>`: Generates only the presets belonging to a single group (see the `group` field in the Presets section). Use `all` to generate everything, or `default` for presets with no explicit group.
+- `check-group [group]`: Verifies that a group's presets **partition** the database — every song appears in exactly one preset of the group — and reports any **missing** (in no preset) or **duplicated** (in more than one preset) songs. With no argument (or `all`) it checks every group in the config; otherwise pass a group name (e.g. `zvv_sort`).
 - `albums-generate`: Generates the "sorted by album" tree that `songs-generate` links into
 - `thumbnails-generate`: Generates all thumbnails with dates
 - `thumbnails-old`: Generates the older style of thumbnails
@@ -144,6 +146,15 @@ These are the main parts of the config file. A preset defines a selection of fil
 Each preset is defined by the flags to include and to exclude. The preset is defined by all the files that have one of the include flags and has none of the exclude flags.\
 You can create as many presets as you want, they can totaly overlap.\
 Some examples are commented out.
+
+**Groups** (optional): each preset may declare a `group` field (e.g. `group = "zvv_sort"`). A group does two things:
+- It is the **parent directory** for the presets in that group. The preset's `path` is relative to the group, so the final output is `<out-root>/<group>/<path>` (with `use-root`, or `./<group>/<path>` without). So `group = "zvv_sort"` + `path = "Neuro"` → `out/zvv_sort/Neuro`.
+- It is an **independent set** you can generate on its own, so you don't have to rebuild every preset when you only changed one collection.
+
+Presets with no `group` keep their `path` as-is (no parent dir) and belong to the implicit `default` group.
+- `songs-generate` always generates **every** preset (all groups) — unchanged behavior.
+- `songs-generate-group <name>` generates only that group's presets. `<name>` can be a group name (e.g. `zvv_sort`, `original_sort`), `all` (everything), or `default`. It errors and lists the available groups if the name matches nothing.
+- Currently the presets are split into two groups, which are also their top-level output folders: `original_sort` and `zvv_sort`.
 
 
 ## Repo organization

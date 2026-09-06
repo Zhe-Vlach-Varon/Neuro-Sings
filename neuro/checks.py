@@ -9,9 +9,9 @@ from loguru import logger
 from tqdm import tqdm
 
 from neuro import LOG_DIR, ROOT_DIR
-from neuro.polars_utils import load_db
-from neuro.utils import format_logger, get_audio_hash
 from neuro.detection import check_missing_setlist_entries
+from neuro.polars_utils import Preset, load_db
+from neuro.utils import MP3GainMode, format_logger, get_audio_hash
 
 
 def check_hash(*, max_workers: int = 1) -> None:
@@ -141,6 +141,88 @@ def check_are_dbs_identical():
     logger.success("Both databases are identical")
 
 
+def _presets_for_group(config: dict, group: str) -> list[dict]:
+    """Returns the preset dicts belonging to a group (mirrors get_presets_for_group in run.py,
+    duplicated here to avoid a circular import run.py -> checks.py -> run.py).
+
+    Args:
+        config (dict): The parsed config.toml.
+        group (str): Group name, or "all" to return every preset.
+
+    Returns:
+        list[dict]: The matching preset dicts.
+
+    Raises:
+        ValueError: If the group matches no preset.
+    """
+    presets = config["Presets"]
+    if group == "all":
+        return presets
+    matched = [p for p in presets if p.get("group", "default") == group]
+    if not matched:
+        available = sorted({p.get("group", "default") for p in presets})
+        raise ValueError(f"Group '{group}' matches no preset. Available groups: {available}")
+    return matched
+
+
+def check_group_coverage(group: str) -> None:
+    """Checks that the presets of a group partition the database: every song appears in
+    exactly one preset of the group.
+
+    A group is a valid partition when it has no *missing* songs (in no preset of the group)
+    and no *duplicated* songs (in more than one preset of the group).
+
+    Args:
+        group (str): Group name (e.g. "zvv_sort", "original_sort", "default").
+            "all" checks the union of every preset (only valid if the presets never overlap).
+
+    Raises:
+        AssertionError: If any song is missing from, or duplicated across, the group's presets.
+    """
+    with open("config.toml", "rb") as file:
+        config = toml.load(file)
+    presets = _presets_for_group(config, group)
+
+    songs = load_db()
+    all_ids = set(songs["id"].to_list())
+
+    # Map each song id to the list of presets (in this group) that contain it.
+    where: dict[int, list[str]] = {}
+    for p in presets:
+        preset = Preset(p, (MP3GainMode.OFF, None), None)
+        labels = f"{p['name']} ({p['path']})"
+        for song_id in preset.get_filtered_df(songs)["id"].to_list():
+            where.setdefault(song_id, []).append(labels)
+
+    missing = sorted(all_ids - set(where))
+    duplicated = {sid: names for sid, names in where.items() if len(names) > 1}
+
+    if missing or duplicated:
+        problems = []
+        if missing:
+            problems.append(f"{len(missing)} missing from every preset: {missing}")
+        if duplicated:
+            dup_str = "; ".join(f"song {sid} in {names}" for sid, names in sorted(duplicated.items()))
+            problems.append(f"{len(duplicated)} in more than one preset: {dup_str}")
+        msg = f"Group '{group}' is not a partition of the database: " + " | ".join(problems)
+        logger.error(msg)
+        raise AssertionError(msg)
+
+    logger.success(
+        f"Group '{group}' partitions the database: "
+        f"every song is in exactly one preset ({len(all_ids)} songs, {len(presets)} presets)"
+    )
+
+
+def check_all_group_coverage() -> None:
+    """Runs check_group_coverage for every group present in config.toml."""
+    with open("config.toml", "rb") as file:
+        config = toml.load(file)
+    groups = sorted({p.get("group", "default") for p in config["Presets"]})
+    for g in groups:
+        check_group_coverage(g)
+
+
 def all_tests() -> None:
     """Runs all checks defined in this file"""
     format_logger(log_file=LOG_DIR / "checks.log")
@@ -150,6 +232,7 @@ def all_tests() -> None:
     check_mp3gain()
     check_are_dbs_identical()
     check_missing_setlist_entries()
+    check_all_group_coverage()
 
 
 if __name__ == "__main__":

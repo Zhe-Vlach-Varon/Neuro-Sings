@@ -9,7 +9,7 @@ import polars as pl
 from loguru import logger
 
 from neuro import DRIVE_DIR, UNOFFICIALV3_DIR, LOG_DIR, SONG_ROOT_DIR, UNOFFV3_EXTRA, UNOFFV3_DISC66, COPYRIGHT_ISSUES_DIR
-from neuro.checks import check_are_dbs_identical
+from neuro.checks import check_are_dbs_identical, check_all_group_coverage, check_group_coverage
 from neuro.detection import export_json, extract_all
 from neuro.file_tags import CustomSong, DriveSong, Song
 from neuro.polars_utils import Preset, load_dates, load_db
@@ -170,15 +170,74 @@ def generate_from_preset(preset: Preset, dates_dict: DateDict, create_placeholde
     logger.success(f"[GEN] Done converting {N_SONGS} songs in {time_format(time() - t)} !")
 
 
+def get_presets_for_group(config: dict, group: str | None = None) -> list[dict]:
+    """Returns the preset dicts belonging to a group.
+
+    Args:
+        config (dict): The parsed config.toml.
+        group (str | None): Group name to filter by. If None, all presets are returned.
+            Presets without an explicit `group` field belong to the "default" group.
+
+    Returns:
+        list[dict]: Matching preset dicts.
+
+    Raises:
+        ValueError: If the requested group matches no preset.
+    """
+    presets = config["Presets"]
+    if group is None:
+        return presets
+    if group == "default":
+        matched = [p for p in presets if p.get("group", "default") == "default"]
+    else:
+        matched = [p for p in presets if p.get("group", "default") == group]
+    if not matched:
+        available = sorted({p.get("group", "default") for p in presets})
+        raise ValueError(f"Group '{group}' matches no preset. Available groups: {available}")
+    return matched
+
+
+def generate_songs_group(group: str) -> None:
+    """CLI entrypoint to generate only the presets belonging to a given group.
+
+    Args:
+        group (str): Group name to generate, or "all" for every preset,
+            or "default" for presets that have no explicit group.
+    """
+    config = load_config()[0]
+    presets = get_presets_for_group(config, None if group == "all" else group)
+    _generate_presets(presets, create_placeholders=False)
+
+
+def check_group() -> None:
+    """CLI entrypoint to verify that a preset group partitions the database.
+
+    Usage: ``check-group [group]`` — with no argument (or ``all``) it checks every group
+    present in config.toml; otherwise it checks the named group (e.g. ``zvv_sort``).
+    """
+    import sys
+    group = sys.argv[1] if len(sys.argv) > 1 else None
+    format_logger(log_file=LOG_DIR / "checks.log")
+    if group is None or group == "all":
+        check_all_group_coverage()
+    else:
+        check_group_coverage(group)
+
+
 def generate_songs(create_placeholders: bool = False) -> None:
     """Generates all songs files. For each files it first copies the files into\
     its destination, then edits the metadata of the destination file. This is\
     just to avoid tempering the original files.\
     Generates songs in preset groups.
     """
+    config = load_config()[0]
+    _generate_presets(get_presets_for_group(config, None), create_placeholders=create_placeholders)
 
+
+def _generate_presets(presets: list[dict], create_placeholders: bool = False) -> None:
+    """Shared generation loop over a list of preset dicts (all or a single group)."""
     format_logger(log_file=LOG_DIR / "generation.log")
-    logger.info("[GEN] Starting generation batch")
+    logger.info(f"[GEN] Starting generation batch ({len(presets)} presets)")
 
     # Avoids wrong generations due to inconsistent databases
     try:
@@ -202,7 +261,7 @@ def generate_songs(create_placeholders: bool = False) -> None:
     # Load the songs DB once and share it across all presets
     songs_df = load_db()
 
-    for preset in config["Presets"]:
+    for preset in presets:
         logger.info(f"[GEN] Generating preset '{preset['name']}'")
         preset_obj = Preset(preset, mp3gain, OUT_ROOT)
         generate_from_preset(preset_obj, dates_dict, create_placeholders, make_links, songs_df)

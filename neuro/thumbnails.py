@@ -16,7 +16,6 @@ from neuro import (
     IMAGES_BG_DIR,
     IMAGES_COVERS_DIR,
     IMAGES_CUSTOM_DIR,
-    IMAGES_DATES_DIR,
     LOG_DIR,
     FONT_PATH,
 )
@@ -203,11 +202,6 @@ def generate_main() -> None:
         lambda name: open_image(IMAGES_BG_DIR, name),
         ["smocus.jpg", "smocus_inter.png", "smocus_new.png"],
     ))
-
-    DATES_IMAGES = {
-        y: open_image(IMAGES_DATES_DIR, f"{y}-dates.png", rgba=True)
-        for y in range(2023, 7)
-    }
     # fmt: on
 
     logger.info("[THUMB] Starting the generation of thumbnails")

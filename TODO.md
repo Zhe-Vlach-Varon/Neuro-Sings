@@ -65,17 +65,18 @@
 - [x] attempt to automatically get ASCII song titles by finding sets of characters inside parantheses and striping non-alphanumeric characters from that
 - [ ] update to use the new metadata format from Unofficial Archive that separates english and original language titles and artist names, and splits out the song version identifiers (Neuro Ver., Evil Ver., etc)
 - [ ] get list of all output files, and remove all files in out folder not in the list prior to generating
-
-- [ ] fix for duplicates getting processed before the first useage of the song
-
+- [ ] add function that can update the database based on the output of the setlist check
 
 ## later plans
 - [ ] figure out how to package as a graphical program that does everything except download/upload
 - [ ] catalog alternate titles and artist names
 - [ ] automate updating Duplicates.md and Song List.md
 - [ ] switch to rewriting the embedded metadata in the same format as the unofficial archive and tell people to use the metadata customizer instead of making multiple copies with each format
-  - [ ] find out if they plan to update the metadata customizer, and if not do it myself
+  ~~- [ ] find out if they plan to update the metadata customizer, and if not do it myself~~ they discontinued it
 - [ ] add support for metadata customizer presets
+- [ ] automatically update duplicates.md
+- [ ] replace os.system calls with the preferred way to call other programs
+- [ ] lint the codebase
 
 
 # Old TODOS

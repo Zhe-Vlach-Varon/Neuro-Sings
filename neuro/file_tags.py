@@ -5,12 +5,11 @@ import shutil
 from dataclasses import dataclass
 from io import BytesIO
 from pathlib import Path
-from typing import Optional
 
 from loguru import logger
 from mutagen.flac import FLAC, Picture
 from mutagen.id3 import ID3
-from mutagen.id3._frames import APIC, TALB, TBPM, TDRC, TDRL, TIT2, TKEY, TPE1, TPE2, TRCK, TSO2, TYER, TextFrame
+from mutagen.id3._frames import APIC, COMM, TALB, TBPM, TDRC, TDRL, TIT2, TKEY, TPE1, TPE2, TRCK, TSO2, TYER, TextFrame
 from PIL import Image
 
 from neuro import IMAGES_COVERS_DIR, IMAGES_CUSTOM_DIR, LOG_DIR, ROOT_DIR
@@ -21,7 +20,33 @@ from neuro.polars_utils import load_db
 
 from metadata_utils import engraver as engraver
 
-songs_df = load_db()
+
+# Lazily-built {album: track count} map, computed once per loaded songs DB.
+_counts_source: pl.DataFrame | None = None
+_album_track_counts: dict[str, int] | None = None
+
+
+def get_album_track_count(album: str) -> int:
+    """Total number of tracks in `album`.
+
+    The {album: count} map is computed once per loaded songs DB via a single group-by
+    (instead of filtering the whole frame on every call), and reused across all songs.
+    It's rebuilt automatically when load_db() returns a fresh DataFrame (file changed).
+
+    Args:
+        album (str): Album name to look up.
+
+    Returns:
+        int: Number of songs sharing that album (0 if it isn't in the DB).
+    """
+    global _counts_source, _album_track_counts
+    df = load_db()
+    if _album_track_counts is None or _counts_source is not df:
+        grouped = df.group_by("Album").agg(pl.len().alias("count"))
+        _album_track_counts = dict(zip(grouped.get_column("Album"), grouped.get_column("count")))
+        _counts_source = df
+    return _album_track_counts.get(album, 0)
+
 
 class Song:
     """Represents a Song's Metadata. Abstract class, used for common code between drive/custom songs."""
@@ -52,16 +77,16 @@ class Song:
         """Songs that were re-run during the same stream"""
         copyright_issues: bool
 
-    def init_flags(self, flags: Optional[str]) -> None:
+    def init_flags(self, flags: str | None) -> None:
         """Detects song's flags by searching substrings in the flags column.\
             Stores the result in `self.flags`.
 
         Args:
-            flags (Optional[str]): Content of the flags column
+            flags (str | None): Content of the flags column
         """
 
         # flag is false if song has no flags of if it has flags but not the selected one
-        def flag_check(flag: str, flag_field: Optional[str]) -> bool:
+        def flag_check(flag: str, flag_field: str | None) -> bool:
             if flag_field is None:
                 return False
             flag_list = flag_field.split(";")
@@ -101,11 +126,10 @@ class Song:
         self.file: Path = ROOT_DIR / Path(song_dict["File_IN"])
         try:
             file_check(self.file)
-        except:
-            self.init_flags(song_dict['Flags'])
-            if not self.flags.originals and not self.flags.official:
-                logger.error(f"unable to find {self.file}")
-                exit(1)
+        except FileNotFoundError:
+            # Missing input files are reported and handled in one place, at generation time (neuro/run.py),
+            # based on the audio hash map. The library must not exit() from a constructor.
+            logger.debug(f"[SONG] Input file missing for '{self.title}': {self.file}")
 
         assert song_dict["Album_ID"] is not None
         self.track_n: str = song_dict["Album_ID"]
@@ -119,10 +143,8 @@ class Song:
         self.key = song_dict["Key"]  # Can be None
         self.tempo = song_dict["Tempo (1/4 beat)"]  # Can be None
 
-        self.image: Optional[str] = song_dict["Image"]
-        self.outfile: Optional[Path] = None
-
-        self.who: str = ""
+        self.image: str | None = song_dict["Image"]
+        self.outfile: Path | None = None
 
         self.lead_singer = str(song_dict["Lead Singer"]).lower()
 
@@ -134,14 +156,58 @@ class Song:
     def create_out_file(self, *, out_dir: Path, create: bool = True) -> bool:
         """Virtual method"""
         raise NotImplementedError
-    
-    def create_placeholder_files(self, *, out_dir: Path, create: bool = True) -> bool:
-        """Virtual method"""
-        raise NotImplementedError
-    
+
+    def create_placeholder_files(self, *, out_dir: Path, create: bool = True, numberedFiles: bool = False) -> bool:
+        """Creates placeholder files (metadata + cover) in the output directory.
+
+        Args:
+            out_dir: Output directory.
+            create: If False and the directory already exists, skip.
+            numberedFiles: Passed to file_name.
+
+        Returns:
+            True if files were created, False if skipped.
+        """
+        name = self.file_name(self._file_name_custom, numberedFiles=numberedFiles)
+        dir_path = out_dir / name
+
+        if not create and dir_path.exists():
+            return False
+
+        dir_path.mkdir(parents=True, exist_ok=True)
+
+        metadata_file = dir_path / "metadata.txt"
+        metadata_content = (
+            f"Title: {self.title}\n"
+            f"Title (OG): {self.title_og}\n"
+            f"Artist: {self.artist}\n"
+            f"Artist (OG): {self.artist_og}\n"
+            f"Cover Artist: {self.cover_artist}\n"
+            f"Version: {self.version}\n"
+            f"Album: {self.album}\n"
+            f"Date: {self.date}\n"
+            f"Track: {self.track_n}\n"
+            f"Identify: {self.identify}\n"
+            f"Key: {self.key or 'N/A'}\n"
+            f"Tempo: {self.tempo or 'N/A'}\n"
+            f"Comment: {self.comment}\n"
+            f"Special: {self.special}\n"
+            f"Hash: {self.hash_in}\n"
+            f"Flags: {self.d.get('Flags', 'N/A')}\n"
+            f"Lead Singer: {self.lead_singer}\n"
+        )
+        metadata_file.write_text(metadata_content)
+
+        # Copy cover image to folder (skip for custom songs with as_drive flag and no image)
+        cover = None if (self.image is None and self.flags.as_drive) else self.cover_path
+        if cover and cover.exists():
+            shutil.copy2(cover, dir_path / "cover.jpg")
+
+        return True
+
     def create_file_link(self, *, out_dir: Path, existing_path: Path, create: bool = True, numberedFiles: bool = False) -> bool:
         """Creates a filesystem symlink from self.outfile to an existing file.
-        
+
         Args:
             out_dir: Output directory (same as create_out_file).
             existing_path: Path to the existing file to link to.
@@ -151,8 +217,22 @@ class Song:
         Returns:
             True if the link was created, False if skipped.
         """
-        raise NotImplementedError
-    
+        self.outfile = self._resolve_outfile(out_dir, numberedFiles)
+
+        full_existing_path = Path.cwd() / existing_path
+
+        if not full_existing_path.exists():
+            logger.error(f"file does not exist {full_existing_path}")
+            exit(1)
+
+        if not create and self.outfile.exists():
+            return False
+
+        if self.outfile.exists() or self.outfile.is_symlink():
+            self.outfile.unlink()
+        self.outfile.symlink_to(full_existing_path)
+        return True
+
     def apply_tags(self, ascii_tags: bool = False) -> None:
         """virtual method"""
         raise NotImplementedError
@@ -171,9 +251,24 @@ class Song:
             mime="image/jpeg",  # image/jpeg or image/png
             type=18,  # 3 is for the cover image
             desc="Cover",
-            data=open(cover, "rb").read(),
+            data=cover.read_bytes(),  # read_bytes() closes the handle automatically (open().read() leaked it)
         )
         return img
+
+    def apply_album_artist_and_cover(self, id3: ID3, album_artist: str, cover: Path) -> None:
+        """Adds the album-artist (TPE2/TSO2) and cover picture (APIC) frames to an existing ID3 object.
+        Shared by `DriveSong.apply_tags` and `CustomSong.apply_id3` so both keep the same frame sequence.
+
+        Args:
+            id3 (ID3): Tag object the frames are added to.
+            album_artist (str): Value used for both TPE2 and TSO2.
+            cover (Path): Cover image path (must exist; not checked here).
+        """
+        id3.add(TPE2(encoding=3, text=album_artist))
+        id3.add(TSO2(encoding=3, text=album_artist))
+        # Replaces any picture already present with this song's cover.
+        id3.delall("APIC")
+        id3.add(self.id3_pic(cover))
 
     def get_id3_frames(self, ascii_tags: bool = False) -> list[TextFrame]:
         """Gets tags specific to ID3 tags.
@@ -181,8 +276,6 @@ class Song:
         Returns:
             _ (list[TextFrame]): Dictionary with Album artist.
         """
-        filtered_songs = songs_df.filter(pl.col('Album') == self.album)
-
         additional = [
             # Title
             TIT2(text=f"{(self.title if ascii_tags or self.title_og == "None" else self.title_og)}{f" ({self.identify})" if self.identify != "None" else ""}", encoding=3),
@@ -195,7 +288,7 @@ class Song:
             TYER(text=self.date[:4], encoding=3),
             TDRC(text=self.date, encoding=3),
             # Track number
-            TRCK(text=f"{self.track_n}/{filtered_songs.height}", encoding=3),
+            TRCK(text=f"{self.track_n}/{self.album_track_count}", encoding=3),
         ]
 
         if self.key is not None:
@@ -221,6 +314,57 @@ class Song:
             "PERFORMER": "Neuro-Sama/Evil Neuro",
         }
         return additional
+
+    @property
+    def who(self) -> str:
+        """Name used in the dated-cover filename suffix (previously assigned imperatively in apply_tags).
+
+        Returns:
+            str: "evil", "neuro" or the subclass-specific fallback (see `_who_fallback`).
+        """
+        if self.flags.evil:
+            return "evil"
+        if self.flags.neuro:
+            return "neuro"
+        return self._who_fallback
+
+    @property
+    def _who_fallback(self) -> str:
+        """Fallback for `who` when the song has neither an evil nor a neuro flag. Subclass-specific."""
+        raise NotImplementedError
+
+    @property
+    def cover_path(self) -> Path:
+        """Resolved path to the cover image for this song.
+
+        Returns:
+            Path: The cover image path (custom image or dated cover).
+        """
+        if self.image is not None:
+            return IMAGES_CUSTOM_DIR / f"{self.image}.jpg"
+        if self.flags.duet:
+            return IMAGES_COVERS_DIR / f"{self.date}-{self.who}-duet.jpg"
+        if self.flags.v1 or self.flags.v2:
+            return IMAGES_COVERS_DIR / f"{self.date}.jpg"
+        return IMAGES_COVERS_DIR / f"{self.date}-{self.who}.jpg"
+
+    @property
+    def album_track_count(self) -> int:
+        """Total number of tracks in this song's album (O(1) lookup into a precomputed map).
+
+        Returns:
+            int: The number of songs sharing the same album.
+        """
+        return get_album_track_count(self.album)
+
+    @property
+    def _file_name_custom(self) -> bool:
+        """Whether file_name() should use custom naming mode. Must be implemented by subclasses."""
+        raise NotImplementedError
+
+    def _resolve_outfile(self, out_dir: Path, numberedFiles: bool = False) -> Path:
+        """Resolves the output file path. Must be implemented by subclasses."""
+        raise NotImplementedError
 
     @property
     def album_artist(self) -> str:
@@ -274,14 +418,18 @@ class Song:
         Returns:
             str: The filename without type extension.
         """
-        if custom and self.flags.originals:
-            filename = f"{f'{self.track_n}. ' if numberedFiles else ''}{self.cover_artist} - {self.title}{f" ({self.identify})" if self.identify != "None" else ""}{" - Encore" if self.flags.encore else ""}"
-        elif custom and self.flags.official:
-            filename = f"{f'{self.track_n}. ' if numberedFiles else ''}{self.cover_artist} - {self.title}{f" ({self.identify})" if self.identify != "None" else ""}{" - Encore" if self.flags.encore else ""}"
+        # Fragments shared by every naming variant (composed once instead of repeated inline).
+        prefix = f"{self.track_n}. " if numberedFiles else ""
+        identify = f" ({self.identify})" if self.identify != "None" else ""
+        encore = " - Encore" if self.flags.encore else ""
+
+        # originals and official use the exact same format, so a single branch covers both.
+        if custom and (self.flags.originals or self.flags.official):
+            filename = f"{prefix}{self.cover_artist} - {self.title}{identify}{encore}"
         elif custom and not self.flags.originals:
-            filename = f"{f'{self.track_n}. ' if numberedFiles else ''}{self.artist} - {self.title}{f" ({self.identify})" if self.identify != "None" else ""}{" - Encore" if self.flags.encore else ""} - {self.cover_artist}"
+            filename = f"{prefix}{self.artist} - {self.title}{identify}{encore} - {self.cover_artist}"
         else:
-            filename = f"{f'{self.track_n}. ' if numberedFiles else ''}{self.artist} - {self.title}{f" ({self.identify})" if self.identify != "None" else ""}{" - Encore" if self.flags.encore else ""} [{self.name_tag}] [{self.date}]"
+            filename = f"{prefix}{self.artist} - {self.title}{identify}{encore} [{self.name_tag}] [{self.date}]"
         # TODO add {self.track_n} to start of file name
         # TODO get total number of tracks for tag
         # TODO if entire karaoke stream (only karaoke streams, not the subathon or other setlists from the non-karaoke folder)
@@ -294,6 +442,18 @@ class DriveSong(Song):
 
     def __init__(self, song_dict: dict, karaoke_dict: dict) -> None:
         super().__init__(song_dict, karaoke_dict)
+
+    @property
+    def _file_name_custom(self) -> bool:
+        return self.flags.as_custom
+
+    @property
+    def _who_fallback(self) -> str:
+        return self.lead_singer
+
+    def _resolve_outfile(self, out_dir: Path, numberedFiles: bool = False) -> Path:
+        name = self.file_name(self._file_name_custom, numberedFiles=numberedFiles)
+        return ROOT_DIR / out_dir / f"{name}.mp3"
 
     def create_out_file(self, *, out_dir: Path = Path("out"), create: bool = True, numberedFiles: bool = False) -> bool:
         """Creates the output file on the filesystem by copying the original. The metadata are written later.
@@ -320,82 +480,6 @@ class DriveSong(Song):
             shutil.copy2(self.file, self.outfile)
             return True
         return False
-    
-    def create_placeholder_files(self, *, out_dir: Path, create: bool = True, numberedFiles: bool = False) -> bool:
-        name = self.file_name(self.flags.as_custom, numberedFiles=numberedFiles)
-        dir_path = out_dir / name
-        
-        if not create and dir_path.exists():
-            return False
-        
-        dir_path.mkdir(parents=True, exist_ok=True)
-        
-        metadata_file = dir_path / "metadata.txt"
-        metadata_content = (
-            f"Title: {self.title}\n"
-            f"Title (OG): {self.title_og}\n"
-            f"Artist: {self.artist}\n"
-            f"Artist (OG): {self.artist_og}\n"
-            f"Cover Artist: {self.cover_artist}\n"
-            f"Version: {self.version}\n"
-            f"Album: {self.album}\n"
-            f"Date: {self.date}\n"
-            f"Track: {self.track_n}\n"
-            f"Identify: {self.identify}\n"
-            f"Key: {self.key or 'N/A'}\n"
-            f"Tempo: {self.tempo or 'N/A'}\n"
-            f"Comment: {self.comment}\n"
-            f"Special: {self.special}\n"
-            f"Hash: {self.hash_in}\n"
-            f"Flags: {self.d.get('Flags', 'N/A')}\n"
-            f"Lead Singer: {self.lead_singer}\n"
-        )
-        metadata_file.write_text(metadata_content)
-        
-        # Copy cover image to folder
-        if self.image is None:
-            if self.flags.duet:
-                cover = IMAGES_COVERS_DIR / Path(f"{self.date}-{self.who}-duet.jpg")
-            elif self.flags.v1 or self.flags.v2:
-                cover = IMAGES_COVERS_DIR / Path(f"{self.date}.jpg")
-            else:
-                cover = IMAGES_COVERS_DIR / Path(f"{self.date}-{self.who}.jpg")
-        else:
-            cover = IMAGES_CUSTOM_DIR / f"{self.image}.jpg"
-        
-        if cover.exists():
-            shutil.copy2(cover, dir_path / "cover.jpg")
-        
-        return True
-    
-    def create_file_link(self, *, out_dir: Path, existing_path: Path, create: bool = True, numberedFiles: bool = False) -> bool:
-        """Creates a symlink from self.outfile to existing_path for a drive song.
-        
-        Args:
-            out_dir: Output directory.
-            existing_path: Path to the existing file to link to.
-            create: If False and self.outfile already exists, skip.
-            numberedFiles: Passed to file_name.
-
-        Returns:
-            True if the link was created, False if skipped.
-        """
-        name = self.file_name(self.flags.as_custom, numberedFiles=numberedFiles)
-        self.outfile = ROOT_DIR / out_dir / f"{name}.mp3"
-
-        full_existing_path = Path.cwd() / existing_path
-
-        if not full_existing_path.exists():
-            logger.error(f"file does not exist {full_existing_path}")
-            exit(1)
-
-        if not create and self.outfile.exists():
-            return False
-
-        if self.outfile.exists() or self.outfile.is_symlink():
-            self.outfile.unlink()
-        self.outfile.symlink_to(full_existing_path)
-        return True
 
     def apply_tags(self, ascii_tags: bool = False) -> None:
         """Applies ID3 tags on the file. First uses EasyID3 for text tags. Then ID3 to write the cover
@@ -408,46 +492,23 @@ class DriveSong(Song):
         for frame in common_props:
             id3.add(frame)
 
-        
-        filtered_songs = songs_df.filter(pl.col('Album') == self.album)
 
-        track_n = f"{self.track_n}/{filtered_songs.height}"
+        track_n = f"{self.track_n}/{self.album_track_count}"
 
-        id3.add(TPE2(encoding=3, text=self.album_artist))
-        id3.add(TSO2(encoding=3, text=self.album_artist))
-
-        if self.flags.evil:
-            self.who = "evil"
-        elif self.flags.neuro:
-            self.who = "neuro"
-        else:
-            self.who = self.lead_singer
-
-        # Cover Image
-        if self.image is None:
-            if self.flags.duet:
-                cover = IMAGES_COVERS_DIR / Path(f"{self.date}-{self.who}-duet.jpg")
-            elif self.flags.v1 or self.flags.v2:
-                cover = IMAGES_COVERS_DIR / Path(f"{self.date}.jpg")
-            else:
-                cover = IMAGES_COVERS_DIR / Path(f"{self.date}-{self.who}.jpg")
-        else:
-            cover = IMAGES_CUSTOM_DIR / f"{self.image}.jpg"
-        
-        # print(self.who)
-
-        # print(self.file)
-        # print(self.flags)
+        # Cover Image (self.who is now computed on demand by the cover_path property)
+        cover = self.cover_path
         file_check(cover)
-        id3.delall("APIC")
-        id3.add(self.id3_pic(cover))
-        id3.save()
 
+        self.apply_album_artist_and_cover(id3, self.album_artist, cover)
+
+        # Add the JSON metadata payload to this same ID3 object and save once,
+        # instead of engrave_payload() re-parsing and re-saving the whole file.
         payload_data = engraver.build_payload(self.file, self.date, self.title, self.title_og,
                                self.identify, self.artist, self.artist_og,
                                self.cover_artist, self.version, self.album, "1", track_n,
                                self.comment, self.special, self.hash_in)
-        engraver.engrave_payload(self.outfile, payload_data)
+        id3.add(COMM(encoding=3, lang="ved", desc="", text=[payload_data]))
+        id3.save(v2_version="3", v1="2")
 
 
 class CustomSong(Song):
@@ -455,6 +516,18 @@ class CustomSong(Song):
 
     def __init__(self, song_dict: dict, karaoke_dict: dict = {}) -> None:
         super().__init__(song_dict, karaoke_dict)
+
+    @property
+    def _who_fallback(self) -> str:
+        return "twins"
+
+    @property
+    def _file_name_custom(self) -> bool:
+        return not self.flags.as_drive
+
+    def _resolve_outfile(self, out_dir: Path, numberedFiles: bool = False) -> Path:
+        name = self.file_name(self._file_name_custom, numberedFiles=numberedFiles)
+        return ROOT_DIR / out_dir / f"{name}{self.file.suffix}"
 
     def create_out_file(self, *, out_dir: Path, create: bool = True, numberedFiles: bool = False) -> bool:
         """Creates the output file on the filesystem by copying the original. The metadata are written later.
@@ -477,88 +550,6 @@ class CustomSong(Song):
             shutil.copy2(file, self.outfile)
             return True
         return False
-    
-    def create_placeholder_files(self, *, out_dir: Path, create: bool = True, numberedFiles: bool = False) -> bool:
-        name = self.file_name(not self.flags.as_drive, numberedFiles=numberedFiles)
-        dir_path = out_dir / name
-        
-        if not create and dir_path.exists():
-            return False
-        
-        dir_path.mkdir(parents=True, exist_ok=True)
-        
-        metadata_file = dir_path / "metadata.txt"
-        metadata_content = (
-            f"Title: {self.title}\n"
-            f"Title (OG): {self.title_og}\n"
-            f"Artist: {self.artist}\n"
-            f"Artist (OG): {self.artist_og}\n"
-            f"Cover Artist: {self.cover_artist}\n"
-            f"Version: {self.version}\n"
-            f"Album: {self.album}\n"
-            f"Date: {self.date}\n"
-            f"Track: {self.track_n}\n"
-            f"Identify: {self.identify}\n"
-            f"Key: {self.key or 'N/A'}\n"
-            f"Tempo: {self.tempo or 'N/A'}\n"
-            f"Comment: {self.comment}\n"
-            f"Special: {self.special}\n"
-            f"Hash: {self.hash_in}\n"
-            f"Flags: {self.d.get('Flags', 'N/A')}\n"
-            f"Lead Singer: {self.lead_singer}\n"
-        )
-        metadata_file.write_text(metadata_content)
-        
-        # Copy cover image to folder
-        if self.image is None and not self.flags.as_drive:
-            if self.flags.duet:
-                cover = IMAGES_COVERS_DIR / Path(f"{self.date}-{self.who}-duet.jpg")
-            elif self.flags.v1 or self.flags.v2:
-                cover = IMAGES_COVERS_DIR / Path(f"{self.date}.jpg")
-            else:
-                cover = IMAGES_COVERS_DIR / Path(f"{self.date}-{self.who}.jpg")
-        elif self.image is not None:
-            cover = IMAGES_CUSTOM_DIR / f"{self.image}.jpg"
-        else:
-            # For custom songs with as_drive flag but no image, try to find a cover
-            cover = None
-        
-        if cover and cover.exists():
-            shutil.copy2(cover, dir_path / "cover.jpg")
-        
-        return True
-    
-    def create_file_link(self, *, out_dir: Path, existing_path: Path, create: bool = True, numberedFiles: bool = False) -> bool:
-        """Creates a symlink from self.outfile to existing_path for a custom song.
-        
-        Args:
-            out_dir: Output directory.
-            existing_path: Path to the existing file to link to.
-            create: If False and self.outfile already exists, skip.
-            numberedFiles: Passed to file_name.
-
-        Returns:
-            True if the link was created, False if skipped.
-        """
-        file = self.file
-        ext = file.suffix
-
-        name = self.file_name(not self.flags.as_drive, numberedFiles=numberedFiles)
-        self.outfile = ROOT_DIR / out_dir / f"{name}{ext}"
-
-        full_existing_path = Path.cwd() / existing_path
-
-        if not full_existing_path.exists():
-            logger.error(f"file does not exist {full_existing_path}")
-            exit(1)
-
-        if not create and self.outfile.exists():
-            return False
-
-        if self.outfile.exists() or self.outfile.is_symlink():
-            self.outfile.unlink()
-        self.outfile.symlink_to(full_existing_path)
-        return True
 
     def apply_tags(self, ascii_tags: bool = False) -> None:
         """Custom Song version of the tag management. Here it needs to check the file's format first\
@@ -573,32 +564,8 @@ class CustomSong(Song):
         if self.image is None and not self.flags.as_drive:
             logger.error(f"Image can't be None for custom song {self.file}")
 
-        if self.flags.evil:
-            self.who = "evil"
-        elif self.flags.neuro:
-            self.who = "neuro"
-        else:
-            self.who = "twins"
-
-        # Cover Image
-        if self.image is None:
-            if self.flags.duet:
-                # print("duet")
-                self.cover = IMAGES_COVERS_DIR / Path(f"{self.date}-{self.who}-duet.jpg")
-            elif self.flags.v1 or self.flags.v2:
-                # print("v1 or v2")
-                self.cover = IMAGES_COVERS_DIR / Path(f"{self.date}.jpg")
-            else:
-                # print("v3")
-                self.cover = IMAGES_COVERS_DIR / Path(f"{self.date}-{self.who}.jpg")
-        else:
-            # print("Custom image")
-            self.cover = IMAGES_CUSTOM_DIR / f"{self.image}.jpg"
-        
-        # print(self.who)
-
-        # print(self.file)
-        # print(self.flags)
+        # Cover Image (self.who is now computed on demand by the cover_path property)
+        self.cover = self.cover_path
         file_check(self.cover)
 
         match ext:
@@ -617,30 +584,25 @@ class CustomSong(Song):
 
         for frame in self.get_id3_frames(ascii_tags=ascii_tags):
             id3.add(frame)
-        track_n = id3.get(TRCK)
-        
-        filtered_songs = songs_df.filter(pl.col('Album') == self.album)
 
-        track_n = f"{self.track_n}/{filtered_songs.height}"
+        track_n = f"{self.track_n}/{self.album_track_count}"
 
         if self.flags.as_drive or self.flags.arg:
             album_artist = self.album_artist
         else:
             album_artist = "Neuro-Sama/Evil Neuro"
 
-        id3.add(TPE2(encoding=3, text=album_artist))
-        id3.add(TSO2(encoding=3, text=album_artist))
+        # Album artist (TPE2/TSO2) + cover picture (APIC), same shared sequence as DriveSong.
+        self.apply_album_artist_and_cover(id3, album_artist, self.cover)
 
-        # Cover Image
-        id3.delall("APIC")
-        id3.add(self.id3_pic(self.cover))
-        id3.save()
-
+        # Add the JSON metadata payload to this same ID3 object and save once,
+        # instead of engrave_payload() re-parsing and re-saving the whole file.
         payload_data = engraver.build_payload(self.file, self.date, self.title, self.title_og,
                                self.identify, self.artist, self.artist_og,
                                self.cover_artist, self.version, self.album, "1", track_n,
                                self.comment, self.special, self.hash_in)
-        engraver.engrave_payload(self.outfile, payload_data)
+        id3.add(COMM(encoding=3, lang="ved", desc="", text=[payload_data]))
+        id3.save(v2_version="3", v1="2")
 
     def get_flac_pic(self) -> Picture:
         """Generates a picture for a FLAC file's cover. This very particular method works, so\
@@ -694,7 +656,6 @@ class CustomSong(Song):
         file.clear_pictures()
         file.add_picture(image)
         file.save()
-
 
 
 if __name__ == "__main__":

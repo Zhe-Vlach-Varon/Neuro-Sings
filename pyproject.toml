@@ -12,6 +12,7 @@ dependencies = [
     "pillow>=11.2.1",
     "polars>=1.30.0",
     "pyarrow>=20.0.0",
+    "python-dateutil>=2.8",
     "sqlalchemy>=2.0.41",
     "tqdm>=4.67.1",
     "tinytag>=2.2.0",
@@ -30,11 +31,6 @@ thumbnails-generate = "neuro.thumbnails:generate_main"
 thumbnails-old = "neuro.thumbnails:generate_oldge"
 update-db = "neuro.json_to_csv:update_db"
 clear-db = "neuro.json_to_csv:clear_db"
-# Shouldn't ever need to use this again, was used to update the database after switching from using file hashes to using hashes of just the audio data
-update-hashes = "neuro.json_to_csv:update_db_hashes" 
-update-filenames = "neuro.json_to_csv:update_db_filenames"
-add-special = "neuro.json_to_csv:add_special"
-add-comment = "neuro.json_to_csv:add_comment"
 db-check = "neuro.checks:all_tests"
 inputs-pull = "neuro._shortcuts:inputs_pull"
 setlists-pull = "neuro._shortcuts:setlists_pull"
@@ -43,7 +39,7 @@ drive-pull = "neuro._shortcuts:drive_pull"
 drive-push = "neuro._shortcuts:drive_push"
 db-sync = "neuro._shortcuts:dbs_sync"
 mp3gain_standalone = "neuro.run:mp3gain_standalone"
-setlist-check = "neuro.detection:check_missing_setlist_entries"
+setlist-check = "neuro.detection:run_setlist_check"
 
 [build-system]
 requires = ["pdm-backend"]
@@ -53,7 +49,11 @@ build-backend = "pdm.backend"
 distribution = true
 
 [dependency-groups]
-dev = ["ipykernel>=6.29.5"]
+dev = [
+    "ipykernel>=6.29.5",
+    # Linting is a dev tool, not a runtime dependency (see AGENTS.md: ruff).
+    "ruff>=0.16.5",
+]
 
 [tool.ruff] # See https://github.com/astral-sh/ruff#configuration
 line-length = 120

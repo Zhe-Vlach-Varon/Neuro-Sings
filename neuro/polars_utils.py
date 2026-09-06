@@ -2,12 +2,42 @@
 
 from functools import reduce
 from pathlib import Path
-from typing import Optional
+from typing import Callable
 
 import polars as pl
 
 from neuro import DATES_CSV, ROOT_DIR, SONGS_CSV, SONGS_DB
 from neuro.utils import MP3GainMode, MP3ModeTuple
+
+# --- result caching ---
+_cache: dict[str, tuple[float, pl.DataFrame]] = {}
+
+
+def _get_or_load(key: str, filepath: Path, loader: Callable[[], pl.DataFrame]) -> pl.DataFrame:
+    """Return a cached DataFrame if the underlying file is unchanged, otherwise reload it.
+
+    Args:
+        key (str): Unique cache key (e.g. "songs:db" or "dates:csv").
+        filepath (Path): File whose mtime is used for invalidation.
+        loader (Callable[[], pl.DataFrame]): Function to (re)load the DataFrame.
+
+    Returns:
+        pl.DataFrame: Cached or freshly loaded DataFrame.
+    """
+    mtime = filepath.stat().st_mtime
+    if key in _cache:
+        cached_mtime, df = _cache[key]
+        if cached_mtime == mtime:
+            return df
+    df = loader()
+    _cache[key] = (mtime, df)
+    return df
+
+
+def clear_cache() -> None:
+    """Invalidate all cached DataFrames."""
+    _cache.clear()
+# --- end result caching ---
 
 songs_schema = {
     'id': pl.Int64,
@@ -45,9 +75,10 @@ def flag_expr(flag: str) -> pl.Expr:
         flag (str): Which flag to consider.
 
     Returns:
-        pl.Expr: An expression representing the rows that contain the given flag in the "Flags" column.
+        pl.Expr: An expression representing the rows that have the given flag in the "Flags" column.
+            Uses exact match: the Flags string is split on ";" and the flag must equal one element.
     """
-    return pl.col("Flags").str.contains(flag)
+    return pl.col("Flags").str.split(";").list.contains(flag)
 
 
 def stack_or(flag_list: list[str]) -> pl.Expr:
@@ -87,27 +118,30 @@ def load_db(as_db: bool = True, root: Path = ROOT_DIR) -> pl.DataFrame:
     Returns:
         pl.DataFrame: A polars DataFrame, regardless of the storage format.
     """
-    if as_db:
-        REQ = "SELECT * FROM Songs"
-        return pl.read_database_uri(REQ, f"sqlite://{root / SONGS_DB}")
-    else:
-        return pl.read_csv(root / SONGS_CSV, schema=songs_schema)
+    filepath = root / (SONGS_DB if as_db else SONGS_CSV)
+    key = f"songs:{'db' if as_db else 'csv'}:{root}"
+    return _get_or_load(key, filepath, lambda: (
+        pl.read_database_uri("SELECT * FROM Songs", f"sqlite://{root / SONGS_DB}") if as_db
+        else pl.read_csv(root / SONGS_CSV, schema=songs_schema)
+    ))
 
 
-def load_dates(as_db: bool = True) -> pl.DataFrame:
+def load_dates(as_db: bool = True, root: Path = ROOT_DIR) -> pl.DataFrame:
     """Same as `load_db`. Loads dates database regardless of format.
 
     Args:
         as_db (bool, optional): Loads from a `.db` file or not. Defaults to True.
+        root (Path, optional): Root dir to search the database from. Defaults to ROOT_DIR.
 
     Returns:
         pl.DataFrame: Polars DataFrame with dates.
     """
-    if as_db:
-        REQ = "SELECT * FROM Dates"
-        return pl.read_database_uri(REQ, f"sqlite://{SONGS_DB}")
-    else:
-        return pl.read_csv(DATES_CSV)
+    filepath = root / (SONGS_DB if as_db else DATES_CSV)
+    key = f"dates:{'db' if as_db else 'csv'}:{root}"
+    return _get_or_load(key, filepath, lambda: (
+        pl.read_database_uri("SELECT * FROM Dates", f"sqlite://{root / SONGS_DB}") if as_db
+        else pl.read_csv(root / DATES_CSV)
+    ))
 
 
 PresetDict = dict[str, bool | str | list[str]]
@@ -132,13 +166,13 @@ class Preset:
         else:
             return []
 
-    def __init__(self, preset_dict: PresetDict, mp3gain_config: MP3ModeTuple, root: Optional[Path] = None) -> None:
+    def __init__(self, preset_dict: PresetDict, mp3gain_config: MP3ModeTuple, root: Path | None = None) -> None:
         """Preset constructor.
 
         Args:
             preset_dict (PresetDict): Dict from the TOML loading.
             mp3gain_config (MP3ModeTuple): Configuration of mp3gain.
-            root (Optional[Path], optional): Root path from outside of the Preset part, if None\
+            root (Path | None, optional): Root path from outside of the Preset part, if None\
                 then the path in preset is the full path, otherwise they use the root path\
                 as a common folder for all presets. Defaults to None.
         """
@@ -171,13 +205,18 @@ class Preset:
             self.path = root / path
 
 
-    def get_filtered_df(self) -> pl.DataFrame:
+    def get_filtered_df(self, songs_df: pl.DataFrame | None = None) -> pl.DataFrame:
         """Applies filters defined in a preset to get a filtered version of the database.
+
+        Args:
+            songs_df (pl.DataFrame | None): Pre-loaded songs DataFrame to filter.
+                If None, loads from disk via `load_db()`.
 
         Returns:
             pl.DataFrame: Filtered DB that only has rows that check the conditions.
         """
-        songs_df = load_db()
+        if songs_df is None:
+            songs_df = load_db()
 
         assert (self.include_type == "and") | (self.include_type == "or")
 
@@ -188,9 +227,13 @@ class Preset:
             
         assert (self.exclude_type == "and") | (self.exclude_type == "or")
 
-        if self.exclude_type == "and":
+        if not self.exclude:
+            # Empty exclusion list means no exclusion. Without this guard, exclude-type="and"
+            # would reduce to lit(True) and .not_() would filter out every single song.
+            excludes = pl.lit(False)
+        elif self.exclude_type == "and":
             excludes = stack_and(self.exclude)  # exclude#1 & exclude#2 ...
-        elif self.exclude_type == "or":
+        else:
             excludes = stack_or(self.exclude)  # exclude#1 | exclude#2 ...
 
         # Has one of the include flags and none of the exclude

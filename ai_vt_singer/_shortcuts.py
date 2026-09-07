@@ -71,6 +71,10 @@ def _create_drive_shortcuts(out_dir: Path, dest: str, dir_prefix: str, error_lab
     (thousands of symlinks would otherwise mean thousands of serial round-trips).
     Fails fast like before: the first rclone error cancels the pending ones and exits 1.
 
+    Before creating shortcuts, the target directory structure is created on the remote
+    (sequentially, parents before children) to avoid a race condition where multiple
+    workers creating shortcuts in the same non-existent directory produce duplicate folders.
+
     Args:
         out_dir (Path): Local output dir containing the symlinked .mp3 files.
         dest (str): Remote destination prefix (e.g. "DriveName:" or "./").
@@ -82,10 +86,19 @@ def _create_drive_shortcuts(out_dir: Path, dest: str, dir_prefix: str, error_lab
         SystemExit: If any rclone call fails (exit code 1), after cancelling pending work.
     """
     base = out_dir.resolve()
+    files = [f for f in base.rglob("*.mp3") if f.is_symlink()]
+
+    if not files:
+        return
+
     commands: list[tuple[Path, str]] = []
-    for file in [f for f in base.rglob("*.mp3") if f.is_symlink()]:
+    parent_dirs: set[Path] = set()
+    for file in files:
         source_drive_path = file.resolve().relative_to(base)
         shortcut_drive_path = file.relative_to(base)
+        parent = shortcut_drive_path.parent
+        if str(parent) != ".":
+            parent_dirs.add(parent)
         cmd = (
             f"{RCLONE_BACKEND_COMMAND} {dest}{dir_prefix}"
             f" \"{REMOTE_OUT_PREFIX / source_drive_path}\""
@@ -93,8 +106,16 @@ def _create_drive_shortcuts(out_dir: Path, dest: str, dir_prefix: str, error_lab
         )
         commands.append((file, cmd))
 
-    if not commands:
-        return
+    # Create the directory structure on the remote first (sequentially, parents before
+    # children) to avoid a race condition where multiple workers creating shortcuts in
+    # the same non-existent directory produce duplicate folders.
+    if parent_dirs:
+        logger.info(f"Creating {len(parent_dirs)} directories on the remote before making shortcuts")
+        for d in sorted(parent_dirs, key=lambda p: len(p.parts)):
+            _rclone(
+                f"rclone mkdir {dest}{dir_prefix}{REMOTE_OUT_PREFIX / d}",
+                f"failed to create directory '{d}' on the remote",
+            )
 
     def _run(item: tuple[Path, str]) -> tuple[Path, int]:
         file, cmd = item

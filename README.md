@@ -157,6 +157,81 @@ Presets with no `group` keep their `path` as-is (no parent dir) and belong to th
 - Currently the presets are split into two groups, which are also their top-level output folders: `original_sort` and `zvv_sort`.
 
 
+## Multi-project support
+
+The codebase can manage **multiple independent cover-artist projects** from a single checkout.
+Each project is a self-contained directory with its own `config.toml`, database, input files,
+and output. This is useful for maintaining separate singer databases (e.g. Neuro Twins + Vedal)
+without mixing their data.
+
+### How it works
+
+- **`[project]` config section** (`config.toml`): defines the project's identity — singer
+  names, flag tokens, voice versions, duet group name, drive remotes, and all paths.
+- **`neuro/artists.py`**: `CoverArtist` (one singer) and `Project` (one full project) dataclasses.
+- **`neuro/config.py`**: `load_project()` parses `config.toml` → `Project`.
+- **`neuro/__init__.py`**: `get_project()` returns the cached active project.
+- **`neuro/cli.py`**: `chdir_to_project()` enables the `--project <dir>` flag on all commands.
+
+### Using multiple projects
+
+Each project directory contains its own `config.toml` + `data/` + `songs/` + `setlists/` +
+`images/` + `out/`. Two equivalent ways to select which project to operate on:
+
+```bash
+# Option 1: cd into the project
+cd projects/my-project
+pdm run db-check
+pdm run songs-generate
+
+# Option 2: --project flag from the main repo
+pdm run db-check --project projects/my-project
+pdm run songs-generate --project projects/my-project
+```
+
+The `--project` flag can appear in any position (before or after other arguments).
+
+### Creating a new project
+
+```bash
+# 1. Copy the template
+cp -r projects/_template projects/my-new-project
+
+# 2. Edit the config
+$EDITOR projects/my-new-project/config.toml
+
+# 3. Create the expected subdirectories
+mkdir -p projects/my-new-project/{data,songs/{custom,unofficialV3,officially_released_songs,copyright_issues},setlists,images/{bg,cover,custom},logs}
+
+# 4. Run the pipeline
+pdm run clear-db --project projects/my-new-project
+pdm run update-json --project projects/my-new-project
+pdm run update-db --project projects/my-new-project
+pdm run db-check --project projects/my-new-project
+pdm run songs-generate --project projects/my-new-project
+```
+
+See [`projects/_template/README.md`](projects/_template/README.md) for the full checklist.
+
+### Config reference (`[project]` section)
+
+| Key | Type | Description |
+|-----|------|-------------|
+| `name` | string | Unique project identifier (used in cache keys) |
+| `display-name` | string | Human-readable project name |
+| `voice-versions` | list[str] | Ordered voice versions (e.g. `["v1", "v2", "v3"]`) |
+| `duet-group-name` | string | "Singer" value for duets in `dates.csv` (e.g. `"Twins"`) |
+
+Each `[[project.artists]]` entry:
+
+| Key | Type | Description |
+|-----|------|-------------|
+| `name` | string | Canonical singer name in DB (e.g. `"Neuro"`) |
+| `flag` | string | DB flag token (e.g. `"neuro"`) |
+| `display-name` | string | ID3 tag name (e.g. `"Neuro-Sama"`) |
+| `cover-suffix` | string | Token in cover-image filenames (e.g. `"neuro"`) |
+| `album-artist` | string | TPE2/TSO2 album-artist value |
+
 ## Repo organization
 ### Folders
 - `setlists/`: The setlists (source of truth for each karaoke), grouped by voice version (`v1 voice/`, `v2 voice/`, `v3 voice/`). The code also recognizes a `non-karaoke/` subfolder (e.g. `v3 voice/non-karaoke/`) for non-karaoke streams, which is currently empty.
@@ -165,6 +240,7 @@ Presets with no `group` keep their `path` as-is (no parent dir) and belong to th
 - `out/`: The generated output (not on GitHub): `unofficial_releases/` and `official_releases/`, each with per-preset subdirs plus an `albums/` tree.
 - `data/`: Databases and reference data. The song library exists in two formats that must stay identical: `songs.csv` and `songs.db` (sqlite). `songs_new.json` is the review buffer (not the DB). Also `dates.csv`, `official_covers.csv`, `original_songs.csv`, `copyright_issues.csv`, `microphones.csv` and `dates_v12.csv`.
 - `neuro/`: Source code folder
+- `projects/`: Multi-project support — `_template/` is the scaffold for bootstrapping new projects
 - `metadata_utils/`: Unofficial-Archive helpers (enables writing/reading the JSON metadata payload in the ID3 comment frame).
 - `fonts/`: Fonts used for the date text on thumbnails.
 - `logs/`: Run logs.
@@ -176,7 +252,10 @@ Presets with no `group` keep their `path` as-is (no parent dir) and belong to th
 - `pyproject.toml`: Project definition, requirements, etc...
 
 ### Code files
-- `__init__.py`: Centralizes all the project paths
+- `__init__.py`: Centralizes all the project paths + `get_project()` accessor
+- `artists.py`: `CoverArtist` and `Project` dataclasses (multi-project data model)
+- `cli.py`: `chdir_to_project()` — shared helper for the `--project <dir>` CLI flag
+- `config.py`: `load_project()` — parses `config.toml` into a `Project` instance
 - `_shortcuts.py`: Quick CLI shortcuts (drive pull/push, etc.)
 - `checks.py`: Various checks on database
 - `detection.py`: Searches files matching regex patterns

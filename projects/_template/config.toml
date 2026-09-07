@@ -1,0 +1,57 @@
+# ── project identity ──────────────────────────────────────────────
+# Edit these values to match your project.
+[project]
+name = "my-project"
+display-name = "My Project"
+voice-versions = ["v1"]
+duet-group-name = "Duet"
+
+[[project.artists]]
+name = "SingerA"
+flag = "singer_a"
+display-name = "Singer A"
+cover-suffix = "singer_a"
+album-artist = "Singer A"
+
+# Add more artists here as needed:
+# [[project.artists]]
+# name = "SingerB"
+# flag = "singer_b"
+# display-name = "Singer B"
+# cover-suffix = "singer_b"
+# album-artist = "Singer A/Singer B"
+
+# ── drive (rclone remote names) ───────────────────────────────────
+# Set these to the rclone remote names for your project's drives.
+# Leave empty/absent if you don't use Google Drive sync.
+[drive]
+public = ""
+private = ""
+source = ""
+
+# ── output ────────────────────────────────────────────────────────
+[output]
+use-root = true
+out-root = "out"
+make-links = true
+
+# ── features ──────────────────────────────────────────────────────
+[features]
+activated = []
+
+# [features.mp3gain]
+# mode = "per-preset"
+# type = "gain"
+
+# ── presets ───────────────────────────────────────────────────────
+# Define your presets here. Each preset selects songs by flag inclusion/exclusion.
+# See the main project's config.toml for detailed examples.
+#
+# [[Presets]]
+# name = "All Songs"
+# path = "all"
+# include-flags = ["singer_a", "singer_b"]
+# exclude-flags = []
+# include-type = "or"
+# exclude-type = "or"
+# mp3gain = false

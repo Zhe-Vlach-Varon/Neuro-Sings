@@ -609,16 +609,18 @@ and a cross-project group correctly rejected.
 
 ### Phase 5 — Cleanup and documentation (1–2 days)
 
-- [ ] Remove deprecated module-level constants from `neuro/__init__.py`
+- [x] Remove deprecated module-level constants from `neuro/__init__.py`
       (or keep as thin wrappers around `get_project()` for one more release).
-- [ ] Update `AGENTS.md` to document the multi-project model:
+      → **Kept** (still imported by 7 modules). Updated the deprecation comment to document
+      exactly which constants remain and why.
+- [x] Update `AGENTS.md` to document the multi-project model:
   - How to create a new project directory
   - The `[project]` config section reference
   - The `CoverArtist` and `Project` data model
   - The per-project test procedure
-- [ ] Add a `projects/_template/` directory with a minimal `config.toml` and directory
+- [x] Add a `projects/_template/` directory with a minimal `config.toml` and directory
       structure that users can copy to bootstrap a new project.
-- [ ] Update `README.md` with a "Multi-project" section.
+- [x] Update `README.md` with a "Multi-project" section.
 
 ---
 

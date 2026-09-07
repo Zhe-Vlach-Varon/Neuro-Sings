@@ -6,10 +6,11 @@ from pathlib import Path
 
 ROOT_DIR = Path(".")
 
-# ── Deprecated path constants ─────────────────────────────────────────────────
-# These are kept for backward compatibility. New code should use
-# `neuro.get_project()` to obtain the active project and read paths from it.
-# They will be removed in a future major version.
+# ── Legacy path constants (retained for backward compatibility) ──────────────
+# New code should use `neuro.get_project()` to obtain the active project and
+# read paths from it. These are kept because several modules still import them
+# directly (e.g. `LOG_DIR` in 6 modules, `ROOT_DIR` in 3). They will be removed
+# in a future major version once all imports are migrated to `get_project()`.
 # ──────────────────────────────────────────────────────────────────────────────
 
 DATA_DIR = ROOT_DIR / Path("data")

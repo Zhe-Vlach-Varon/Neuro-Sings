@@ -6,6 +6,7 @@ from loguru import logger
 
 from neuro import LOG_DIR
 from neuro import get_project
+from neuro.cli import chdir_to_project
 from neuro.polars_utils import load_dates, load_db
 from neuro.utils import format_logger
 
@@ -151,6 +152,7 @@ def _create_drive_shortcuts(out_dir: Path, dest: str, dir_prefix: str, error_lab
 
 
 def setlists_pull() -> None:
+    chdir_to_project()
     format_logger(log_file=LOG_DIR / "sync.log")
     project = get_project()
     setlist_pull_command = f"{DRIVE_RCLONE_COMMAND} {project.drive_public}:{REMOTE_INPUT_PREFIX}/{project.setlists_dir} {project.setlists_dir}"
@@ -158,6 +160,7 @@ def setlists_pull() -> None:
 
 
 def setlists_push() -> None:
+    chdir_to_project()
     format_logger(log_file=LOG_DIR / "sync.log")
     project = get_project()
     public_dest = f"{project.drive_public}:" if not TR else f"{LOCAL_TEST_OUT_PUB_DIR}/"
@@ -167,6 +170,7 @@ def setlists_push() -> None:
 
 
 def drive_pull() -> None:
+    chdir_to_project()
     format_logger(log_file=LOG_DIR / "sync.log")
     project = get_project()
     drive_pull_command = f"{DRIVE_RCLONE_COMMAND} {project.drive_source}: {LOCAL_TEST_IN_DIR}/{project.song_root.name}/unofficialV3"
@@ -175,6 +179,7 @@ def drive_pull() -> None:
 # TODO command to apply my changes to unofficial archive metadata
 
 def inputs_pull() -> None:
+    chdir_to_project()
     format_logger(log_file=LOG_DIR / "sync.log")
     project = get_project()
     public_drive = project.drive_public
@@ -198,6 +203,7 @@ def inputs_pull() -> None:
 
 
 def drive_push() -> None:
+    chdir_to_project()
     format_logger(log_file=LOG_DIR / "sync.log")
     project = get_project()
     public_drive = project.drive_public
@@ -235,6 +241,7 @@ def drive_push() -> None:
 
 
 def dbs_sync() -> None:
+    chdir_to_project()
     format_logger(log_file=LOG_DIR / "sync.log")
     project = get_project()
     FROM_DB = False

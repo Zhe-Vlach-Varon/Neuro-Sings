@@ -9,6 +9,7 @@ from loguru import logger
 from tqdm import tqdm
 
 from neuro import LOG_DIR, ROOT_DIR
+from neuro.cli import chdir_to_project
 from neuro.detection import check_missing_setlist_entries
 from neuro.polars_utils import Preset, load_db
 from neuro.utils import MP3GainMode, format_logger, get_audio_hash
@@ -225,6 +226,7 @@ def check_all_group_coverage() -> None:
 
 def all_tests() -> None:
     """Runs all checks defined in this file"""
+    chdir_to_project()
     format_logger(log_file=LOG_DIR / "checks.log")
     check_case("Artist")
     check_case("Title")

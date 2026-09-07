@@ -11,6 +11,7 @@ from loguru import logger
 from neuro import LOG_DIR, UNOFFV3_EXTRA, UNOFFV3_DISC66
 from neuro import get_project
 from neuro.checks import check_are_dbs_identical, check_all_group_coverage, check_group_coverage
+from neuro.cli import chdir_to_project
 from neuro.detection import export_json, extract_all
 from neuro.file_tags import CustomSong, DriveSong, Song
 from neuro.polars_utils import Preset, load_dates, load_db
@@ -25,6 +26,7 @@ def new_batch_detection() -> None:
     """Re-runs the song detection based on regex. Adds songs that aren't already in\
         the database in a JSON file for them to be reviewed.
     """
+    chdir_to_project()
     format_logger(log_file=LOG_DIR / "batches.log")
     # These 3 lines could be one call, but it would just make the code less clear
     out = extract_all()  # Extracts data
@@ -204,13 +206,17 @@ def get_presets_for_group(config: dict, group: str | None = None) -> list[dict]:
     return matched
 
 
-def generate_songs_group(group: str) -> None:
+def generate_songs_group(group: str | None = None) -> None:
     """CLI entrypoint to generate only the presets belonging to a given group.
 
     Args:
-        group (str): Group name to generate, or "all" for every preset,
-            or "default" for presets that have no explicit group.
+        group: Group name to generate, or "all" for every preset,
+            or "default" for presets that have no explicit group. When omitted it is
+            read from the first CLI argument (the console wrapper passes no args).
     """
+    remaining = chdir_to_project()
+    if group is None:
+        group = remaining[0] if remaining else "all"
     config = load_config()[0]
     presets = get_presets_for_group(config, None if group == "all" else group)
     _generate_presets(presets, create_placeholders=False)
@@ -222,8 +228,8 @@ def check_group() -> None:
     Usage: ``check-group [group]`` — with no argument (or ``all``) it checks every group
     present in config.toml; otherwise it checks the named group (e.g. ``zvv_sort``).
     """
-    import sys
-    group = sys.argv[1] if len(sys.argv) > 1 else None
+    remaining = chdir_to_project()
+    group = remaining[0] if remaining else None
     format_logger(log_file=LOG_DIR / "checks.log")
     if group is None or group == "all":
         check_all_group_coverage()
@@ -237,6 +243,7 @@ def generate_songs(create_placeholders: bool = False) -> None:
     just to avoid tempering the original files.\
     Generates songs in preset groups.
     """
+    chdir_to_project()
     config = load_config()[0]
     _generate_presets(get_presets_for_group(config, None), create_placeholders=create_placeholders)
 
@@ -280,6 +287,8 @@ def generate_albums(create_placeholders: bool = False) -> None:
     """generates all songs sorted by album"""
 
     global g_hash_to_file_dict
+
+    chdir_to_project()
 
     if not len(g_hash_to_file_dict):
         g_hash_to_file_dict = get_audio_hash_to_file_mapping(get_project().song_root)
@@ -411,6 +420,7 @@ def mp3gain_standalone() -> None:
     Bypasses the per-preset `mp3gain` booleans: this command exists to apply the configured\
         gain type over every existing preset output, so a preset's own boolean must not disable it.
     """
+    chdir_to_project()
     format_logger(log_file=LOG_DIR / "generation.log")
     logger.info("[MP3G] Starting mp3gain batch")
 

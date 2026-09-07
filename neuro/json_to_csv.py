@@ -7,10 +7,12 @@ from loguru import logger
 
 from neuro import LOG_DIR
 from neuro import get_project
+from neuro.cli import chdir_to_project
 from neuro.detection import check_missing_setlist_entries, is_twin_duet_stream
 from neuro.polars_utils import load_dates, load_db, songs_schema, dates_schema
 import neuro.utils as neutils
 def clear_db() -> None:
+    chdir_to_project()
     project = get_project()
     songs_df = pl.DataFrame({}, schema=songs_schema)
     dates_df = pl.DataFrame({}, schema=dates_schema)
@@ -25,6 +27,7 @@ def clear_db() -> None:
 def update_db() -> None:
     """Updates the song database, adding songs from the JSON file that aren't yet in it
     The Date CSV/Table is also updated for each new stream"""
+    chdir_to_project()
     project = get_project()
     neutils.format_logger(log_file=LOG_DIR / "json.log")
     with open(project.songs_json, "r") as f:

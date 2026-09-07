@@ -14,6 +14,7 @@ from loguru import logger
 from neuro import LOG_DIR, ROOT_DIR, UNOFFV3_EXTRA, UNOFFV3_DISC66
 from neuro import get_project
 from neuro.artists import Project
+from neuro.cli import chdir_to_project
 from neuro.polars_utils import load_db
 import neuro.utils as neutils
 
@@ -863,6 +864,7 @@ def check_missing_setlist_entries() -> list[dict]:
 
 
 def run_setlist_check() -> int:
+    chdir_to_project()
     neutils.format_logger(log_file=LOG_DIR / "setlist-check.log")
     return len(check_missing_setlist_entries()) == 0
 

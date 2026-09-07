@@ -573,11 +573,37 @@ makes everything CWD-relative.
 **Alternative (if a single checkout must serve multiple projects):** Add a `--project <dir>`
 argument to the entry points in `pyproject.toml`. The default is `.` (current directory).
 
-- [ ] Decide: separate directories (recommended) vs `--project` flag.
-- [ ] If `--project` flag: add to all entry points, resolve `config_path` from the arg.
-- [ ] If separate directories: no code change needed, just document the workflow.
+**Decision: implement the `--project <dir>` flag** (the alternative), because it is the
+strict superset — it *subsumes* the separate-directories workflow (a project dir just needs a
+`config.toml`), it lets a single checkout serve many projects without PDM-project-walking
+friction, and it stays backward-compatible (no flag ⇒ current CWD ⇒ existing behaviour). Since
+every path is CWD-relative, selecting a project is simply an `os.chdir` before any work.
 
-**Files touched:** possibly `pyproject.toml`, `neuro/config.py`.
+Implementation: a single shared helper `neuro.cli.chdir_to_project(argv=None)` parses
+`--project <dir>` (also `--project=<dir>`, in any position), validates the dir exists and has a
+`config.toml`, and `os.chdir`s into it; it returns the remaining args so entry points that take a
+positional (e.g. `check-group <group>`) parse it from the list. Because the chdir happens before
+`get_project()` is first called (lazy + cached), the right project's `config.toml` and all
+CWD-relative constants resolve under it automatically. Every one of the 18 `[project.scripts]`
+entry points now calls it first. Also fixed `generate_songs_group`, which was broken via the
+console wrapper (required `group` param, called with no args) — it now reads the group from the
+remaining args and defaults to `"all"`.
+
+- [x] Decide: separate directories (recommended) vs `--project` flag. → **`--project` flag.**
+- [x] If `--project` flag: add to all entry points, resolve `config_path` from the arg.
+      → Added `chdir_to_project()` to all 18 entry points; `get_project()` now reads the
+        target project's `config.toml`.
+- [x] Document the workflow. → See `neuro/cli.py` docstring; both `cd <proj> && <cmd>` and
+      `<cmd> --project <proj>` work.
+
+**Files touched:** `neuro/cli.py` (new), `neuro/run.py`, `neuro/checks.py`, `neuro/detection.py`,
+`neuro/json_to_csv.py`, `neuro/thumbnails.py`, `neuro/_shortcuts.py`.
+
+**Verified:** `ruff` clean (no new findings); unit-level tests of `chdir_to_project` (dir
+resolution, `--project=` form, leftover args, and the three error paths); end-to-end via the real
+CLI — `pdm run check-group` (main repo, 1859 songs) vs `pdm run check-group --project <vedal>`
+(vedal, 0 songs, `vedal_sort` group), with `--project` composable before/after a positional group
+and a cross-project group correctly rejected.
 
 ---
 

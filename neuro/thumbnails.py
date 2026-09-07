@@ -13,6 +13,7 @@ from loguru import logger
 
 from neuro import DATES_OLD_CSV, LOG_DIR, FONT_PATH
 from neuro import get_project
+from neuro.cli import chdir_to_project
 from neuro.polars_utils import load_dates
 from neuro.utils import format_logger, time_format
 
@@ -78,6 +79,7 @@ def generate_oldge() -> None:
         be generated often.\n
         Generates monthly dates in custom folder because that's how they are used.
     """
+    chdir_to_project()
     project = get_project()
     format_logger(log_file=LOG_DIR / "thumbnails.log")
     t = time()
@@ -191,6 +193,7 @@ def singer_match(singer: Singer, version: DuetVersion) -> tuple[int, int]:
 
 def generate_main() -> None:
     """Generates all thumbnails at once. It automatically re-generate all of them."""
+    chdir_to_project()
     project = get_project()
     format_logger(log_file=LOG_DIR / "thumbnails.log")
 

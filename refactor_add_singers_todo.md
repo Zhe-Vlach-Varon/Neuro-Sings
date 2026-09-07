@@ -319,7 +319,7 @@ through `project.artists`. This is the core of the refactoring.
       ...
   ```
 
-- [ ] **3b. `neuro/utils.py` — `post_process_flags()`:**
+- [x] **3b. `neuro/utils.py` — `post_process_flags()`:**
 
   ```python
   # BEFORE
@@ -342,7 +342,7 @@ through `project.artists`. This is the core of the refactoring.
       return flags
   ```
 
-- [ ] **3c. `neuro/file_tags.py` — `Flags` dataclass:**
+- [x] **3c. `neuro/file_tags.py` — `Flags` dataclass:**
 
   Keep `neuro: bool` and `evil: bool` for backward compat. Add a generic field:
 

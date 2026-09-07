@@ -7,6 +7,8 @@ name = "neuro"
 display-name = "Neuro Twins"
 voice-versions = ["v1", "v2", "v3"]
 duet-group-name = "Twins"
+# Lead-singer names that are classified as ARG (get the 'arg;' flag)
+arg-singers = ["Study-sama"]
 
 [[project.artists]]
 name = "Neuro"
@@ -21,6 +23,32 @@ flag = "evil"
 display-name = "Evil Neuro"
 cover-suffix = "evil"
 album-artist = "Neuro-Sama/Evil Neuro"
+
+# Song-specific overrides: title → name_tag value (checked before flag-based logic)
+[project.song-overrides.name-tag]
+"Chinatown Blues" = "Neuro + Vedal"
+
+# Song-specific overrides: title → version value (used by extract_official)
+[project.song-overrides.version]
+"Chinatown Blues" = "2"
+
+# Thumbnail background images (optional — omit if this project doesn't generate thumbnails)
+# solo: singer_name → {duet_version: filename}  (singers not listed get no solo image)
+[project.thumbnails.solo.Neuro]
+v1 = "nwero.png"
+v2v1 = "newero.png"
+v2 = "newero.png"
+
+[project.thumbnails.solo.Evil]
+v1 = "eliv.png"
+v2v1 = "eliv.png"
+v2 = "neweliv.png"
+
+# duet: duet_version → filename  (keys also define the valid duet versions)
+[project.thumbnails.duet]
+v1 = "smocus.jpg"
+v2v1 = "smocus_inter.png"
+v2 = "smocus_new.png"
 
 # ── drive (rclone remote names) ───────────────────────────────────
 [drive]

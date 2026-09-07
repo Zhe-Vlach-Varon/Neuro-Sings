@@ -4,41 +4,16 @@ from pathlib import Path
 
 from loguru import logger
 
-from neuro import LOG_DIR
-from neuro import get_project
+from neuro import LOG_DIR, get_project
 from neuro.cli import chdir_to_project
 from neuro.polars_utils import load_dates, load_db
 from neuro.utils import format_logger
-
-# pb's original drive, no longer updated
-ORIGINAL_AUDIO_DRIVE_NAME = "Neuro-sama-audio"
-
-# original maintainer's Neuro-Sings drive
-ORIGINAL_NEURO_SINGS_DRIVE_NAME = "Neuro-Sings"
-
-# Current Source Drive
-UNOFFICIAL_V3_DRIVE_NAME = "unofficialV3"
-
-# Zhe_Vlach_Varon's current drives
-PUBLIC_DRIVE_NAME = "Neuro-Sings-ZVV"
-PRIVATE_DRIVE_NAME = "Neuro-Sings-ZVV-official-releases"
 
 # Path constants for local and remote Paths
 REMOTE_INPUT_PREFIX = Path("_inputs")
 REMOTE_OUT_PREFIX = Path("out")
 
 DOT_VSCODE_DIR = Path(".vscode")
-
-# input files for upload to public folder
-# DATA_DIR
-# IMAGES_ROOT_DIR
-# SETLISTS_DIR
-# CUSTOM_DIR
-# UNOFFICIALV3_DIR
-
-# input files for upload to private folder
-# COPYRIGHT_ISSUES_DIR
-# OFFICIAL_RELEASE_DIR
 
 # rclone command
 RCLONE_SYNC = "rclone sync"
@@ -68,14 +43,6 @@ DRIVE_RCLONE_COMMAND = f"{RCLONE_SYNC}{COMMON_OPTIONS}{DRIVE_OPTIONS}{V}{DR}"
 LOCAL_TEST_IN_DIR = Path("temp")
 LOCAL_TEST_OUT_PUB_DIR = Path("temp_public")
 LOCAL_TEST_OUT_PRV_DIR = Path("temp_private")
-LOCAL_PUBLIC_DIR = Path(PUBLIC_DRIVE_NAME)
-LOCAL_PRIVATE_DIR = Path(PRIVATE_DRIVE_NAME)
-
-PUBLIC_DEST = f"{PUBLIC_DRIVE_NAME}:" if not TR else f"{LOCAL_TEST_OUT_PUB_DIR}/"
-PRIVATE_DEST = f"{PRIVATE_DRIVE_NAME}:" if not TR else f"{LOCAL_TEST_OUT_PRV_DIR}/"
-
-PUBLIC_DIR = f"{LOCAL_PUBLIC_DIR}/" if TR else ""
-PRIVATE_DIR = f"{LOCAL_PRIVATE_DIR}/" if TR else ""
 
 RCLONE_BACKEND_COMMAND = f"rclone backend shortcut{V}{DR}"
 

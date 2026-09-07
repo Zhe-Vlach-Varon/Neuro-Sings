@@ -409,8 +409,8 @@ class Song:
             return f"{first_name} v1"
         if self.flags.v2:
             return f"{first_name} v2"
-        if self.title == "Chinatown Blues":
-            return "Neuro + Vedal"  # project-specific song override
+        if self.title in self._project.song_name_tag_overrides:
+            return self._project.song_name_tag_overrides[self.title]
         # A song can have both singer and duet tags, but the duet tag is prioritized
         if self.flags.duet:
             return "Duet"

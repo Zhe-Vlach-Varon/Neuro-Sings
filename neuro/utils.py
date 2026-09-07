@@ -524,7 +524,7 @@ def get_flags(song: SongEntry, project: Project | None = None) -> str:
     duplicate = song['duplicate']
     encore = song['encore']
 
-    if lead_singer == 'Study-sama':
+    if lead_singer in project.arg_singers:
         return 'arg;'
 
     first_artist_flag = project.artists[0].flag

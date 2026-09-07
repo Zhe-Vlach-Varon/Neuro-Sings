@@ -280,10 +280,7 @@ def extract_official(files: list[Path], out: neutils.SongJSON ={}) -> neutils.So
                 if lead_singer is None:
                     logger.error(f"how did we get here: neuro/detection.py: unexpected Cover Artist '{cover_artist}'")
                     exit(1)
-                if title == 'Chinatown Blues':
-                    version = '2'
-                else:
-                    version = '1'
+                version = project.song_version_overrides.get(title, '1')
                 data = _make_song_entry(artist, cover_artist, title, file, date, id, lead_singer, version)
                 if 'custom' in out.keys():
                     out['custom'].append(data)

@@ -5,6 +5,8 @@ name = "my-project"
 display-name = "My Project"
 voice-versions = ["v1"]
 duet-group-name = "Duet"
+# Lead-singer names that are classified as ARG (get the 'arg;' flag). Empty = no ARG songs.
+arg-singers = []
 
 [[project.artists]]
 name = "SingerA"
@@ -20,6 +22,24 @@ album-artist = "Singer A"
 # display-name = "Singer B"
 # cover-suffix = "singer_b"
 # album-artist = "Singer A/Singer B"
+
+# Song-specific overrides (optional — omit if not needed)
+# [project.song-overrides.name-tag]
+# "Some Song Title" = "Singer A + Other"
+
+# [project.song-overrides.version]
+# "Some Song Title" = "2"
+
+# Thumbnail background images (optional — omit if this project doesn't generate thumbnails)
+# solo: singer_name → {duet_version: filename}
+# [project.thumbnails.solo.SingerA]
+# v1 = "singer_a_v1.png"
+# v2 = "singer_a_v2.png"
+#
+# duet: duet_version → filename (keys also define the valid duet versions)
+# [project.thumbnails.duet]
+# v1 = "duet_v1.jpg"
+# v2 = "duet_v2.jpg"
 
 # ── drive (rclone remote names) ───────────────────────────────────
 # Set these to the rclone remote names for your project's drives.

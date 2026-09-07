@@ -79,6 +79,14 @@ def _synthesized_project() -> Project:
         drive_public="Neuro-Sings-ZVV",
         drive_private="Neuro-Sings-ZVV-official-releases",
         drive_source="unofficialV3",
+        bg_solo_images={
+            "Neuro": {"v1": "nwero.png", "v2v1": "newero.png", "v2": "newero.png"},
+            "Evil": {"v1": "eliv.png", "v2v1": "eliv.png", "v2": "neweliv.png"},
+        },
+        bg_duet_images={"v1": "smocus.jpg", "v2v1": "smocus_inter.png", "v2": "smocus_new.png"},
+        arg_singers=("Study-sama",),
+        song_name_tag_overrides={"Chinatown Blues": "Neuro + Vedal"},
+        song_version_overrides={"Chinatown Blues": "2"},
     )
 
 
@@ -110,6 +118,17 @@ def load_project(config_path: Path = Path("config.toml")) -> Project:
     base = Path(".")
     out_root = Path(out_cfg.get("out-root", "out"))
 
+    # Thumbnail bg image mappings
+    thumbnails = p.get("thumbnails", {})
+    bg_solo = thumbnails.get("solo")   # dict[str, dict[str, str]] | None
+    bg_duet = thumbnails.get("duet")   # dict[str, str] | None
+
+    # Project-specific overrides
+    arg_singers = tuple(p.get("arg-singers", ()))
+    song_overrides = p.get("song-overrides", {})
+    name_tag_overrides = song_overrides.get("name-tag", {})
+    version_overrides = song_overrides.get("version", {})
+
     return Project(
         name=p["name"],
         display_name=p.get("display-name", p["name"]),
@@ -133,4 +152,9 @@ def load_project(config_path: Path = Path("config.toml")) -> Project:
         drive_public=drive_cfg.get("public"),
         drive_private=drive_cfg.get("private"),
         drive_source=drive_cfg.get("source"),
+        bg_solo_images=bg_solo,
+        bg_duet_images=bg_duet,
+        arg_singers=arg_singers,
+        song_name_tag_overrides=name_tag_overrides,
+        song_version_overrides=version_overrides,
     )

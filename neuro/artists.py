@@ -10,7 +10,7 @@ The model is deliberately framework-agnostic: it only depends on the standard li
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 
 
@@ -70,6 +70,37 @@ class Project:
     drive_public: str | None
     drive_private: str | None
     drive_source: str | None
+
+    # --- thumbnail bg image mappings (optional; None = not configured) ---
+    bg_solo_images: dict[str, dict[str, str]] | None = None
+    """Mapping of singer_name → {duet_version: bg_image_filename} for solo thumbnails.
+
+    E.g. ``{"Neuro": {"v1": "nwero.png", "v2": "newero.png"},
+             "Evil": {"v1": "eliv.png", "v2": "neweliv.png"}}``.
+    A singer not present in this dict gets no solo thumbnail (e.g. the duet group)."""
+
+    bg_duet_images: dict[str, str] | None = None
+    """Mapping of duet_version → bg_image_filename for duet thumbnails.
+
+    E.g. ``{"v1": "smocus.jpg", "v2v1": "smocus_inter.png", "v2": "smocus_new.png"}``.
+    The keys define the valid duet versions for ``check_stream()``."""
+
+    # --- project-specific overrides ---
+    arg_singers: tuple[str, ...] = ()
+    """Lead-singer names that are classified as ARG songs (e.g. ``("Study-sama",)``).
+
+    ``get_flags()`` returns ``'arg;'`` for any song whose lead singer is in this tuple."""
+
+    song_name_tag_overrides: dict[str, str] = field(default_factory=dict)
+    """Song-specific ``name_tag`` overrides: ``{title: name_tag_value}``.
+
+    E.g. ``{"Chinatown Blues": "Neuro + Vedal"}``. Checked before the flag-based logic."""
+
+    song_version_overrides: dict[str, str] = field(default_factory=dict)
+    """Song-specific version overrides: ``{title: version_value}``.
+
+    E.g. ``{"Chinatown Blues": "2"}``. Used by ``extract_official()`` instead of the
+    default ``'1'``."""
 
     # --- helpers ---
     def singer_names(self) -> tuple[str, ...]:

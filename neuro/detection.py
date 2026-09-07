@@ -194,10 +194,19 @@ def extract_unofficialV3(files: list[Path], out: neutils.SongJSON = {}) -> neuti
 
 
 def extract_arg(files: list[Path], out: neutils.SongJSON ={}) -> neutils.SongJSON:
+    project = get_project()
+    if not project.arg_singers:
+        logger.info("no arg-singers configured; skipping ARG extraction")
+        return out
+
+    # ARG disc files carry no per-file artist info, so all of them are attributed to the
+    # first configured ARG singer. The grouping key becomes the DB album name for these rows.
+    artist = project.arg_singers[0]
+    album_key = project.arg_album_name or f"{project.display_name} ARG"
+
     id = 1
     for file in files:
         title = file.stem[4:]
-        artist = 'Study-sama'
         trackInfo = tinytag.TinyTag.get(file)
         date = trackInfo.comment
 
@@ -219,10 +228,10 @@ def extract_arg(files: list[Path], out: neutils.SongJSON ={}) -> neutils.SongJSO
             'Hash_IN': neutils.get_audio_hash(Path(file)),
         }
 
-        if 'Neuro-sama ARG' in out.keys():
-            out['Neuro-sama ARG'].append(data)
+        if album_key in out.keys():
+            out[album_key].append(data)
         else:
-            out['Neuro-sama ARG'] = [data]
+            out[album_key] = [data]
         id += 1
 
     return out
@@ -251,11 +260,26 @@ def _make_song_entry(artist: str, cover_artist: str, title: str, file: Path, dat
 
 
 def extract_official(files: list[Path], out: neutils.SongJSON ={}) -> neutils.SongJSON:
-    # load original_songs.csv and official_covers.csv
+    # load original_songs.csv and official_covers.csv (both optional — a project may not have either)
     # search files for each song
     project = get_project()
-    official_songs_csv = pl.read_csv(project.data_dir / "official_covers.csv", separator='|').to_dicts()
-    original_songs_csv = pl.read_csv(project.data_dir / "original_songs.csv").to_dicts()
+
+    official_covers_path = project.data_dir / "official_covers.csv"
+    if official_covers_path.exists():
+        official_songs_csv = pl.read_csv(official_covers_path, separator='|').to_dicts()
+    else:
+        logger.info(f"{official_covers_path} not found; skipping official covers")
+        official_songs_csv = []
+
+    original_songs_path = project.data_dir / "original_songs.csv"
+    if original_songs_path.exists():
+        original_songs_csv = pl.read_csv(original_songs_path).to_dicts()
+    else:
+        logger.info(f"{original_songs_path} not found; skipping original songs")
+        original_songs_csv = []
+
+    if not official_songs_csv and not original_songs_csv:
+        return out
 
     songs_db = load_db()
 

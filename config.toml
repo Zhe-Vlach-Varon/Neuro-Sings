@@ -7,8 +7,11 @@ name = "neuro"
 display-name = "Neuro Twins"
 voice-versions = ["v1", "v2", "v3"]
 duet-group-name = "Twins"
-# Lead-singer names that are classified as ARG (get the 'arg;' flag)
+# Lead-singer names that are classified as ARG (get the 'arg;' flag). Empty = no ARG songs.
 arg-singers = ["Study-sama"]
+# Album name assigned to ARG rows in the DB (defaults to "<display-name> ARG" if unset;
+# pinned here because existing rows use "Neuro-sama ARG")
+arg-album = "Neuro-sama ARG"
 
 [[project.artists]]
 name = "Neuro"

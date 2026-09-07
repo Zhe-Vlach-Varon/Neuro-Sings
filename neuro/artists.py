@@ -89,7 +89,14 @@ class Project:
     arg_singers: tuple[str, ...] = ()
     """Lead-singer names that are classified as ARG songs (e.g. ``("Study-sama",)``).
 
-    ``get_flags()`` returns ``'arg;'`` for any song whose lead singer is in this tuple."""
+    ``get_flags()`` returns ``'arg;'`` for any song whose lead singer is in this tuple.
+    Empty means the project has no ARG songs and ``extract_arg()`` is a no-op."""
+
+    arg_album_name: str | None = None
+    """Album/grouping key that ``extract_arg()`` assigns to ARG songs (e.g. ``"Neuro-sama ARG"``).
+
+    Defaults to ``"<display-name> ARG"`` when unset. Must match the existing DB album name
+    for projects that already have ARG rows, so set it explicitly in those cases."""
 
     song_name_tag_overrides: dict[str, str] = field(default_factory=dict)
     """Song-specific ``name_tag`` overrides: ``{title: name_tag_value}``.

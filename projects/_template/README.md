@@ -61,6 +61,13 @@ This directory contains the minimal scaffolding to bootstrap a new cover-artist 
 - Setlist files in `setlists/` (if running `update-json`)
 - Cover images in `images/cover/` and `images/bg/` (if running `thumbnails-generate`)
 
+Optional data files (only needed if you have official releases / original songs to import):
+
+- `data/official_covers.csv` — pipe-separated, columns `Date|Title|Artist|Cover Artist`.
+  If absent, `update-json` skips official-cover detection.
+- `data/original_songs.csv` — comma-separated, columns `Date,Title,Artist`.
+  If absent, `update-json` skips original-song detection.
+
 ## Notes
 
 - The `name` in `[project]` should be a valid Python identifier (used in cache keys).

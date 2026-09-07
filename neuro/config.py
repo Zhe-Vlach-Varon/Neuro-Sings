@@ -85,6 +85,7 @@ def _synthesized_project() -> Project:
         },
         bg_duet_images={"v1": "smocus.jpg", "v2v1": "smocus_inter.png", "v2": "smocus_new.png"},
         arg_singers=("Study-sama",),
+        arg_album_name="Neuro-sama ARG",
         song_name_tag_overrides={"Chinatown Blues": "Neuro + Vedal"},
         song_version_overrides={"Chinatown Blues": "2"},
     )
@@ -125,6 +126,7 @@ def load_project(config_path: Path = Path("config.toml")) -> Project:
 
     # Project-specific overrides
     arg_singers = tuple(p.get("arg-singers", ()))
+    arg_album_name = p.get("arg-album")  # None → extract_arg() derives "<display-name> ARG"
     song_overrides = p.get("song-overrides", {})
     name_tag_overrides = song_overrides.get("name-tag", {})
     version_overrides = song_overrides.get("version", {})
@@ -155,6 +157,7 @@ def load_project(config_path: Path = Path("config.toml")) -> Project:
         bg_solo_images=bg_solo,
         bg_duet_images=bg_duet,
         arg_singers=arg_singers,
+        arg_album_name=arg_album_name,
         song_name_tag_overrides=name_tag_overrides,
         song_version_overrides=version_overrides,
     )

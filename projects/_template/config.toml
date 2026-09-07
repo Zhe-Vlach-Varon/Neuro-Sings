@@ -7,6 +7,9 @@ voice-versions = ["v1"]
 duet-group-name = "Duet"
 # Lead-singer names that are classified as ARG (get the 'arg;' flag). Empty = no ARG songs.
 arg-singers = []
+# Album name assigned to ARG rows in the DB (only used if arg-singers is non-empty;
+# defaults to "<display-name> ARG" when unset)
+# arg-album = "My Project ARG"
 
 [[project.artists]]
 name = "SingerA"

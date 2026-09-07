@@ -1,16 +1,15 @@
 import json
-
 from pathlib import Path
 
 import polars as pl
 from loguru import logger
 
-from neuro import LOG_DIR
-from neuro import get_project
-from neuro.cli import chdir_to_project
-from neuro.detection import check_missing_setlist_entries, is_twin_duet_stream
-from neuro.polars_utils import load_dates, load_db, songs_schema, dates_schema
-import neuro.utils as neutils
+from . import LOG_DIR, get_project, utils
+from .cli import chdir_to_project
+from .detection import check_missing_setlist_entries, is_twin_duet_stream
+from .polars_utils import dates_schema, load_dates, load_db, songs_schema
+
+
 def clear_db() -> None:
     chdir_to_project()
     project = get_project()
@@ -29,9 +28,9 @@ def update_db() -> None:
     The Date CSV/Table is also updated for each new stream"""
     chdir_to_project()
     project = get_project()
-    neutils.format_logger(log_file=LOG_DIR / "json.log")
+    utils.format_logger(log_file=LOG_DIR / "json.log")
     with open(project.songs_json, "r") as f:
-        json_data: neutils.SongJSON = json.load(f)
+        json_data: utils.SongJSON = json.load(f)
 
     songs_df = load_db()
     dates_df = load_dates()
@@ -111,7 +110,7 @@ def update_db() -> None:
 
             if not song["duplicate"]:
                 file = Path(song["File_IN"])
-                neutils.file_check(file)  # Checks if file exists on disk
+                utils.file_check(file)  # Checks if file exists on disk
             else:
                 file = None
 
@@ -133,17 +132,17 @@ def update_db() -> None:
             if not song['duplicate']:
                 # Reuse the hash computed during detection instead of re-reading the file.
                 # Only stale if the file changed on disk since detection (acceptable).
-                in_hash = song.get("Hash_IN") or neutils.get_audio_hash(file)
+                in_hash = song.get("Hash_IN") or utils.get_audio_hash(file)
 
-            flags = neutils.get_flags(song, project)
+            flags = utils.get_flags(song, project)
             assert flags is not None
 
-            if neutils.is_copyright_issue(song['Title'], song['Artist']):
+            if utils.is_copyright_issue(song['Title'], song['Artist']):
                 flags += 'copyright_issues;'
 
             flags += song['additional flags']
 
-            flags = neutils.post_process_flags(flags, song['Cover Artist'], project=project, is_twin_duet=twin_duet_stream)
+            flags = utils.post_process_flags(flags, song['Cover Artist'], project=project, is_twin_duet=twin_duet_stream)
 
             df = pl.DataFrame(
                 {
@@ -215,7 +214,7 @@ def update_db() -> None:
     check_missing_setlist_entries()
 
 
-def get_most_recent_version(song: dict, json_data: neutils.SongJSON, encore: bool, lead_singer: str) -> pl.DataFrame:
+def get_most_recent_version(song: dict, json_data: utils.SongJSON, encore: bool, lead_singer: str) -> pl.DataFrame:
     # if json for song has duplicate true, search database for most recent version of song with same singer
     # either detect singer from existing data, or add cover_artist field to database
     project = get_project()
@@ -224,8 +223,8 @@ def get_most_recent_version(song: dict, json_data: neutils.SongJSON, encore: boo
     latest_version = None
 
     filtered_songs = songDB.filter(
-        (pl.col("Artist").map_elements(lambda x: neutils.get_song_artists_match_count(x, song['Artist']) > 0, return_dtype=pl.Boolean)) &
-        (pl.col("Title").map_elements(lambda x: neutils.do_song_titles_match(x, song['Title']), return_dtype=pl.Boolean)) &
+        (pl.col("Artist").map_elements(lambda x: utils.get_song_artists_match_count(x, song['Artist']) > 0, return_dtype=pl.Boolean)) &
+        (pl.col("Title").map_elements(lambda x: utils.do_song_titles_match(x, song['Title']), return_dtype=pl.Boolean)) &
         (pl.col("Cover Artist") == song["Cover Artist"]) &
         (pl.col("Date") <= song["Date"]) &
         (~pl.col("Flags").str.split(";").list.contains("duplicate"))
@@ -235,7 +234,7 @@ def get_most_recent_version(song: dict, json_data: neutils.SongJSON, encore: boo
 
     for album, json_songs in json_data.items():
         for json_song in json_songs:
-            if (neutils.do_songs_match(song, json_song, ignore_date=True)) and ((song["Date"] >= json_song["Date"]) or (not json_song["id"] == song['Album_ID'])) and "File_IN" in json_song.keys():
+            if (utils.do_songs_match(song, json_song, ignore_date=True)) and ((song["Date"] >= json_song["Date"]) or (not json_song["id"] == song['Album_ID'])) and "File_IN" in json_song.keys():
                 filtered_json_songs.append(json_song)
 
     sorted_filtered_json_songs = sorted(filtered_json_songs, key=lambda d:  d['Date'])                              
@@ -247,7 +246,7 @@ def get_most_recent_version(song: dict, json_data: neutils.SongJSON, encore: boo
         db_flags = latest_db_version["Flags"]
     if len(filtered_json_songs) > 0:
         latest_json_version = sorted_filtered_json_songs[0]
-        json_flags = neutils.get_flags(latest_json_version, project)
+        json_flags = utils.get_flags(latest_json_version, project)
 
     if not latest_db_version is None:
         if not latest_json_version is None:
@@ -288,7 +287,7 @@ def get_most_recent_version(song: dict, json_data: neutils.SongJSON, encore: boo
         if fl not in flags:
             flags += f'{fl};'
 
-    flags = neutils.post_process_flags(flags, song['Cover Artist'], project=project)
+    flags = utils.post_process_flags(flags, song['Cover Artist'], project=project)
 
     # Both branches build the same row; only File_IN/Hash_IN/Key/Tempo come from different sources.
     if filtered_songs.height > 0 and latest_version == latest_db_version:
@@ -300,7 +299,7 @@ def get_most_recent_version(song: dict, json_data: neutils.SongJSON, encore: boo
     elif len(filtered_json_songs) > 0 and latest_version == latest_json_version:
         # latest_version is the JSON entry itself; prefer its existing hash over re-hashing File_IN.
         file_in = latest_version["File_IN"]
-        hash_in = latest_version.get("Hash_IN") or neutils.get_audio_hash(Path(file_in))
+        hash_in = latest_version.get("Hash_IN") or utils.get_audio_hash(Path(file_in))
         key = song["Key"]
         tempo = song["Tempo (1/4 beat)"]
     else:

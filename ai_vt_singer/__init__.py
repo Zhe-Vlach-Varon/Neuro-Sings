@@ -1,4 +1,4 @@
-"""Neuro-sings python package.
+"""AI VT Singer cover-artist formatting package.
 
 This file contains the main paths definitions."""
 
@@ -7,7 +7,7 @@ from pathlib import Path
 ROOT_DIR = Path(".")
 
 # ── Legacy path constants (retained for backward compatibility) ──────────────
-# New code should use `neuro.get_project()` to obtain the active project and
+# New code should use `ai_vt_singer.get_project()` to obtain the active project and
 # read paths from it. These are kept because several modules still import them
 # directly (e.g. `LOG_DIR` in 6 modules, `ROOT_DIR` in 3). They will be removed
 # in a future major version once all imports are migrated to `get_project()`.
@@ -55,12 +55,12 @@ FONTS_DIR = Path("fonts")
 FONT_PATH = FONTS_DIR / "First Coffee.ttf"
 
 # ── Project abstraction (multi-project cover-artist support) ─────────────
-# Re-exported so callers can `from neuro import Project, get_project`. These are
+# Re-exported so callers can `from ai_vt_singer import Project, get_project`. These are
 # imported *after* the path constants above so the backward-compat path in
-# `neuro.config` can read them once the package has finished loading.
-from neuro.artists import CoverArtist as CoverArtist
-from neuro.artists import Project as Project
-from neuro.config import load_project as load_project
+# `ai_vt_singer.config` can read them once the package has finished loading.
+from .artists import CoverArtist as CoverArtist
+from .artists import Project as Project
+from .config import load_project as load_project
 
 _project: Project | None = None
 
@@ -69,7 +69,7 @@ def get_project() -> Project:
     """Return the active :class:`Project`, loading and caching it on first use.
 
     The project is read from ``config.toml`` in the current working directory (see
-    :func:`neuro.config.load_project`), so selecting a project is simply a matter of
+    :func:`ai_vt_singer.config.load_project`), so selecting a project is simply a matter of
     ``cd``-ing into that project's directory.
     """
     global _project

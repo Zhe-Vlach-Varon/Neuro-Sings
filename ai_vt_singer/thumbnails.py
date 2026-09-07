@@ -5,16 +5,16 @@ from pathlib import Path
 from string import digits
 from time import time
 
-from PIL import Image, ImageDraw, ImageFont
-
 import polars as pl
 from loguru import logger
+from PIL import Image, ImageDraw, ImageFont
 
-from neuro import DATES_OLD_CSV, FONT_PATH, LOG_DIR, get_project
-from neuro.artists import Project
-from neuro.cli import chdir_to_project
-from neuro.polars_utils import load_dates
-from neuro.utils import format_logger, time_format
+from . import DATES_OLD_CSV, FONT_PATH, LOG_DIR, get_project
+from .artists import Project
+from .cli import chdir_to_project
+from .polars_utils import load_dates
+from .utils import format_logger, time_format
+
 
 def apply_text(image: Image.Image,
                         text: str,
@@ -137,7 +137,7 @@ def check_stream(stream: dict[str, str], project=None) -> None:
         - Duet format isn't a valid duet version for the project
     """
     if project is None:
-        from neuro import get_project
+        from . import get_project
         project = get_project()
     valid_singers = set(project.singer_names()) | {project.duet_group_name}
     if stream["Singer"] not in valid_singers:

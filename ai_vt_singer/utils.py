@@ -18,8 +18,8 @@ import loguru
 import xxhash
 from mutagen.id3 import ID3, ID3NoHeaderError
 
-from neuro import COPYRIGHT_ISSUES_CSV, LOG_DIR, SETLISTS_DIR, get_project
-from neuro.artists import Project
+from . import COPYRIGHT_ISSUES_CSV, LOG_DIR, SETLISTS_DIR, get_project
+from .artists import Project
 
 logger = loguru.logger
 

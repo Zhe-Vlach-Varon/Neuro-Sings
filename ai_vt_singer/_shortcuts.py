@@ -4,10 +4,10 @@ from pathlib import Path
 
 from loguru import logger
 
-from neuro import LOG_DIR, get_project
-from neuro.cli import chdir_to_project
-from neuro.polars_utils import load_dates, load_db
-from neuro.utils import format_logger
+from . import LOG_DIR, get_project
+from .cli import chdir_to_project
+from .polars_utils import load_dates, load_db
+from .utils import format_logger
 
 # Path constants for local and remote Paths
 REMOTE_INPUT_PREFIX = Path("_inputs")

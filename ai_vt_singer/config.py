@@ -1,8 +1,8 @@
-"""Load the active :class:`~neuro.artists.Project` from ``config.toml``.
+"""Load the active :class:`~ai_vt_singer.artists.Project` from ``config.toml``.
 
 ``load_project`` parses ``config.toml`` and returns a :class:`Project`. If the config has
 no ``[project]`` section (i.e. a pre-refactor config), it synthesizes a ``Project`` from
-the legacy module-level constants in :mod:`neuro` so existing setups keep working
+the legacy module-level constants in :mod:`ai_vt_singer` so existing setups keep working
 unchanged.
 """
 
@@ -11,7 +11,7 @@ from __future__ import annotations
 import tomllib
 from pathlib import Path
 
-from neuro.artists import CoverArtist, Project
+from .artists import CoverArtist, Project
 
 
 def _artist_from_dict(d: dict) -> CoverArtist:
@@ -35,11 +35,26 @@ def _artist_from_dict(d: dict) -> CoverArtist:
 def _synthesized_project() -> Project:
     """Build a :class:`Project` from the legacy module-level constants (backward compat).
 
-    ``import neuro`` is deferred to the call site (not module import time) to avoid a
-    circular import: :mod:`neuro` imports this module, so we can only read its constants
-    once the package has finished loading.
+    ``from . import ...`` is deferred to the call site (not module import time) to avoid a
+    circular import: :mod:`ai_vt_singer` imports this module, so we can only read its
+    constants once the package has finished loading.
     """
-    import neuro  # deferred on purpose — see docstring
+    from . import (  # deferred on purpose — see docstring
+        DATA_DIR,
+        DATES_CSV,
+        FONTS_DIR,
+        IMAGES_BG_DIR,
+        IMAGES_COVERS_DIR,
+        IMAGES_CUSTOM_DIR,
+        OUT_OFFICIAL_DIR,
+        OUT_ROOT_DIR,
+        OUT_UNOFFICIAL_DIR,
+        SETLISTS_DIR,
+        SONG_ROOT_DIR,
+        SONGS_CSV,
+        SONGS_DB,
+        SONGS_JSON,
+    )
 
     return Project(
         name="neuro",
@@ -62,20 +77,20 @@ def _synthesized_project() -> Project:
         ),
         voice_versions=("v1", "v2", "v3"),
         duet_group_name="Twins",
-        data_dir=neuro.DATA_DIR,
-        songs_csv=neuro.SONGS_CSV,
-        songs_db=neuro.SONGS_DB,
-        songs_json=neuro.SONGS_JSON,
-        dates_csv=neuro.DATES_CSV,
-        song_root=neuro.SONG_ROOT_DIR,
-        setlists_dir=neuro.SETLISTS_DIR,
-        images_covers_dir=neuro.IMAGES_COVERS_DIR,
-        images_custom_dir=neuro.IMAGES_CUSTOM_DIR,
-        images_bg_dir=neuro.IMAGES_BG_DIR,
-        out_root=neuro.OUT_ROOT_DIR,
-        out_unofficial=neuro.OUT_UNOFFICIAL_DIR,
-        out_official=neuro.OUT_OFFICIAL_DIR,
-        fonts_dir=neuro.FONTS_DIR,
+        data_dir=DATA_DIR,
+        songs_csv=SONGS_CSV,
+        songs_db=SONGS_DB,
+        songs_json=SONGS_JSON,
+        dates_csv=DATES_CSV,
+        song_root=SONG_ROOT_DIR,
+        setlists_dir=SETLISTS_DIR,
+        images_covers_dir=IMAGES_COVERS_DIR,
+        images_custom_dir=IMAGES_CUSTOM_DIR,
+        images_bg_dir=IMAGES_BG_DIR,
+        out_root=OUT_ROOT_DIR,
+        out_unofficial=OUT_UNOFFICIAL_DIR,
+        out_official=OUT_OFFICIAL_DIR,
+        fonts_dir=FONTS_DIR,
         drive_public="Neuro-Sings-ZVV",
         drive_private="Neuro-Sings-ZVV-official-releases",
         drive_source="unofficialV3",

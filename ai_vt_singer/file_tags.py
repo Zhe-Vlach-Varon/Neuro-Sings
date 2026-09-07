@@ -6,21 +6,19 @@ from dataclasses import dataclass
 from io import BytesIO
 from pathlib import Path
 
+import polars as pl
 from loguru import logger
 from mutagen.flac import FLAC, Picture
 from mutagen.id3 import ID3
 from mutagen.id3._frames import APIC, COMM, TALB, TBPM, TDRC, TDRL, TIT2, TKEY, TPE1, TPE2, TRCK, TSO2, TYER, TextFrame
 from PIL import Image
 
-from neuro import IMAGES_COVERS_DIR, IMAGES_CUSTOM_DIR, LOG_DIR, ROOT_DIR, get_project
-from neuro.artists import Project
-from neuro.utils import file_check, format_logger, SongEntry, sanitize_filename
-
-import polars as pl
-from neuro.polars_utils import load_db
-
 from metadata_utils import engraver as engraver
 
+from . import IMAGES_COVERS_DIR, IMAGES_CUSTOM_DIR, LOG_DIR, ROOT_DIR, get_project
+from .artists import Project
+from .polars_utils import load_db
+from .utils import SongEntry, file_check, format_logger, sanitize_filename
 
 # Lazily-built {album: track count} map, computed once per loaded songs DB.
 _counts_source: pl.DataFrame | None = None

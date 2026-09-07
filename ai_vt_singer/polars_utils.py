@@ -6,9 +6,9 @@ from typing import Callable
 
 import polars as pl
 
-from neuro import get_project
-from neuro.artists import Project
-from neuro.utils import MP3GainMode, MP3ModeTuple
+from . import get_project
+from .artists import Project
+from .utils import MP3GainMode, MP3ModeTuple
 
 # --- result caching ---
 _cache: dict[str, tuple[float, pl.DataFrame]] = {}

@@ -1,21 +1,21 @@
 """Shared CLI helpers for the package entry points (multi-project selection).
 
 Every path in this package resolves relative to the current working directory
-(``ROOT_DIR = Path(".")`` in :mod:`neuro`), so *selecting a project is a matter of
+(``ROOT_DIR = Path(".")`` in :mod:`ai_vt_singer`), so *selecting a project is a matter of
 changing into that project's directory*. Each project is a directory containing its own
 ``config.toml`` (plus ``data/``, ``songs/``, ``setlists/``, ``images/``, ``out/``, ...);
 the existing Neuro Twins project *is* the repository root.
 
 This module provides a single, uniform way for entry points to accept a
 ``--project <dir>`` option and ``chdir`` into it before any project-relative work
-happens. Because the change happens before :func:`neuro.get_project` is first called
+happens. Because the change happens before :func:`ai_vt_singer.get_project` is first called
 (it is lazy and cached), ``get_project()`` reads the right project's ``config.toml``,
 and all the CWD-relative constants / ``project.*`` paths resolve under it automatically.
 
 Usage (identical in every entry point)::
 
     import sys
-    from neuro.cli import chdir_to_project
+    from ai_vt_singer.cli import chdir_to_project
 
     def my_command() -> None:
         remaining = chdir_to_project()   # honours --project <dir>; returns the rest
@@ -72,7 +72,7 @@ def chdir_to_project(argv: list[str] | None = None) -> list[str]:
 
     Because all project paths are CWD-relative, changing directory is enough to select
     the project: ``config.toml``, ``data/``, ``songs/``, ``out/``, etc. all resolve under
-    the new CWD, and :func:`neuro.get_project` reads ``config.toml`` from it. When no
+    the new CWD, and :func:`ai_vt_singer.get_project` reads ``config.toml`` from it. When no
     ``--project`` is given this is a no-op and the current directory is used (the existing
     single-project behaviour).
 

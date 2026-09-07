@@ -8,14 +8,13 @@ from time import time
 import polars as pl
 from loguru import logger
 
-from neuro import LOG_DIR, UNOFFV3_EXTRA, UNOFFV3_DISC66
-from neuro import get_project
-from neuro.checks import check_are_dbs_identical, check_all_group_coverage, check_group_coverage
-from neuro.cli import chdir_to_project
-from neuro.detection import export_json, extract_all
-from neuro.file_tags import CustomSong, DriveSong, Song
-from neuro.polars_utils import Preset, load_dates, load_db
-from neuro.utils import MP3GainMode, MP3ModeTuple, format_logger, time_format, get_audio_hash_to_file_mapping
+from . import LOG_DIR, UNOFFV3_DISC66, UNOFFV3_EXTRA, get_project
+from .checks import check_all_group_coverage, check_are_dbs_identical, check_group_coverage
+from .cli import chdir_to_project
+from .detection import export_json, extract_all
+from .file_tags import CustomSong, DriveSong, Song
+from .polars_utils import Preset, load_dates, load_db
+from .utils import MP3GainMode, MP3ModeTuple, format_logger, get_audio_hash_to_file_mapping, time_format
 
 DateDict = dict[str, dict[str, str]]
 

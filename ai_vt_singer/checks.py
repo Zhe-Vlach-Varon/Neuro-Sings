@@ -8,11 +8,11 @@ from pathlib import Path
 from loguru import logger
 from tqdm import tqdm
 
-from neuro import LOG_DIR, ROOT_DIR
-from neuro.cli import chdir_to_project
-from neuro.detection import check_missing_setlist_entries
-from neuro.polars_utils import Preset, load_db
-from neuro.utils import MP3GainMode, format_logger, get_audio_hash
+from . import LOG_DIR, ROOT_DIR
+from .cli import chdir_to_project
+from .detection import check_missing_setlist_entries
+from .polars_utils import Preset, load_db
+from .utils import MP3GainMode, format_logger, get_audio_hash
 
 
 def check_hash(*, max_workers: int = 1) -> None:

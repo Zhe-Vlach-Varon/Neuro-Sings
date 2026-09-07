@@ -64,6 +64,41 @@ def _rclone(command: str, error_label: str) -> None:
 SHORTCUT_MAX_WORKERS = 4
 
 
+def _remove_broken_shortcuts(out_dir: Path, dest: str, dir_prefix: str) -> None:
+    """Check for broken GDrive shortcuts under out_dir and remove them.
+
+    A shortcut is broken if its target file no longer exists on the remote.
+    Existence checks are parallelized; removals are sequential.
+    """
+    base = out_dir.resolve()
+    files = [f for f in base.rglob("*.mp3") if f.is_symlink()]
+    if not files:
+        return
+
+    def _check_target_exists(file: Path) -> tuple[Path, bool]:
+        source_drive_path = file.resolve().relative_to(base)
+        target_remote = f"{dest}{dir_prefix}{REMOTE_OUT_PREFIX / source_drive_path}"
+        cmd = f'rclone size "{target_remote}"'
+        return file, _rclone_command(cmd) == 0
+
+    broken: list[Path] = []
+    executor = ThreadPoolExecutor(max_workers=SHORTCUT_MAX_WORKERS, thread_name_prefix="check-shortcut")
+    try:
+        for file, target_exists in executor.map(_check_target_exists, files):
+            if not target_exists:
+                broken.append(file)
+    finally:
+        executor.shutdown(wait=False, cancel_futures=True)
+
+    if not broken:
+        return
+
+    logger.info(f"Found {len(broken)} broken shortcuts, removing them")
+    for file in broken:
+        shortcut_remote = f"{dest}{dir_prefix}{REMOTE_OUT_PREFIX / file.relative_to(base)}"
+        _rclone(f'rclone delete "{shortcut_remote}"', f"failed to remove broken shortcut for {file}")
+
+
 def _create_drive_shortcuts(out_dir: Path, dest: str, dir_prefix: str, error_label: str, max_workers: int = SHORTCUT_MAX_WORKERS) -> None:
     """Create GDrive shortcuts for all symlinked .mp3 files under out_dir.
 
@@ -90,6 +125,8 @@ def _create_drive_shortcuts(out_dir: Path, dest: str, dir_prefix: str, error_lab
 
     if not files:
         return
+
+    _remove_broken_shortcuts(out_dir, dest, dir_prefix)
 
     commands: list[tuple[Path, str]] = []
     parent_dirs: set[Path] = set()
@@ -215,13 +252,17 @@ def drive_push() -> None:
     _rclone(f"{DRIVE_RCLONE_COMMAND} {project.fonts_dir} {private_dest}{private_dir}{REMOTE_INPUT_PREFIX}/{project.fonts_dir}", "drive push failed: fonts")
     #_rclone(f"{DRIVE_RCLONE_COMMAND} {DOT_VSCODE_DIR} {private_dest}{private_dir}{REMOTE_INPUT_PREFIX}/{DOT_VSCODE_DIR}", "drive push failed: .vscode")
 
-    # public out files
-    _rclone(f"{DRIVE_RCLONE_COMMAND} {project.out_unofficial} {public_dest}{public_dir}{REMOTE_OUT_PREFIX}{LINK_OPTIONS}", "drive push failed: public out files")
+    # public out files — albums (real files, no shortcuts)
+    _rclone(f"{DRIVE_RCLONE_COMMAND} {project.out_unofficial / 'albums'} {public_dest}{public_dir}{REMOTE_OUT_PREFIX / project.out_unofficial.name / 'albums'}", "drive push failed: public albums")
+    # public out files — preset folders (symlinks → GDrive shortcuts)
+    _rclone(f"{DRIVE_RCLONE_COMMAND} --exclude 'albums/' {project.out_unofficial} {public_dest}{public_dir}{REMOTE_OUT_PREFIX / project.out_unofficial.name}{LINK_OPTIONS}", "drive push failed: public preset folders")
     if remote_links:
         _create_drive_shortcuts(project.out_unofficial, public_dest, public_dir, "drive push failed: public out make GDrive shortcuts")
 
-    # private out files
-    _rclone(f"{DRIVE_RCLONE_COMMAND} {project.out_official} {private_dest}{private_dir}{REMOTE_OUT_PREFIX}{LINK_OPTIONS}", "drive push failed: private out files")
+    # private out files — albums (real files, no shortcuts)
+    _rclone(f"{DRIVE_RCLONE_COMMAND} {project.out_official / 'albums'} {private_dest}{private_dir}{REMOTE_OUT_PREFIX / project.out_official.name / 'albums'}", "drive push failed: private albums")
+    # private out files — preset folders (symlinks → GDrive shortcuts)
+    _rclone(f"{DRIVE_RCLONE_COMMAND} --exclude 'albums/' {project.out_official} {private_dest}{private_dir}{REMOTE_OUT_PREFIX / project.out_official.name}{LINK_OPTIONS}", "drive push failed: private preset folders")
     if remote_links:
         _create_drive_shortcuts(project.out_official, private_dest, private_dir, "drive push failed: private out make GDrive shortcuts")
 

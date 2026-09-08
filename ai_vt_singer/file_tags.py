@@ -15,7 +15,7 @@ from PIL import Image
 
 from metadata_utils import engraver as engraver
 
-from . import IMAGES_COVERS_DIR, IMAGES_CUSTOM_DIR, LOG_DIR, ROOT_DIR, get_project
+from . import get_project
 from .artists import Project
 from .polars_utils import load_db
 from .utils import SongEntry, file_check, format_logger, sanitize_filename
@@ -131,7 +131,7 @@ class Song:
         self.hash_in: str = song_dict["Hash_IN"]
 
         # assert song_dict["File_IN"] is not None
-        self.file: Path = ROOT_DIR / Path(song_dict["File_IN"])
+        self.file: Path = Path(song_dict["File_IN"])
         try:
             file_check(self.file)
         except FileNotFoundError:
@@ -351,12 +351,12 @@ class Song:
             Path: The cover image path (custom image or dated cover).
         """
         if self.image is not None:
-            return IMAGES_CUSTOM_DIR / f"{self.image}.jpg"
+            return self._project.images_custom_dir / f"{self.image}.jpg"
         if self.flags.duet:
-            return IMAGES_COVERS_DIR / f"{self.date}-{self.who}-duet.jpg"
+            return self._project.images_covers_dir / f"{self.date}-{self.who}-duet.jpg"
         if self.flags.v1 or self.flags.v2:
-            return IMAGES_COVERS_DIR / f"{self.date}.jpg"
-        return IMAGES_COVERS_DIR / f"{self.date}-{self.who}.jpg"
+            return self._project.images_covers_dir / f"{self.date}.jpg"
+        return self._project.images_covers_dir / f"{self.date}-{self.who}.jpg"
 
     @property
     def album_track_count(self) -> int:
@@ -464,7 +464,7 @@ class DriveSong(Song):
 
     def _resolve_outfile(self, out_dir: Path, numberedFiles: bool = False) -> Path:
         name = self.file_name(self._file_name_custom, numberedFiles=numberedFiles)
-        return ROOT_DIR / out_dir / f"{name}.mp3"
+        return out_dir / f"{name}.mp3"
 
     def create_out_file(self, *, out_dir: Path = Path("out"), create: bool = True, numberedFiles: bool = False) -> bool:
         """Creates the output file on the filesystem by copying the original. The metadata are written later.
@@ -479,10 +479,10 @@ class DriveSong(Song):
             bool: True if a file was created.
         """
         # Ensures the output directory exists
-        os.makedirs(ROOT_DIR / out_dir, exist_ok=True)
+        os.makedirs(out_dir, exist_ok=True)
         # If the song is flagged as custom, use the custom format
         name = self.file_name(self.flags.as_custom, numberedFiles=numberedFiles)
-        self.outfile = ROOT_DIR / out_dir / f"{name}.mp3"
+        self.outfile = out_dir / f"{name}.mp3"
 
         # print(self.file)
         # print(self.outfile)
@@ -538,7 +538,7 @@ class CustomSong(Song):
 
     def _resolve_outfile(self, out_dir: Path, numberedFiles: bool = False) -> Path:
         name = self.file_name(self._file_name_custom, numberedFiles=numberedFiles)
-        return ROOT_DIR / out_dir / f"{name}{self.file.suffix}"
+        return out_dir / f"{name}{self.file.suffix}"
 
     def create_out_file(self, *, out_dir: Path, create: bool = True, numberedFiles: bool = False) -> bool:
         """Creates the output file on the filesystem by copying the original. The metadata are written later.
@@ -555,7 +555,7 @@ class CustomSong(Song):
         ext = file.suffix
 
         name = self.file_name(not self.flags.as_drive, numberedFiles=numberedFiles)
-        self.outfile = ROOT_DIR / out_dir / f"{name}{ext}"
+        self.outfile = out_dir / f"{name}{ext}"
 
         if create or (not self.outfile.exists()):
             shutil.copy2(file, self.outfile)
@@ -670,4 +670,4 @@ class CustomSong(Song):
 
 
 if __name__ == "__main__":
-    format_logger(log_file=LOG_DIR / "tags.log")
+    format_logger(log_file=get_project().logs_dir / "tags.log")

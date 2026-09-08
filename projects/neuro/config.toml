@@ -12,6 +12,8 @@ arg-singers = ["Study-sama"]
 # Album name assigned to ARG rows in the DB (defaults to "<display-name> ARG" if unset;
 # pinned here because existing rows use "Neuro-sama ARG")
 arg-album = "Neuro-sama ARG"
+# Path to the ARG subdirectory within the unofficial archive
+arg-subdir = "Extra Content/DISC 66 - ARG"
 
 [[project.artists]]
 name = "Neuro"

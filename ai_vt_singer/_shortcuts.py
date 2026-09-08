@@ -6,7 +6,7 @@ from pathlib import Path
 
 from loguru import logger
 
-from . import LOG_DIR, get_project
+from . import get_project
 from .cli import chdir_to_project
 from .polars_utils import load_dates, load_db
 from .utils import format_logger
@@ -196,16 +196,16 @@ def _create_drive_shortcuts(out_dir: Path, dest: str, dir_prefix: str, error_lab
 
 def setlists_pull() -> None:
     chdir_to_project()
-    format_logger(log_file=LOG_DIR / "sync.log")
     project = get_project()
+    format_logger(log_file=project.logs_dir / "sync.log")
     setlist_pull_command = f"{DRIVE_RCLONE_COMMAND} {project.drive_public}:{REMOTE_INPUT_PREFIX}/{project.setlists_dir} {project.setlists_dir}"
     _rclone(setlist_pull_command, "setlists pull failed")
 
 
 def setlists_push() -> None:
     chdir_to_project()
-    format_logger(log_file=LOG_DIR / "sync.log")
     project = get_project()
+    format_logger(log_file=project.logs_dir / "sync.log")
     public_dest = f"{project.drive_public}:" if not TR else f"{LOCAL_TEST_OUT_PUB_DIR}/"
     public_dir = f"{Path(project.drive_public)}/" if TR else ""
     setlist_push_command = f"{DRIVE_RCLONE_COMMAND} {project.setlists_dir} {public_dest}{public_dir}{REMOTE_INPUT_PREFIX}/{project.setlists_dir}"
@@ -214,17 +214,17 @@ def setlists_push() -> None:
 
 def drive_pull() -> None:
     chdir_to_project()
-    format_logger(log_file=LOG_DIR / "sync.log")
     project = get_project()
-    drive_pull_command = f"{DRIVE_RCLONE_COMMAND} {project.drive_source}: {LOCAL_TEST_IN_DIR}/{project.song_root.name}/unofficialV3"
+    format_logger(log_file=project.logs_dir / "sync.log")
+    drive_pull_command = f"{DRIVE_RCLONE_COMMAND} {project.drive_source}: {LOCAL_TEST_IN_DIR}/{project.song_root.name}/{project.song_dirs['unofficialv3']}"
     _rclone(drive_pull_command, "drive pull failed")
 
 # TODO command to apply my changes to unofficial archive metadata
 
 def inputs_pull() -> None:
     chdir_to_project()
-    format_logger(log_file=LOG_DIR / "sync.log")
     project = get_project()
+    format_logger(log_file=project.logs_dir / "sync.log")
     public_drive = project.drive_public
     private_drive = project.drive_private
 
@@ -233,12 +233,12 @@ def inputs_pull() -> None:
 
     _rclone(f"{DRIVE_RCLONE_COMMAND} {public_drive}:{REMOTE_INPUT_PREFIX}/{project.data_dir} {project.data_dir}", "drive pull failed: data")
     _rclone(f"{DRIVE_RCLONE_COMMAND} {public_drive}:{REMOTE_INPUT_PREFIX}/{project.images_covers_dir.parent} {project.images_covers_dir.parent}", "drive pull failed: images")
-    _rclone(f"{DRIVE_RCLONE_COMMAND} {public_drive}:{REMOTE_INPUT_PREFIX}/{project.song_root / 'custom'} {project.song_root / 'custom'}", "drive pull failed: custom")
-    _rclone(f"{DRIVE_RCLONE_COMMAND} {public_drive}:{REMOTE_INPUT_PREFIX}/{project.song_root / 'unofficialV3'} {project.song_root / 'unofficialV3'}", "drive pull failed: unofficialV3")
+    _rclone(f"{DRIVE_RCLONE_COMMAND} {public_drive}:{REMOTE_INPUT_PREFIX}/{project.song_root / project.song_dirs['custom']} {project.song_root / project.song_dirs['custom']}", "drive pull failed: custom")
+    _rclone(f"{DRIVE_RCLONE_COMMAND} {public_drive}:{REMOTE_INPUT_PREFIX}/{project.song_root / project.song_dirs['unofficialv3']} {project.song_root / project.song_dirs['unofficialv3']}", "drive pull failed: unofficialV3")
 
     # private input files
-    _rclone(f"{DRIVE_RCLONE_COMMAND} {private_drive}:{REMOTE_INPUT_PREFIX}/{project.song_root / 'officially_released_songs'} {project.song_root / 'officially_released_songs'}", "drive pull failed: official releases")
-    _rclone(f"{DRIVE_RCLONE_COMMAND} {private_drive}:{REMOTE_INPUT_PREFIX}/{project.song_root / 'copyright_issues'} {project.song_root / 'copyright_issues'}", "drive pull failed: copyright issues")
+    _rclone(f"{DRIVE_RCLONE_COMMAND} {private_drive}:{REMOTE_INPUT_PREFIX}/{project.song_root / project.song_dirs['official']} {project.song_root / project.song_dirs['official']}", "drive pull failed: official releases")
+    _rclone(f"{DRIVE_RCLONE_COMMAND} {private_drive}:{REMOTE_INPUT_PREFIX}/{project.song_root / project.song_dirs['copyright']} {project.song_root / project.song_dirs['copyright']}", "drive pull failed: copyright issues")
     _rclone(f"{DRIVE_RCLONE_COMMAND} {private_drive}:{REMOTE_INPUT_PREFIX}/{project.fonts_dir} {project.fonts_dir}", "drive pull failed: fonts")
 
     logger.success("finished downloading input files from gdrive")
@@ -246,8 +246,8 @@ def inputs_pull() -> None:
 
 def drive_push() -> None:
     chdir_to_project()
-    format_logger(log_file=LOG_DIR / "sync.log")
     project = get_project()
+    format_logger(log_file=project.logs_dir / "sync.log")
     public_drive = project.drive_public
     private_drive = project.drive_private
     public_dest = f"{public_drive}:" if not TR else f"{LOCAL_TEST_OUT_PUB_DIR}/"
@@ -260,12 +260,12 @@ def drive_push() -> None:
 
     _rclone(f"{DRIVE_RCLONE_COMMAND} {project.data_dir} {public_dest}{public_dir}{REMOTE_INPUT_PREFIX}/{project.data_dir}", "drive push failed: data")
     _rclone(f"{DRIVE_RCLONE_COMMAND} {project.images_covers_dir.parent} {public_dest}{public_dir}{REMOTE_INPUT_PREFIX}/{project.images_covers_dir.parent}", "drive push failed: images")
-    _rclone(f"{DRIVE_RCLONE_COMMAND} {project.song_root / 'custom'} {public_dest}{public_dir}{REMOTE_INPUT_PREFIX}/{project.song_root / 'custom'}", "drive push failed: custom")
-    _rclone(f"{DRIVE_RCLONE_COMMAND} {project.song_root / 'unofficialV3'} {public_dest}{public_dir}{REMOTE_INPUT_PREFIX}/{project.song_root / 'unofficialV3'}", "drive push failed: unofficialV3")
+    _rclone(f"{DRIVE_RCLONE_COMMAND} {project.song_root / project.song_dirs['custom']} {public_dest}{public_dir}{REMOTE_INPUT_PREFIX}/{project.song_root / project.song_dirs['custom']}", "drive push failed: custom")
+    _rclone(f"{DRIVE_RCLONE_COMMAND} {project.song_root / project.song_dirs['unofficialv3']} {public_dest}{public_dir}{REMOTE_INPUT_PREFIX}/{project.song_root / project.song_dirs['unofficialv3']}", "drive push failed: unofficialV3")
 
     # private input files
-    _rclone(f"{DRIVE_RCLONE_COMMAND} {project.song_root / 'officially_released_songs'} {private_dest}{private_dir}{REMOTE_INPUT_PREFIX}/{project.song_root / 'officially_released_songs'}", "drive push failed: official releases")
-    _rclone(f"{DRIVE_RCLONE_COMMAND} {project.song_root / 'copyright_issues'} {private_dest}{private_dir}{REMOTE_INPUT_PREFIX}/{project.song_root / 'copyright_issues'}", "drive push failed: copyright issues")
+    _rclone(f"{DRIVE_RCLONE_COMMAND} {project.song_root / project.song_dirs['official']} {private_dest}{private_dir}{REMOTE_INPUT_PREFIX}/{project.song_root / project.song_dirs['official']}", "drive push failed: official releases")
+    _rclone(f"{DRIVE_RCLONE_COMMAND} {project.song_root / project.song_dirs['copyright']} {private_dest}{private_dir}{REMOTE_INPUT_PREFIX}/{project.song_root / project.song_dirs['copyright']}", "drive push failed: copyright issues")
     _rclone(f"{DRIVE_RCLONE_COMMAND} {project.fonts_dir} {private_dest}{private_dir}{REMOTE_INPUT_PREFIX}/{project.fonts_dir}", "drive push failed: fonts")
 
     # public out files — albums (real files, no shortcuts)
@@ -287,8 +287,8 @@ def drive_push() -> None:
 
 def dbs_sync() -> None:
     chdir_to_project()
-    format_logger(log_file=LOG_DIR / "sync.log")
     project = get_project()
+    format_logger(log_file=project.logs_dir / "sync.log")
     FROM_DB = False
     db = load_db(FROM_DB)
     dates = load_dates(FROM_DB)

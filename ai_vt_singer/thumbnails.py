@@ -9,7 +9,7 @@ import polars as pl
 from loguru import logger
 from PIL import Image, ImageDraw, ImageFont
 
-from . import DATES_OLD_CSV, FONT_PATH, LOG_DIR, get_project
+from . import get_project
 from .artists import Project
 from .cli import chdir_to_project
 from .polars_utils import load_dates
@@ -18,7 +18,7 @@ from .utils import format_logger, time_format
 
 def apply_text(image: Image.Image,
                         text: str,
-                        font_file: str | Path = Path(FONT_PATH),
+                        font_file: str | Path = Path("fonts") / "First Coffee.ttf",
                         font_size: int = 64,
                         font_fill_color = (255, 241, 242),
                         font_stroke_width: int = 2,
@@ -80,12 +80,12 @@ def generate_oldge() -> None:
     """
     chdir_to_project()
     project = get_project()
-    format_logger(log_file=LOG_DIR / "thumbnails.log")
+    format_logger(log_file=project.logs_dir / "thumbnails.log")
     t = time()
     # v1 | v2
     SOLO_BG = list(map(lambda name: open_image(project.images_bg_dir, name), ["nuero.png", "nwero_v2.png"]))
 
-    dates = pl.read_csv(DATES_OLD_CSV)
+    dates = pl.read_csv(project.data_dir / "dates_v12.csv")
     N_COVERS = len(dates)
     os.makedirs(project.images_covers_dir, exist_ok=True)
     os.makedirs(project.images_custom_dir, exist_ok=True)
@@ -179,7 +179,7 @@ def generate_main() -> None:
     """Generates all thumbnails at once. It automatically re-generate all of them."""
     chdir_to_project()
     project = get_project()
-    format_logger(log_file=LOG_DIR / "thumbnails.log")
+    format_logger(log_file=project.logs_dir / "thumbnails.log")
 
     if not project.bg_duet_images:
         logger.error(

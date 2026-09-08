@@ -8,7 +8,7 @@ from time import time
 import polars as pl
 from loguru import logger
 
-from . import LOG_DIR, UNOFFV3_DISC66, UNOFFV3_EXTRA, get_project
+from . import get_project
 from .checks import check_all_group_coverage, check_are_dbs_identical, check_group_coverage
 from .cli import chdir_to_project
 from .detection import export_json, extract_all
@@ -26,7 +26,8 @@ def new_batch_detection() -> None:
         the database in a JSON file for them to be reviewed.
     """
     chdir_to_project()
-    format_logger(log_file=LOG_DIR / "batches.log")
+    project = get_project()
+    format_logger(log_file=project.logs_dir / "batches.log")
     # These 3 lines could be one call, but it would just make the code less clear
     out = extract_all()  # Extracts data
     export_json(out)  # Writing into JSON
@@ -73,11 +74,12 @@ def classify_song(song_dict: dict, dates_dict: DateDict) -> DriveSong | CustomSo
     """
     project = get_project()
     file_in = Path(song_dict["File_IN"])
-    unofficialv3_dir = project.song_root / "unofficialV3"
+    unofficialv3_dir = project.song_root / project.song_dirs["unofficialv3"]
+    arg_path = unofficialv3_dir / project.arg_subdir if project.arg_subdir else None
     if (
-        file_in.is_relative_to(project.song_root / "drive")
-        or (file_in.is_relative_to(unofficialv3_dir) and not file_in.is_relative_to(unofficialv3_dir / UNOFFV3_EXTRA / UNOFFV3_DISC66))
-        or file_in.is_relative_to(project.song_root / "copyright_issues")
+        file_in.is_relative_to(project.song_root / project.song_dirs["drive"])
+        or (file_in.is_relative_to(unofficialv3_dir) and (arg_path is None or not file_in.is_relative_to(arg_path)))
+        or file_in.is_relative_to(project.song_root / project.song_dirs["copyright"])
     ):
         return DriveSong(song_dict, dates_dict.get(song_dict["Date"], {}), project)
     return CustomSong(song_dict, project=project)
@@ -229,7 +231,8 @@ def check_group() -> None:
     """
     remaining = chdir_to_project()
     group = remaining[0] if remaining else None
-    format_logger(log_file=LOG_DIR / "checks.log")
+    project = get_project()
+    format_logger(log_file=project.logs_dir / "checks.log")
     if group is None or group == "all":
         check_all_group_coverage()
     else:
@@ -249,7 +252,8 @@ def generate_songs(create_placeholders: bool = False) -> None:
 
 def _generate_presets(presets: list[dict], create_placeholders: bool = False) -> None:
     """Shared generation loop over a list of preset dicts (all or a single group)."""
-    format_logger(log_file=LOG_DIR / "generation.log")
+    project = get_project()
+    format_logger(log_file=project.logs_dir / "generation.log")
     logger.info(f"[GEN] Starting generation batch ({len(presets)} presets)")
 
     # Avoids wrong generations due to inconsistent databases
@@ -292,7 +296,8 @@ def generate_albums(create_placeholders: bool = False) -> None:
     if not len(g_hash_to_file_dict):
         g_hash_to_file_dict = get_audio_hash_to_file_mapping(get_project().song_root)
 
-    format_logger(log_file=LOG_DIR / "generation.log")
+    project = get_project()
+    format_logger(log_file=project.logs_dir / "generation.log")
     logger.info("[GEN] Starting generation batch")
 
     # Avoids wrong generations due to inconsistent databases
@@ -405,7 +410,7 @@ def run_mp3gain(preset: Preset) -> None:
     logger.info(f"[GEN] Running mp3gain for preset {preset.name} ({len(mp3s)} files)")
     options = "-r -k" if preset.mp3gain is MP3GainMode.GAIN else ""
     # One log per preset, so every run's output survives instead of being truncated by the next one
-    OUT_LOG = LOG_DIR / f"mpgain_{preset.name}.log"
+    OUT_LOG = get_project().logs_dir / f"mpgain_{preset.name}.log"
     cmd = f"mp3gain {options} {shlex.quote(str(preset.path))}/*.mp3 > {shlex.quote(str(OUT_LOG))} 2>&1"
     # check=False on purpose: a nonzero exit is expected and reported via the log, not raised
     result = subprocess.run(cmd, shell=True, check=False)
@@ -420,7 +425,8 @@ def mp3gain_standalone() -> None:
         gain type over every existing preset output, so a preset's own boolean must not disable it.
     """
     chdir_to_project()
-    format_logger(log_file=LOG_DIR / "generation.log")
+    project = get_project()
+    format_logger(log_file=project.logs_dir / "generation.log")
     logger.info("[MP3G] Starting mp3gain batch")
 
     config, OUT_ROOT = load_config()

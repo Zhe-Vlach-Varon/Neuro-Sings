@@ -8,7 +8,7 @@ from pathlib import Path
 from loguru import logger
 from tqdm import tqdm
 
-from . import LOG_DIR, ROOT_DIR
+from . import get_project
 from .cli import chdir_to_project
 from .detection import check_missing_setlist_entries
 from .polars_utils import Preset, load_db
@@ -32,7 +32,7 @@ def check_hash(*, max_workers: int = 1) -> None:
     rows = list(songs.iter_rows(named=True))
 
     def _check(song: dict) -> str | None:
-        file = ROOT_DIR / Path(song["File_IN"])
+        file = Path(song["File_IN"])
         if not file.exists():
             return f"{file}: does not exist"
         if get_audio_hash(file) != song["Hash_IN"]:
@@ -227,7 +227,8 @@ def check_all_group_coverage() -> None:
 def all_tests() -> None:
     """Runs all checks defined in this file"""
     chdir_to_project()
-    format_logger(log_file=LOG_DIR / "checks.log")
+    project = get_project()
+    format_logger(log_file=project.logs_dir / "checks.log")
     check_case("Artist")
     check_case("Title")
     check_hash()

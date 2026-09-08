@@ -10,7 +10,7 @@ import tinytag
 from dateutil.parser import parse
 from loguru import logger
 
-from . import LOG_DIR, ROOT_DIR, UNOFFV3_DISC66, UNOFFV3_EXTRA, get_project, utils
+from . import get_project, utils
 from .artists import Project
 from .cli import chdir_to_project
 from .polars_utils import load_db
@@ -33,7 +33,7 @@ def get_files(songs: pl.DataFrame) -> dict[str, list[Path]]:
     # Set of all files already treated and registered
     # TODO add error checking for if a empty entry was accidentally added to the DB
     # TODO switch to using audio hash to check if song is already in database
-    existing = set(map(lambda x: ROOT_DIR / Path(x), songs.get_column("File_IN").to_list()))
+    existing = set(map(lambda x: Path(x), songs.get_column("File_IN").to_list()))
 
     def get_audios(p: Path, *, filetype: str = "mp3", exclude_dirs = []) -> list[Path]:
         files = list(p.glob(f"**/*.{filetype}"))
@@ -43,16 +43,18 @@ def get_files(songs: pl.DataFrame) -> dict[str, list[Path]]:
             logger.warning(f"no files found in {p} of filetype {filetype}")
         return filtered_files
 
-    custom_dir = project.song_root / "custom"
-    unofficialV3_dir = project.song_root / "unofficialV3"
-    arg_dir = unofficialV3_dir / UNOFFV3_EXTRA / UNOFFV3_DISC66
-    official_dir = project.song_root / "officially_released_songs"
-    copyright_issues_dir = project.song_root / "copyright_issues"
+    custom_dir = project.song_root / project.song_dirs["custom"]
+    unofficialv3_dir = project.song_root / project.song_dirs["unofficialv3"]
+    official_dir = project.song_root / project.song_dirs["official"]
+    copyright_issues_dir = project.song_root / project.song_dirs["copyright"]
+
+    # ARG songs live in a subdirectory of the unofficial archive; may not exist for all projects
+    arg_dir = unofficialv3_dir / project.arg_subdir if project.arg_subdir else None
 
     return {
         "Custom": get_audios(custom_dir) + get_audios(custom_dir, filetype="flac"),
-        "UnofficialV3": get_audios(unofficialV3_dir, exclude_dirs=[UNOFFV3_EXTRA]),
-        "ARG": get_audios(arg_dir),
+        "UnofficialV3": get_audios(unofficialv3_dir, exclude_dirs=[project.arg_subdir.split("/")[0]] if project.arg_subdir else []),
+        "ARG": get_audios(arg_dir) if arg_dir else [],
         "Official": list(official_dir.glob(f"*/**/*.mp3")), # search in all subdirectories recursively, can't use this glob pattern for UnofficialV3 as that would also get the ARG songs a second time
         "Copyright": get_audios(copyright_issues_dir),
     }
@@ -883,7 +885,8 @@ def check_missing_setlist_entries() -> list[dict]:
 
 def run_setlist_check() -> int:
     chdir_to_project()
-    utils.format_logger(log_file=LOG_DIR / "setlist-check.log")
+    project = get_project()
+    utils.format_logger(log_file=project.logs_dir / "setlist-check.log")
     return len(check_missing_setlist_entries()) == 0
 
 

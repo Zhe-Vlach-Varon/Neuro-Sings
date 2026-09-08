@@ -65,6 +65,7 @@ class Project:
     out_unofficial: Path
     out_official: Path
     fonts_dir: Path
+    logs_dir: Path
 
     # --- drive (rclone remote names) ---
     drive_public: str | None
@@ -97,6 +98,24 @@ class Project:
 
     Defaults to ``"<display-name> ARG"`` when unset. Must match the existing DB album name
     for projects that already have ARG rows, so set it explicitly in those cases."""
+
+    arg_subdir: str | None = None
+    """Path to the ARG subdirectory within the unofficial archive (e.g. ``"Extra Content/DISC 66 - ARG"``).
+
+    Relative to ``song_root / song_dirs["unofficialv3"]``. If ``None``, the project has no
+    ARG subdirectory and ARG extraction is a no-op."""
+
+    song_dirs: dict[str, str] = field(default_factory=lambda: {
+        "drive": "drive",
+        "custom": "custom",
+        "unofficialv3": "unofficialV3",
+        "official": "officially_released_songs",
+        "copyright": "copyright_issues",
+    })
+    """Mapping of semantic song directory names to actual directory names under ``song_root``.
+
+    Keys: ``"drive"``, ``"custom"``, ``"unofficialv3"``, ``"official"``, ``"copyright"``.
+    Values: the actual subdirectory name (e.g. ``"unofficialV3"``, ``"officially_released_songs"``)."""
 
     song_name_tag_overrides: dict[str, str] = field(default_factory=dict)
     """Song-specific ``name_tag`` overrides: ``{title: name_tag_value}``.

@@ -18,7 +18,7 @@ import loguru
 import xxhash
 from mutagen.id3 import ID3, ID3NoHeaderError
 
-from . import COPYRIGHT_ISSUES_CSV, LOG_DIR, SETLISTS_DIR, get_project
+from . import get_project
 from .artists import Project
 
 logger = loguru.logger
@@ -59,17 +59,19 @@ def rotation_fn(_msg: loguru.Message, file_opened: TextIO) -> bool:
     return is_old or is_big
 
 
-def format_logger(*, log_file: Path = LOG_DIR / "neuro.log", verbosity: int = 5) -> None:
+def format_logger(*, log_file: Path | None = None, verbosity: int = 5) -> None:
     """Formats a loguru logger, can be called from anywhere to set it up.
 
     Args:
-        log_file (Path, optional): File to store the logs. Defaults to LOG_DIR/"neuro.log".
+        log_file (Path, optional): File to store the logs. Defaults to "logs/neuro.log".
         verbosity (int, optional): Level of verbosity [0-6], the higher the more verbose, see VERBOSE\
             Variable in this file for more details. Defaults to 5 (DEBUG).
 
     Raises:
         ValueError: If verbosity isn't in [0,6].
     """
+    if log_file is None:
+        log_file = Path("logs") / "neuro.log"
 
     if verbosity not in VERBOSE:
         logger.error(f"Logger got wrong verbosity {verbosity}")
@@ -416,11 +418,12 @@ non_karaoke_albums = []
 
 def get_non_karaoke_album_names() -> list:
     if not len(non_karaoke_albums):
-        setlists = list(SETLISTS_DIR.glob(f"**/*"))
+        setlists_dir = get_project().setlists_dir
+        setlists = list(setlists_dir.glob(f"**/*"))
         for setlist in setlists:
             if setlist.name == 'Setlists.md' or setlist.is_dir():
                 continue
-            if setlist.is_relative_to(SETLISTS_DIR / 'v3 voice' / 'non-karaoke'):
+            if setlist.is_relative_to(setlists_dir / 'v3 voice' / 'non-karaoke'):
                 non_karaoke_albums.append(setlist.stem)
     return non_karaoke_albums
 
@@ -458,7 +461,7 @@ _copyright_entries = []
 def _load_copyright_entries() -> list:
     """Load and cache copyright_issues.csv entries (loaded once per process)."""
     if not _copyright_entries:
-        copyright_file = COPYRIGHT_ISSUES_CSV
+        copyright_file = get_project().data_dir / "copyright_issues.csv"
         if copyright_file.exists():
             with open(copyright_file, 'r', encoding='utf-8') as f:
                 reader = csv.DictReader(f, delimiter='|')

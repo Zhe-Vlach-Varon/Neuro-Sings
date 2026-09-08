@@ -4,7 +4,7 @@ from pathlib import Path
 import polars as pl
 from loguru import logger
 
-from . import LOG_DIR, get_project, utils
+from . import get_project, utils
 from .cli import chdir_to_project
 from .detection import check_missing_setlist_entries, is_twin_duet_stream
 from .polars_utils import dates_schema, load_dates, load_db, songs_schema
@@ -28,7 +28,7 @@ def update_db() -> None:
     The Date CSV/Table is also updated for each new stream"""
     chdir_to_project()
     project = get_project()
-    utils.format_logger(log_file=LOG_DIR / "json.log")
+    utils.format_logger(log_file=get_project().logs_dir / "json.log")
     with open(project.songs_json, "r") as f:
         json_data: utils.SongJSON = json.load(f)
 

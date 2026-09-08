@@ -1,9 +1,7 @@
 """Load the active :class:`~ai_vt_singer.artists.Project` from ``config.toml``.
 
-``load_project`` parses ``config.toml`` and returns a :class:`Project`. If the config has
-no ``[project]`` section (i.e. a pre-refactor config), it synthesizes a ``Project`` from
-the legacy module-level constants in :mod:`ai_vt_singer` so existing setups keep working
-unchanged.
+``load_project`` parses ``config.toml`` and returns a :class:`Project`. The config **must**
+contain a ``[project]`` section; a ``ValueError`` is raised otherwise.
 """
 
 from __future__ import annotations
@@ -32,99 +30,30 @@ def _artist_from_dict(d: dict) -> CoverArtist:
     )
 
 
-def _synthesized_project() -> Project:
-    """Build a :class:`Project` from the legacy module-level constants (backward compat).
-
-    ``from . import ...`` is deferred to the call site (not module import time) to avoid a
-    circular import: :mod:`ai_vt_singer` imports this module, so we can only read its
-    constants once the package has finished loading.
-    """
-    from . import (  # deferred on purpose — see docstring
-        DATA_DIR,
-        DATES_CSV,
-        FONTS_DIR,
-        IMAGES_BG_DIR,
-        IMAGES_COVERS_DIR,
-        IMAGES_CUSTOM_DIR,
-        OUT_OFFICIAL_DIR,
-        OUT_ROOT_DIR,
-        OUT_UNOFFICIAL_DIR,
-        SETLISTS_DIR,
-        SONG_ROOT_DIR,
-        SONGS_CSV,
-        SONGS_DB,
-        SONGS_JSON,
-    )
-
-    return Project(
-        name="neuro",
-        display_name="Neuro Twins",
-        artists=(
-            CoverArtist(
-                name="Neuro",
-                flag="neuro",
-                display_name="Neuro-Sama",
-                cover_suffix="neuro",
-                album_artist="Neuro-Sama/Evil Neuro",
-            ),
-            CoverArtist(
-                name="Evil",
-                flag="evil",
-                display_name="Evil Neuro",
-                cover_suffix="evil",
-                album_artist="Neuro-Sama/Evil Neuro",
-            ),
-        ),
-        voice_versions=("v1", "v2", "v3"),
-        duet_group_name="Twins",
-        data_dir=DATA_DIR,
-        songs_csv=SONGS_CSV,
-        songs_db=SONGS_DB,
-        songs_json=SONGS_JSON,
-        dates_csv=DATES_CSV,
-        song_root=SONG_ROOT_DIR,
-        setlists_dir=SETLISTS_DIR,
-        images_covers_dir=IMAGES_COVERS_DIR,
-        images_custom_dir=IMAGES_CUSTOM_DIR,
-        images_bg_dir=IMAGES_BG_DIR,
-        out_root=OUT_ROOT_DIR,
-        out_unofficial=OUT_UNOFFICIAL_DIR,
-        out_official=OUT_OFFICIAL_DIR,
-        fonts_dir=FONTS_DIR,
-        drive_public="Neuro-Sings-ZVV",
-        drive_private="Neuro-Sings-ZVV-official-releases",
-        drive_source="unofficialV3",
-        bg_solo_images={
-            "Neuro": {"v1": "nwero.png", "v2v1": "newero.png", "v2": "newero.png"},
-            "Evil": {"v1": "eliv.png", "v2v1": "eliv.png", "v2": "neweliv.png"},
-        },
-        bg_duet_images={"v1": "smocus.jpg", "v2v1": "smocus_inter.png", "v2": "smocus_new.png"},
-        arg_singers=("Study-sama",),
-        arg_album_name="Neuro-sama ARG",
-        song_name_tag_overrides={"Chinatown Blues": "Neuro + Vedal"},
-        song_version_overrides={"Chinatown Blues": "2"},
-    )
-
-
 def load_project(config_path: Path = Path("config.toml")) -> Project:
     """Parse ``config.toml`` and return a :class:`Project` instance.
 
     Paths are resolved relative to the current working directory (matching the existing
     ``ROOT_DIR = Path(".")`` design), so a project is selected simply by ``cd``-ing into its
-    directory. If the config lacks a ``[project]`` section, a backward-compatible project is
-    synthesized from the legacy constants.
+    directory. The config **must** contain a ``[project]`` section.
 
     Args:
         config_path: Path to the config file. Defaults to ``config.toml`` in the CWD.
 
     Returns:
         A fully populated :class:`Project`.
+
+    Raises:
+        ValueError: If the config lacks a ``[project]`` section.
     """
     with open(config_path, "rb") as f:
         raw = tomllib.load(f)
 
     if "project" not in raw:
-        return _synthesized_project()
+        raise ValueError(
+            f"Config file '{config_path}' must contain a [project] section. "
+            f"See the multi-project support docs for the expected format."
+        )
 
     p = raw["project"]
     out_cfg = raw.get("output", {})
@@ -142,16 +71,35 @@ def load_project(config_path: Path = Path("config.toml")) -> Project:
     # Project-specific overrides
     arg_singers = tuple(p.get("arg-singers", ()))
     arg_album_name = p.get("arg-album")  # None → extract_arg() derives "<display-name> ARG"
+    arg_subdir = p.get("arg-subdir")    # None → no ARG subdirectory
     song_overrides = p.get("song-overrides", {})
     name_tag_overrides = song_overrides.get("name-tag", {})
     version_overrides = song_overrides.get("version", {})
+
+    # Song directories (optional override; defaults cover common cases)
+    default_song_dirs = {
+        "drive": "drive",
+        "custom": "custom",
+        "unofficialv3": "unofficialV3",
+        "official": "officially_released_songs",
+        "copyright": "copyright_issues",
+    }
+    song_dirs_cfg = p.get("song-dirs", {})
+    song_dirs = {**default_song_dirs, **song_dirs_cfg}
+
+    # Duet group name: required for multi-artist projects
+    duet_group_name = p.get("duet-group-name")
+    if duet_group_name is None and len(artists) >= 2:
+        duet_group_name = " & ".join(a.name for a in artists)
+    elif duet_group_name is None:
+        duet_group_name = ""
 
     return Project(
         name=p["name"],
         display_name=p.get("display-name", p["name"]),
         artists=artists,
         voice_versions=tuple(p.get("voice-versions", ("v1", "v2", "v3"))),
-        duet_group_name=p.get("duet-group-name", "Twins"),
+        duet_group_name=duet_group_name,
         data_dir=base / "data",
         songs_csv=base / "data" / "songs.csv",
         songs_db=base / "data" / "songs.db",
@@ -166,6 +114,7 @@ def load_project(config_path: Path = Path("config.toml")) -> Project:
         out_unofficial=out_root / "unofficial_releases",
         out_official=out_root / "official_releases",
         fonts_dir=base / "fonts",
+        logs_dir=base / "logs",
         drive_public=drive_cfg.get("public"),
         drive_private=drive_cfg.get("private"),
         drive_source=drive_cfg.get("source"),
@@ -173,6 +122,8 @@ def load_project(config_path: Path = Path("config.toml")) -> Project:
         bg_duet_images=bg_duet,
         arg_singers=arg_singers,
         arg_album_name=arg_album_name,
+        arg_subdir=arg_subdir,
+        song_dirs=song_dirs,
         song_name_tag_overrides=name_tag_overrides,
         song_version_overrides=version_overrides,
     )

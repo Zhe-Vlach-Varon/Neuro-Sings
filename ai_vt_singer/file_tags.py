@@ -2,24 +2,24 @@
 
 import os
 import shutil
+import sys
 from dataclasses import dataclass
 from io import BytesIO
 from pathlib import Path
 
+import polars as pl
 from loguru import logger
 from mutagen.flac import FLAC, Picture
 from mutagen.id3 import ID3
 from mutagen.id3._frames import APIC, COMM, TALB, TBPM, TDRC, TDRL, TIT2, TKEY, TPE1, TPE2, TRCK, TSO2, TYER, TextFrame
 from PIL import Image
 
-from neuro import IMAGES_COVERS_DIR, IMAGES_CUSTOM_DIR, LOG_DIR, ROOT_DIR
-from neuro.utils import file_check, format_logger, SongEntry, sanitize_filename
+from metadata_utils import engraver
 
-import polars as pl
-from neuro.polars_utils import load_db
-
-from metadata_utils import engraver as engraver
-
+from . import get_project
+from .artists import Project
+from .polars_utils import load_db
+from .utils import SongEntry, file_check, format_logger, sanitize_filename
 
 # Lazily-built {album: track count} map, computed once per loaded songs DB.
 _counts_source: pl.DataFrame | None = None
@@ -59,8 +59,6 @@ class Song:
         """Neuro v2 voice"""
         v3: bool
         """Neuro/Evil v3 voice"""
-        neuro: bool
-        evil: bool
         duet: bool
         duplicate: bool
         """Duplicate song, file doesn't exist in drive, but song was sung that day"""
@@ -76,6 +74,10 @@ class Song:
         encore: bool
         """Songs that were re-run during the same stream"""
         copyright_issues: bool
+        singer_flags: dict = None
+        """Generic singer flag map {flag_token: bool}, populated from the project artists.
+
+        Provides project-agnostic access to singer flags (e.g. ``singer_flags.get('neuro')``)."""
 
     def init_flags(self, flags: str | None) -> None:
         """Detects song's flags by searching substrings in the flags column.\
@@ -92,12 +94,16 @@ class Song:
             flag_list = flag_field.split(";")
             return flag in flag_list
 
-        # Strange code, but just expands into `"v1": flags_check("v1", flags)`...
-        # for all flags. It uses the fact that Flags fields are exactly the same
-        # strings as the flags
-        self.flags = self.Flags(**{flag: flag_check(flag, flags) for flag in self.Flags.__dataclass_fields__.keys()})
+        # Auto-populate all bool fields from the flags string.
+        # 'singer_flags' is a dict (not a bool flag) so it's excluded and set separately below.
+        bool_fields = [f for f in self.Flags.__dataclass_fields__ if f != 'singer_flags']
+        self.flags = self.Flags(**{flag: flag_check(flag, flags) for flag in bool_fields})
 
-    def __init__(self, song_dict: SongEntry, karaoke_dict: dict = {}) -> None:
+        # Populate singer_flags from project artists (generic, project-agnostic access).
+        flag_list = (flags or '').split(';')
+        self.flags.singer_flags = {a.flag: (a.flag in flag_list) for a in self._project.artists}
+
+    def __init__(self, song_dict: SongEntry, karaoke_dict: dict | None = None, project: Project | None = None) -> None:
         # Lots of asserts, mainly for type checking, but also detects irregular entries in database
         assert song_dict["Title"] is not None
         self.title: str = song_dict["Title"]
@@ -123,7 +129,7 @@ class Song:
         self.hash_in: str = song_dict["Hash_IN"]
 
         # assert song_dict["File_IN"] is not None
-        self.file: Path = ROOT_DIR / Path(song_dict["File_IN"])
+        self.file: Path = Path(song_dict["File_IN"])
         try:
             file_check(self.file)
         except FileNotFoundError:
@@ -149,7 +155,10 @@ class Song:
         self.lead_singer = str(song_dict["Lead Singer"]).lower()
 
         self.d: SongEntry = song_dict
-        self.k: SongEntry = karaoke_dict
+        self.k: SongEntry = karaoke_dict or {}
+
+        # Project reference (must be set before init_flags which populates singer_flags)
+        self._project: Project = project if project is not None else get_project()
 
         self.init_flags(song_dict["Flags"])
 
@@ -223,7 +232,7 @@ class Song:
 
         if not full_existing_path.exists():
             logger.error(f"file does not exist {full_existing_path}")
-            exit(1)
+            sys.exit(1)
 
         if not create and self.outfile.exists():
             return False
@@ -278,9 +287,9 @@ class Song:
         """
         additional = [
             # Title
-            TIT2(text=f"{(self.title if ascii_tags or self.title_og == "None" else self.title_og)}{f" ({self.identify})" if self.identify != "None" else ""}", encoding=3),
+            TIT2(text=f"{(self.title if ascii_tags or self.title_og == 'None' else self.title_og)}{f' ({self.identify})' if self.identify != 'None' else ''}", encoding=3),
             # Artist
-            TPE1(text=(f"{self.cover_artist} - {(self.artist if ascii_tags or self.artist_og == "None" else self.artist_og)}" if not (self.flags.originals or self.flags.official) else self.cover_artist), encoding=3),
+            TPE1(text=(f"{self.cover_artist} - {(self.artist if ascii_tags or self.artist_og == 'None' else self.artist_og)}" if not (self.flags.originals or self.flags.official) else self.cover_artist), encoding=3),
             # Album
             TALB(text=self.album, encoding=3),
             # Year-Month-Day | Using all frames for different software compatibility
@@ -311,7 +320,7 @@ class Song:
             "DATE": self.date,
             "TITLE": (self.title if not ascii_tags else self.title_og),
             "TRACKNUMBER": f"{self.track_n}",
-            "PERFORMER": "Neuro-Sama/Evil Neuro",
+            "PERFORMER": self._project.artists[0].album_artist,
         }
         return additional
 
@@ -320,17 +329,16 @@ class Song:
         """Name used in the dated-cover filename suffix (previously assigned imperatively in apply_tags).
 
         Returns:
-            str: "evil", "neuro" or the subclass-specific fallback (see `_who_fallback`).
+            str: The cover_suffix of the matching artist, or the subclass-specific fallback.
         """
-        if self.flags.evil:
-            return "evil"
-        if self.flags.neuro:
-            return "neuro"
+        for artist in self._project.artists:
+            if self.flags.singer_flags.get(artist.flag, False):
+                return artist.cover_suffix
         return self._who_fallback
 
     @property
     def _who_fallback(self) -> str:
-        """Fallback for `who` when the song has neither an evil nor a neuro flag. Subclass-specific."""
+        """Fallback for `who` when no singer flag matches. Subclass-specific."""
         raise NotImplementedError
 
     @property
@@ -341,12 +349,12 @@ class Song:
             Path: The cover image path (custom image or dated cover).
         """
         if self.image is not None:
-            return IMAGES_CUSTOM_DIR / f"{self.image}.jpg"
+            return self._project.images_custom_dir / f"{self.image}.jpg"
         if self.flags.duet:
-            return IMAGES_COVERS_DIR / f"{self.date}-{self.who}-duet.jpg"
+            return self._project.images_covers_dir / f"{self.date}-{self.who}-duet.jpg"
         if self.flags.v1 or self.flags.v2:
-            return IMAGES_COVERS_DIR / f"{self.date}.jpg"
-        return IMAGES_COVERS_DIR / f"{self.date}-{self.who}.jpg"
+            return self._project.images_covers_dir / f"{self.date}.jpg"
+        return self._project.images_covers_dir / f"{self.date}-{self.who}.jpg"
 
     @property
     def album_track_count(self) -> int:
@@ -373,12 +381,13 @@ class Song:
         Returns:
             str: The artist. Can be Neuro-Sama, Evil Neuro, or Neuro [v1]/[v2].
         """
-        # removed the different cases so that all tracks in an album will have the same album_artist,
+        first = self._project.artists[0]
+        # Historical v1/v2 voice versions have specific album artist names tied to the first artist.
         if self.flags.v1 and self.date < "2023-05-27":
-            return "Neuro [v1]"
-        if self.flags.v2 and self.date <= "2023-06-08" and self.cover_artist == "Neuro [v2]":
-            return "Neuro [v2]"
-        return "Neuro-Sama/Evil Neuro"
+            return f"{first.name} [v1]"
+        if self.flags.v2 and self.date <= "2023-06-08" and self.cover_artist == f"{first.name} [v2]":
+            return f"{first.name} [v2]"
+        return first.album_artist
 
     @property
     def name_tag(self) -> str:
@@ -386,25 +395,25 @@ class Song:
             other attributes.
 
         Raises:
-            ValueError: When a song doesn't have at least neuro or evil tag.
+            ValueError: When a song doesn't have at least one singer flag.
 
         Returns:
             str: The tag: Neuro, Evil, Duet, Neuro + Vedal, Neuro v1/v2.
         """
+        first_name = self._project.artists[0].name
         if self.flags.v1:
-            return "Neuro v1"
+            return f"{first_name} v1"
         if self.flags.v2:
-            return "Neuro v2"
-        if self.title == "Chinatown Blues":
-            return "Neuro + Vedal"
-        # A song can have both evil/neuro and duet tags, but the duet tag is prioritized
+            return f"{first_name} v2"
+        if self.title in self._project.song_name_tag_overrides:
+            return self._project.song_name_tag_overrides[self.title]
+        # A song can have both singer and duet tags, but the duet tag is prioritized
         if self.flags.duet:
             return "Duet"
-        if self.flags.evil:
-            return "Evil"
-        if self.flags.neuro:
-            return "Neuro"
-        # A song must have the Neuro or Evil tag, if it has neither, raise an Error
+        for artist in self._project.artists:
+            if self.flags.singer_flags.get(artist.flag, False):
+                return artist.name
+        # A song must have at least one singer flag, if it has neither, raise an Error
         logger.error(f"Song '{self.file}' has no flags to define its tag!")
         raise ValueError(f"Song '{self.file}' has no flags to define its tag!")
 
@@ -440,8 +449,8 @@ class Song:
 class DriveSong(Song):
     """Metadata for a song from the drive."""
 
-    def __init__(self, song_dict: dict, karaoke_dict: dict) -> None:
-        super().__init__(song_dict, karaoke_dict)
+    def __init__(self, song_dict: dict, karaoke_dict: dict, project: Project | None = None) -> None:
+        super().__init__(song_dict, karaoke_dict, project)
 
     @property
     def _file_name_custom(self) -> bool:
@@ -453,7 +462,7 @@ class DriveSong(Song):
 
     def _resolve_outfile(self, out_dir: Path, numberedFiles: bool = False) -> Path:
         name = self.file_name(self._file_name_custom, numberedFiles=numberedFiles)
-        return ROOT_DIR / out_dir / f"{name}.mp3"
+        return out_dir / f"{name}.mp3"
 
     def create_out_file(self, *, out_dir: Path = Path("out"), create: bool = True, numberedFiles: bool = False) -> bool:
         """Creates the output file on the filesystem by copying the original. The metadata are written later.
@@ -468,10 +477,10 @@ class DriveSong(Song):
             bool: True if a file was created.
         """
         # Ensures the output directory exists
-        os.makedirs(ROOT_DIR / out_dir, exist_ok=True)
+        os.makedirs(out_dir, exist_ok=True)
         # If the song is flagged as custom, use the custom format
         name = self.file_name(self.flags.as_custom, numberedFiles=numberedFiles)
-        self.outfile = ROOT_DIR / out_dir / f"{name}.mp3"
+        self.outfile = out_dir / f"{name}.mp3"
 
         # print(self.file)
         # print(self.outfile)
@@ -514,12 +523,12 @@ class DriveSong(Song):
 class CustomSong(Song):
     """Metadata for a song added manually (not from the drive)."""
 
-    def __init__(self, song_dict: dict, karaoke_dict: dict = {}) -> None:
-        super().__init__(song_dict, karaoke_dict)
+    def __init__(self, song_dict: dict, karaoke_dict: dict | None = None, project: Project | None = None) -> None:
+        super().__init__(song_dict, karaoke_dict, project)
 
     @property
     def _who_fallback(self) -> str:
-        return "twins"
+        return self._project.duet_group_name.lower()
 
     @property
     def _file_name_custom(self) -> bool:
@@ -527,7 +536,7 @@ class CustomSong(Song):
 
     def _resolve_outfile(self, out_dir: Path, numberedFiles: bool = False) -> Path:
         name = self.file_name(self._file_name_custom, numberedFiles=numberedFiles)
-        return ROOT_DIR / out_dir / f"{name}{self.file.suffix}"
+        return out_dir / f"{name}{self.file.suffix}"
 
     def create_out_file(self, *, out_dir: Path, create: bool = True, numberedFiles: bool = False) -> bool:
         """Creates the output file on the filesystem by copying the original. The metadata are written later.
@@ -544,7 +553,7 @@ class CustomSong(Song):
         ext = file.suffix
 
         name = self.file_name(not self.flags.as_drive, numberedFiles=numberedFiles)
-        self.outfile = ROOT_DIR / out_dir / f"{name}{ext}"
+        self.outfile = out_dir / f"{name}{ext}"
 
         if create or (not self.outfile.exists()):
             shutil.copy2(file, self.outfile)
@@ -590,7 +599,7 @@ class CustomSong(Song):
         if self.flags.as_drive or self.flags.arg:
             album_artist = self.album_artist
         else:
-            album_artist = "Neuro-Sama/Evil Neuro"
+            album_artist = self._project.artists[0].album_artist
 
         # Album artist (TPE2/TSO2) + cover picture (APIC), same shared sequence as DriveSong.
         self.apply_album_artist_and_cover(id3, album_artist, self.cover)
@@ -659,4 +668,4 @@ class CustomSong(Song):
 
 
 if __name__ == "__main__":
-    format_logger(log_file=LOG_DIR / "tags.log")
+    format_logger(log_file=get_project().logs_dir / "tags.log")

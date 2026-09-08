@@ -1,3 +1,4 @@
+# noqa: N999
 import json
 import logging
 import unicodedata
@@ -92,8 +93,8 @@ def _substitution(new_filename_pattern: str, song_data: dict[str, str]) -> str:
     new_value = new_filename_pattern
     for r_key in REPLACEMENT_MAP:
         new_value = new_value.replace(r_key, song_data[REPLACEMENT_MAP[r_key]])
-    for s_key in secondary_map:
-        new_value = new_value.replace(s_key, secondary_map[s_key](song_data))
+    for s_key, sub_func in secondary_map.items():
+        new_value = new_value.replace(s_key, sub_func(song_data))
     return new_value
 
 def get_song_data(song_path: str | Path) -> tuple[str, dict[str, str], ID3]:
@@ -229,8 +230,8 @@ def sanitize_filename(filename: str) -> str:
         '|': '_'
     }
 
-    for char in FORBIDDEN_CHARS:
-        filename = filename.replace(char, FORBIDDEN_CHARS[char])
+    for char, replacement in FORBIDDEN_CHARS.items():
+        filename = filename.replace(char, replacement)
 
     while("  " in filename):
         filename = filename.replace("  ", " ")
@@ -248,9 +249,9 @@ def process_new_tags(song: Song, song_data: (dict[str, str] | None) = None) -> N
 
         if not song_data:
             logger.debug(f"No existing payload found for {song.path}")
-            return None
+            return
     
-    if not "Comment" in song_data.keys() or not song_data["Comment"]:
+    if "Comment" not in song_data or not song_data["Comment"]:
         song_data["Comment"] = "None"
 
     song.title = _substitution(pattern_defaults["title"], song_data)

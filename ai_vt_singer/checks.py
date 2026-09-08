@@ -1,6 +1,6 @@
 """Some checks to run on files"""
 
-import os
+import subprocess
 import tomllib as toml
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
@@ -8,10 +8,11 @@ from pathlib import Path
 from loguru import logger
 from tqdm import tqdm
 
-from neuro import LOG_DIR, ROOT_DIR
-from neuro.detection import check_missing_setlist_entries
-from neuro.polars_utils import Preset, load_db
-from neuro.utils import MP3GainMode, format_logger, get_audio_hash
+from . import get_project
+from .cli import chdir_to_project
+from .detection import check_missing_setlist_entries
+from .polars_utils import Preset, load_db
+from .utils import MP3GainMode, format_logger, get_audio_hash
 
 
 def check_hash(*, max_workers: int = 1) -> None:
@@ -31,7 +32,7 @@ def check_hash(*, max_workers: int = 1) -> None:
     rows = list(songs.iter_rows(named=True))
 
     def _check(song: dict) -> str | None:
-        file = ROOT_DIR / Path(song["File_IN"])
+        file = Path(song["File_IN"])
         if not file.exists():
             return f"{file}: does not exist"
         if get_audio_hash(file) != song["Hash_IN"]:
@@ -97,7 +98,7 @@ def check_mp3gain() -> None:
     with open("config.toml", "rb") as file:
         config = toml.load(file)
     if "mp3gain" in config["features"]["activated"]:
-        if os.system("mp3gain -q") != 0:
+        if subprocess.run(["mp3gain", "-q"], check=False).returncode != 0:
             logger.error("mp3gain activated, but executable not found")
         else:
             logger.success("mp3gain executable found")
@@ -130,7 +131,7 @@ def check_are_dbs_identical():
     have_differences = False
     for i, (row_sq, row_csv) in enumerate(zip(sqlite.rows(named=True), csv.rows(named=True))):
         # row is a dictionary with the column names as keys
-        for key in row_sq.keys():
+        for key in row_sq:
             message = f"Row {i} differs between databases in column {key}: {row_sq[key]} != {row_csv[key]}"
             if row_sq[key] != row_csv[key]:
                 logger.error(message)
@@ -225,7 +226,9 @@ def check_all_group_coverage() -> None:
 
 def all_tests() -> None:
     """Runs all checks defined in this file"""
-    format_logger(log_file=LOG_DIR / "checks.log")
+    chdir_to_project()
+    project = get_project()
+    format_logger(log_file=project.logs_dir / "checks.log")
     check_case("Artist")
     check_case("Title")
     check_hash()

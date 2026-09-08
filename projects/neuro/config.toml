@@ -1,3 +1,66 @@
+# ── project identity ──────────────────────────────────────────────
+# Who sings in this project. `name` is the canonical singer name used in the DB,
+# `flag` is the DB flag token, `display-name` is the ID3 tag name, `cover-suffix`
+# is the token in cover-image filenames, and `album-artist` is the TPE2/TSO2 value.
+[project]
+name = "neuro"
+display-name = "Neuro Twins"
+voice-versions = ["v1", "v2", "v3"]
+duet-group-name = "Twins"
+# Lead-singer names that are classified as ARG (get the 'arg;' flag). Empty = no ARG songs.
+arg-singers = ["Study-sama"]
+# Album name assigned to ARG rows in the DB (defaults to "<display-name> ARG" if unset;
+# pinned here because existing rows use "Neuro-sama ARG")
+arg-album = "Neuro-sama ARG"
+# Path to the ARG subdirectory within the unofficial archive
+arg-subdir = "Extra Content/DISC 66 - ARG"
+
+[[project.artists]]
+name = "Neuro"
+flag = "neuro"
+display-name = "Neuro-Sama"
+cover-suffix = "neuro"
+album-artist = "Neuro-Sama/Evil Neuro"
+
+[[project.artists]]
+name = "Evil"
+flag = "evil"
+display-name = "Evil Neuro"
+cover-suffix = "evil"
+album-artist = "Neuro-Sama/Evil Neuro"
+
+# Song-specific overrides: title → name_tag value (checked before flag-based logic)
+[project.song-overrides.name-tag]
+"Chinatown Blues" = "Neuro + Vedal"
+
+# Song-specific overrides: title → version value (used by extract_official)
+[project.song-overrides.version]
+"Chinatown Blues" = "2"
+
+# Thumbnail background images (optional — omit if this project doesn't generate thumbnails)
+# solo: singer_name → {duet_version: filename}  (singers not listed get no solo image)
+[project.thumbnails.solo.Neuro]
+v1 = "nwero.png"
+v2v1 = "newero.png"
+v2 = "newero.png"
+
+[project.thumbnails.solo.Evil]
+v1 = "eliv.png"
+v2v1 = "eliv.png"
+v2 = "neweliv.png"
+
+# duet: duet_version → filename  (keys also define the valid duet versions)
+[project.thumbnails.duet]
+v1 = "smocus.jpg"
+v2v1 = "smocus_inter.png"
+v2 = "smocus_new.png"
+
+# ── drive (rclone remote names) ───────────────────────────────────
+[drive]
+public = "Neuro-Sings-ZVV"
+private = "Neuro-Sings-ZVV-official-releases"
+source = "unofficialV3"
+
 [output]
 # If disabled, the path in presets are directly applied, relative or absolute
 # If enabled, the paths in presets must be relative

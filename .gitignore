@@ -1,20 +1,20 @@
-# Custom
-songs
-logs
+# Project-specific artifacts (all projects live under projects/)
+projects/*/songs/
+projects/*/out/
+projects/*/logs/
+projects/*/images/bg/
+projects/*/images/custom/
+projects/*/images/cover/
+projects/*/fonts/First Coffee.otf
+projects/*/fonts/First Coffee.ttf
+
+# Dev / tooling
 .pdm-build
-images/bg
-images/custom
-images/cover
 .pdm-python
-.directory
-out
 .directory
 .ruff_cache
 .vscode                     
-Neuro-Sings-ZVV-official-releases
 found_song_files.txt
-fonts/First Coffee.otf
-fonts/First Coffee.ttf
 temp
 temp_public
 temp_private

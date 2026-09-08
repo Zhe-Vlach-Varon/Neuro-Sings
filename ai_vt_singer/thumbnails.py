@@ -1,30 +1,25 @@
 """Thumbnail generation for the songs"""
 
 import os
+import sys
 from pathlib import Path
 from string import digits
 from time import time
-from typing import Literal, TypeAlias
-
-from PIL import Image, ImageDraw, ImageFont
 
 import polars as pl
 from loguru import logger
+from PIL import Image, ImageDraw, ImageFont
 
-from neuro import (
-    DATES_OLD_CSV,
-    IMAGES_BG_DIR,
-    IMAGES_COVERS_DIR,
-    IMAGES_CUSTOM_DIR,
-    LOG_DIR,
-    FONT_PATH,
-)
-from neuro.polars_utils import load_dates
-from neuro.utils import format_logger, time_format
+from . import get_project
+from .artists import Project
+from .cli import chdir_to_project
+from .polars_utils import load_dates
+from .utils import format_logger, time_format
+
 
 def apply_text(image: Image.Image,
                         text: str,
-                        font_file: str | Path = Path(FONT_PATH),
+                        font_file: str | Path = Path("fonts") / "First Coffee.ttf",
                         font_size: int = 64,
                         font_fill_color = (255, 241, 242),
                         font_stroke_width: int = 2,
@@ -52,9 +47,9 @@ def apply_text(image: Image.Image,
 
     try:
         font = ImageFont.truetype(font_file, size=font_size)
-    except IOError:
+    except OSError:
         logger.error("Font \"First Coffee\" not found, exitting...")
-        exit(1)
+        sys.exit(1)
 
     text_x = int(w / 2)
     text_y = int(h * 0.8)
@@ -84,15 +79,17 @@ def generate_oldge() -> None:
         be generated often.\n
         Generates monthly dates in custom folder because that's how they are used.
     """
-    format_logger(log_file=LOG_DIR / "thumbnails.log")
+    chdir_to_project()
+    project = get_project()
+    format_logger(log_file=project.logs_dir / "thumbnails.log")
     t = time()
     # v1 | v2
-    SOLO_BG = list(map(lambda name: open_image(IMAGES_BG_DIR, name), ["nuero.png", "nwero_v2.png"]))
+    SOLO_BG = [open_image(project.images_bg_dir, name) for name in ["nuero.png", "nwero_v2.png"]]
 
-    dates = pl.read_csv(DATES_OLD_CSV)
+    dates = pl.read_csv(project.data_dir / "dates_v12.csv")
     N_COVERS = len(dates)
-    os.makedirs(IMAGES_COVERS_DIR, exist_ok=True)
-    os.makedirs(IMAGES_CUSTOM_DIR, exist_ok=True)
+    os.makedirs(project.images_covers_dir, exist_ok=True)
+    os.makedirs(project.images_custom_dir, exist_ok=True)
 
     i_m, i_k = 0, 0
     for stream in dates.iter_rows(named=True):
@@ -105,7 +102,7 @@ def generate_oldge() -> None:
 
 
         if date[5] in digits:  # It's a month digit and not a month written in letters
-            apply_text(base, date).convert("RGB").save(IMAGES_COVERS_DIR / f"{date}.jpg")
+            apply_text(base, date).convert("RGB").save(project.images_covers_dir / f"{date}.jpg")
             i_k += 1
         else:
             if date[5] == 'J':
@@ -116,9 +113,9 @@ def generate_oldge() -> None:
                 text = 'March 2023'
             else:
                 logger.error(f"How did I get here? neuro.thumbnails.generate_oldge | date == {date} | date[5] == {date[5]}")
-                exit(1)
+                sys.exit(1)
             
-            apply_text(base, text).convert("RGB").save(IMAGES_CUSTOM_DIR / f"{date}.jpg")
+            apply_text(base, text).convert("RGB").save(project.images_custom_dir / f"{date}.jpg")
             i_m += 1
 
         index = i_m + i_k - 1
@@ -128,81 +125,80 @@ def generate_oldge() -> None:
     logger.success(f"[THUMB] [{N_COVERS}/{N_COVERS}] successfully generated in {time_format(time() - t)}")
 
 
-def check_stream(stream: dict[str, str]) -> None:
+def check_stream(stream: dict[str, str], project=None) -> None:
     """Checks if the data matches the expectations
 
     Args:
         stream (dict[str, str]): Row from the dates csv
+        project: The active project (defaults to get_project()).
 
     Raises:
         ValueError: If one of these conditions isn't fulfilled:
-        - Singer isn't Neuro or Evil
-        - Duet format isn't v1, v2v1 or v2
+        - Singer isn't a project singer or the duet group name
+        - Duet format isn't a valid duet version for the project
     """
-    if stream["Singer"] not in ["Neuro", "Evil", "Twins"]:
+    if project is None:
+        from . import get_project
+        project = get_project()
+    valid_singers = set(project.singer_names()) | {project.duet_group_name}
+    if stream["Singer"] not in valid_singers:
         raise ValueError(f"Wrong singer {stream['Singer']}")
 
-    if stream["Duet Format"] not in ["v1", "v2v1", "v2"]:
+    valid_versions = set((project.bg_duet_images or {}).keys())
+    if valid_versions and stream["Duet Format"] not in valid_versions:
         raise ValueError(f"Wrong duet version {stream['Duet Format']}")
 
 
-Singer: TypeAlias = Literal["Neuro", "Evil"]
-DuetVersion: TypeAlias = Literal["v1", "v2v1", "v2"]
+def singer_match(singer: str, version: str, project: Project) -> tuple[str | None, str]:
+    """Returns (solo_bg_filename, duet_bg_filename) for the given singer and duet version.
 
-
-def singer_match(singer: Singer, version: DuetVersion) -> tuple[int, int]:
-    """Returns solo and duet images indices in their lists.
+    Lookups are driven by the project's ``bg_solo_images`` and ``bg_duet_images`` config,
+    so different projects can map singers/versions to different background images.
 
     Args:
-        singer (str): Who is singing, should be "Neuro" or "Evil".
-        version (str): Version for duets, should be "v1", "v2" or "v1v2".
+        singer: Singer name (e.g. "Neuro", "Evil") or duet group name (e.g. "Twins").
+        version: Duet version string from the dates CSV (e.g. "v1", "v2v1", "v2").
+        project: The active project.
 
     Returns:
-        solo/duet (tuple[int, int]): Index for solo and duet background images.\
-            Solo: 0 for Neuro v2 | 1 for Neuro v3 | 2 for Evil v1 | 3 for Evil v2. | -1 for Twins\
-            Duet: 0 for Neuro/Evil v2/v1 | 1 for v3/v1 | 2 for v3/v2.
+        (solo_filename | None, duet_filename): ``solo_filename`` is ``None`` when the singer
+        has no solo image for this version (e.g. the duet group).
+
+    Raises:
+        ValueError: If no duet bg image is configured for this version.
     """
-    match singer:
-        case "Neuro":
-            solo = 0
-            # v2 in version means Neuro v2 was already released
-            if "v2" in version:
-                solo = 1
-        case "Evil":
-            solo = 3
-            # v1 in version means Evil v2 wasn't already released
-            if "v1" in version:
-                solo = 2
-        case "Twins":
-            solo = -1
-
-    match version:
-        case "v1":
-            duet = 0
-        case "v2v1":
-            duet = 1
-        case "v2":
-            duet = 2
-
+    solo = (project.bg_solo_images or {}).get(singer, {}).get(version)
+    duet = (project.bg_duet_images or {}).get(version)
+    if duet is None:
+        raise ValueError(
+            f"No duet bg image configured for version '{version}' in project '{project.name}' "
+            f"([project.thumbnails.duet] in config.toml)"
+        )
     return solo, duet
 
 def generate_main() -> None:
     """Generates all thumbnails at once. It automatically re-generate all of them."""
-    format_logger(log_file=LOG_DIR / "thumbnails.log")
+    chdir_to_project()
+    project = get_project()
+    format_logger(log_file=project.logs_dir / "thumbnails.log")
 
-    # fmt: off
-    # v3 | v3 Voice w/ v2 Model | Eliv v1 Model | Eliv v2 Model
-    SOLO_BG = list(map(
-        lambda name: open_image(IMAGES_BG_DIR, name),
-        ["nwero.png", "newero.png", "eliv.png", "neweliv.png"],
-    ))
+    if not project.bg_duet_images:
+        logger.error(
+            f"Project '{project.name}' has no thumbnail bg images configured. "
+            f"Add a [project.thumbnails] section to config.toml."
+        )
+        sys.exit(1)
 
-    # Neuro v2, Evil v1 | Neuro v3, Evil v1 | Neuro v3, Evil v2
-    DUET_BG = list(map(
-        lambda name: open_image(IMAGES_BG_DIR, name),
-        ["smocus.jpg", "smocus_inter.png", "smocus_new.png"],
-    ))
-    # fmt: on
+    # Preload all needed bg images (avoids re-opening files per stream)
+    solo_bg: dict[tuple[str, str], Image.Image] = {
+        (singer, ver): open_image(project.images_bg_dir, fname)
+        for singer, versions in (project.bg_solo_images or {}).items()
+        for ver, fname in versions.items()
+    }
+    duet_bg: dict[str, Image.Image] = {
+        ver: open_image(project.images_bg_dir, fname)
+        for ver, fname in project.bg_duet_images.items()
+    }
 
     logger.info("[THUMB] Starting the generation of thumbnails")
 
@@ -211,30 +207,28 @@ def generate_main() -> None:
 
     N_COVERS = len(dates)
 
-    os.makedirs(IMAGES_COVERS_DIR, exist_ok=True)
+    os.makedirs(project.images_covers_dir, exist_ok=True)
 
     i_total = 0
 
     for stream in dates.iter_rows(named=True):
-        check_stream(stream)
+        check_stream(stream, project)
         date = stream["Date"]
 
-        for who in ['Neuro', 'Evil']: # TODO temp fix to generate cover images for both singers for each date
+        for who in project.singer_names():  # generate cover images for each project singer
             version = stream["Duet Format"]
 
-            # print(who)
+            # Solo thumbnail generation (skip for singers with no solo image, e.g. duet group)
+            solo_img = solo_bg.get((who, version))
+            if solo_img:
+                apply_text(solo_img, date).convert("RGB").save(
+                    project.images_covers_dir / f"{date}-{who.lower()}.jpg"
+                )
 
-            i_solo, i_duet = singer_match(who, version)
-
-            # Doesn't generate solo covers for Twins streams
-            if i_solo != -1:
-                # Solo thumbnail generation
-                apply_text(SOLO_BG[i_solo], date).convert("RGB").save(IMAGES_COVERS_DIR / f"{date}-{str(who).lower()}.jpg")
             # Duet thumbnail generation
-            apply_text(DUET_BG[i_duet], date).convert("RGB").save(IMAGES_COVERS_DIR / f"{date}-{str(who).lower()}-duet.jpg")
-
-            # print(IMAGES_COVERS_DIR / f"{date}-{str(who).lower()}.jpg")
-            # print(IMAGES_COVERS_DIR / f"{date}-{str(who).lower()}-duet.jpg")
+            apply_text(duet_bg[version], date).convert("RGB").save(
+                project.images_covers_dir / f"{date}-{who.lower()}-duet.jpg"
+            )
 
         i_total = i_total + 1
         logger.debug(f"[THUMB] [{i_total:3d}/{N_COVERS}] Cover Pictures for {date} done")

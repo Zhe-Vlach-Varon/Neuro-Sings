@@ -7,7 +7,7 @@ import re
 import sys
 import unicodedata
 from concurrent.futures import ThreadPoolExecutor
-from datetime import datetime
+from datetime import UTC, datetime
 from enum import Enum
 from pathlib import Path
 from typing import TextIO
@@ -18,7 +18,8 @@ import loguru
 import xxhash
 from mutagen.id3 import ID3, ID3NoHeaderError
 
-from neuro import COPYRIGHT_ISSUES_CSV, LOG_DIR, SETLISTS_DIR
+from . import get_project
+from .artists import Project
 
 logger = loguru.logger
 
@@ -52,23 +53,25 @@ def rotation_fn(_msg: loguru.Message, file_opened: TextIO) -> bool:
     """
     file = Path(file_opened.name)
     # File is more than 1 week old
-    is_old = datetime.now().timestamp() - file.stat().st_ctime > 7 * 86400
+    is_old = datetime.now(tz=UTC).timestamp() - file.stat().st_ctime > 7 * 86400
     # File is >2MiB
     is_big = file.stat().st_size > (2 << 20)  # Multiplies by 1024 instead of 1000
     return is_old or is_big
 
 
-def format_logger(*, log_file: Path = LOG_DIR / "neuro.log", verbosity: int = 5) -> None:
+def format_logger(*, log_file: Path | None = None, verbosity: int = 5) -> None:
     """Formats a loguru logger, can be called from anywhere to set it up.
 
     Args:
-        log_file (Path, optional): File to store the logs. Defaults to LOG_DIR/"neuro.log".
+        log_file (Path, optional): File to store the logs. Defaults to "logs/neuro.log".
         verbosity (int, optional): Level of verbosity [0-6], the higher the more verbose, see VERBOSE\
             Variable in this file for more details. Defaults to 5 (DEBUG).
 
     Raises:
         ValueError: If verbosity isn't in [0,6].
     """
+    if log_file is None:
+        log_file = Path("logs") / "neuro.log"
 
     if verbosity not in VERBOSE:
         logger.error(f"Logger got wrong verbosity {verbosity}")
@@ -111,7 +114,7 @@ def file_check(file_: Path | str, /) -> None:
     """
     file: Path = Path(file_)
     if not file.exists():
-        err = f"File '{str(file)}' not found."
+        err = f"File '{file!s}' not found."
         logger.error(err)
         raise FileNotFoundError(err)
 
@@ -225,7 +228,7 @@ def get_audio_hash(file_path: Path) -> (str | None):
         # 4. Hash the raw audio
         return xxhash.xxh64(raw_audio).hexdigest()
 
-    except Exception as e:
+    except (OSError, ValueError) as e:
         logger.error(f"Error processing {file_path}: {e}")
         return None
 
@@ -396,7 +399,7 @@ def do_songs_match(s1: SongEntry, s2: SongEntry, ignore_date: bool = False) -> b
     artists_match = get_song_artists_match_count(s1['Artist'], s2['Artist']) > 0 or get_song_artists_match_count(s2['Artist'], s1['Artist']) > 0
     titles_match = do_song_titles_match(s1['Title'], s2['Title']) or do_song_titles_match(s2['Title'], s1['Title'])
     identifys_match = do_song_titles_match(s1['Identify'], s2['Identify']) or do_song_titles_match(s2['Identify'], s1['Identify'])
-    dates_match = ('Date' not in s2.keys() or s1['Date'] == s2['Date']) or ignore_date
+    dates_match = ('Date' not in s2 or s1['Date'] == s2['Date']) or ignore_date
     cover_artists_match = s1['Cover Artist'] == s2['Cover Artist']
     final_result = artists_match and titles_match and dates_match and cover_artists_match and identifys_match
 
@@ -415,11 +418,12 @@ non_karaoke_albums = []
 
 def get_non_karaoke_album_names() -> list:
     if not len(non_karaoke_albums):
-        setlists = list(SETLISTS_DIR.glob(f"**/*"))
+        setlists_dir = get_project().setlists_dir
+        setlists = list(setlists_dir.glob("**/*"))
         for setlist in setlists:
             if setlist.name == 'Setlists.md' or setlist.is_dir():
                 continue
-            if setlist.is_relative_to(SETLISTS_DIR / 'v3 voice' / 'non-karaoke'):
+            if setlist.is_relative_to(setlists_dir / 'v3 voice' / 'non-karaoke'):
                 non_karaoke_albums.append(setlist.stem)
     return non_karaoke_albums
 
@@ -457,7 +461,7 @@ _copyright_entries = []
 def _load_copyright_entries() -> list:
     """Load and cache copyright_issues.csv entries (loaded once per process)."""
     if not _copyright_entries:
-        copyright_file = COPYRIGHT_ISSUES_CSV
+        copyright_file = get_project().data_dir / "copyright_issues.csv"
         if copyright_file.exists():
             with open(copyright_file, 'r', encoding='utf-8') as f:
                 reader = csv.DictReader(f, delimiter='|')
@@ -493,10 +497,10 @@ def is_copyright_issue(title: str | None, artist: str | None) -> bool:
 
     return False
 
-def get_flags(song: SongEntry) -> str:
+def get_flags(song: SongEntry, project: Project | None = None) -> str:
 
     """ Singing voice version: 'v1', 'v2', 'v3', ''
-        Lead singer: 'neuro', 'evil'
+        Lead singer: singer flag from project (e.g. 'neuro', 'evil')
         Duet: 'duet', ''
         Duplicate: 'duplicate', ''
         Encore: 'encore', ''
@@ -513,46 +517,53 @@ def get_flags(song: SongEntry) -> str:
         ARG: 'arg', ''
         arg songs have only the arg flag"""
 
+    if project is None:
+        project = get_project()
+
     flags: str = ""
 
     cover_artist = song['Cover Artist']
     lead_singer = song['Lead Singer']
-    duplicate = song['duplicate']
-    encore = song['encore']
 
-    if lead_singer == 'Study-sama':
+    if lead_singer in project.arg_singers:
         return 'arg;'
 
+    first_artist_flag = project.artists[0].flag
     if '[v1]' in cover_artist:
-        flags = 'v1;neuro;'
+        flags = f'v1;{first_artist_flag};'
     elif '[v2]' in cover_artist:
-        flags = 'v2;neuro;'
+        flags = f'v2;{first_artist_flag};'
     else:
         flags = 'v3;'
-
-        if lead_singer == 'Neuro':
-            flags += 'neuro;'
-        if lead_singer == 'Evil':
-            flags += 'evil;'
-    if cover_artist == 'Neuro & Evil':
+        if lead_singer in project.singer_names():
+            flags += project.flag_for(lead_singer) + ';'
+    if cover_artist == project.duet_cover_artist():
         flags += 'duet;'
-    elif ('Neuro ' in cover_artist and ' & ' in cover_artist and 'Evil' not in cover_artist) or 'Evil & ' in cover_artist or 'Neuro, Evil, ' in cover_artist:
+    elif any(s in cover_artist for s in project.singer_names()) and (
+        (' & ' in cover_artist or ', ' in cover_artist) and cover_artist != project.duet_cover_artist()
+    ):
         flags += 'collab;'
 
-    return post_process_flags(flags, song['Cover Artist'])
+    return post_process_flags(flags, song['Cover Artist'], project=project)
 
 
-def post_process_flags(flags: str, cover_artist: str, is_twin_duet: bool = False) -> str:
+def post_process_flags(flags: str, cover_artist: str, *, project: Project | None = None, is_twin_duet: bool = False) -> str:
     """Apply post-processing transformations to a flags string.
 
-    1. If is_twin_duet: remove 'evil;' and 'neuro;' (twin-duet streams don't get per-voice flags).
-    2. If cover_artist is 'Neuro & Evil' and 'original' is in flags: remove 'neuro;'/`evil;`, ensure 'duet;' is present.
+    1. If is_twin_duet: remove all singer flags (twin-duet streams don't get per-voice flags).
+    2. If cover_artist is the project duet name and 'original' is in flags: remove singer flags, ensure 'duet;' is present.
     """
-    if is_twin_duet:
-        flags = flags.replace('evil;', '').replace('neuro;', '')
+    if project is None:
+        project = get_project()
 
-    if cover_artist == 'Neuro & Evil' and 'original' in flags:
-        flags = flags.replace('neuro;', '').replace('evil;', '')
+    singer_flags = project.all_singer_flags()  # e.g. ('neuro;', 'evil;')
+    if is_twin_duet:
+        for sf in singer_flags:
+            flags = flags.replace(sf, '')
+
+    if cover_artist == project.duet_cover_artist() and 'original' in flags:
+        for sf in singer_flags:
+            flags = flags.replace(sf, '')
         if 'duet;' not in flags:
             flags += 'duet;'
 

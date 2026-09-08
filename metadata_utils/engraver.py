@@ -1,3 +1,4 @@
+import logging
 from pathlib import Path
 from typing import cast
 
@@ -6,8 +7,11 @@ from mutagen.id3 import COMM, ID3, Frame, ID3NoHeaderError
 # from mutagen.mp3 import MP3
 from tinytag import TinyTag
 
-import logging
 logger = logging.getLogger(__name__)
+
+
+class MissingFieldError(ValueError):
+    """Raised when a required metadata field is missing while building the payload."""
 
 
 def get_all_mp3(directory: Path | str) -> list[str]: 
@@ -43,42 +47,42 @@ def build_payload(filename: str, date: str, title: str, title_og: str | None,
     if date:
         comm_ved += f"\"Date\":\"{date}\","
     else:
-        raise Exception(f"No date for {filename}!")
+        raise MissingFieldError(f"No date for {filename}!")
 
     if title:
         comm_ved += f"\"Title\":\"{title}\","
     else:
-        raise Exception(f"No title for {filename}!")
+        raise MissingFieldError(f"No title for {filename}!")
     
     if title_og:
         comm_ved += f"\"TitleOG\":\"{title_og}\","
     else:
-        raise Exception(f"No title_og for {filename}!")
+        raise MissingFieldError(f"No title_og for {filename}!")
     
     if identify:
         comm_ved += f"\"Identify\":\"{identify}\","
     else:
-        raise Exception(f"No identify for {filename}!")
+        raise MissingFieldError(f"No identify for {filename}!")
 
     if artist:
         comm_ved += f"\"Artist\":\"{artist}\","
     else:
-        raise Exception(f"No artist for {filename}!")
+        raise MissingFieldError(f"No artist for {filename}!")
     
     if artist_og:
         comm_ved += f"\"ArtistOG\":\"{artist_og}\","
     else:
-        raise Exception(f"No artist_og for {filename}!")
+        raise MissingFieldError(f"No artist_og for {filename}!")
 
     if cover_artist:
         comm_ved += f"\"CoverArtist\":\"{cover_artist}\","
     else:
-        raise Exception(f"No cover_artist for {filename}!")
+        raise MissingFieldError(f"No cover_artist for {filename}!")
 
     if version:
         comm_ved += f"\"Version\":\"{version}\","
     else:
-        raise Exception(f"No version for {filename}!")
+        raise MissingFieldError(f"No version for {filename}!")
     
     if album:
         comm_ved += f"\"Album\":\"{album}\","
@@ -86,12 +90,12 @@ def build_payload(filename: str, date: str, title: str, title_og: str | None,
     if disc_number:
         comm_ved += f"\"Discnumber\":\"{disc_number}\","
     else:
-        raise Exception(f"No disc number for {filename}!")
+        raise MissingFieldError(f"No disc number for {filename}!")
 
     if track:
         comm_ved += f"\"Track\":\"{track}\","
     else:
-        raise Exception(f"No track for {filename}!")
+        raise MissingFieldError(f"No track for {filename}!")
 
     if comment:
         comm_ved += f"\"Comment\":\"{comment}\","
@@ -103,7 +107,7 @@ def build_payload(filename: str, date: str, title: str, title_og: str | None,
     if xxhash:
         comm_ved += f"\"xxHash\":\"{xxhash}\"}}"
     else:
-        raise Exception(f"No hash for {filename}!")
+        raise MissingFieldError(f"No hash for {filename}!")
 
     return comm_ved
 

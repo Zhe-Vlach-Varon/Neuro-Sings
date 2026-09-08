@@ -40,7 +40,7 @@ setlists-push = "ai_vt_singer._shortcuts:setlists_push"
 drive-pull = "ai_vt_singer._shortcuts:drive_pull"
 drive-push = "ai_vt_singer._shortcuts:drive_push"
 db-sync = "ai_vt_singer._shortcuts:dbs_sync"
-mp3gain_standalone = "ai_vt_singer.run:mp3gain_standalone"
+mp3gain-standalone = "ai_vt_singer.run:mp3gain_standalone"
 setlist-check = "ai_vt_singer.detection:run_setlist_check"
 
 [build-system]

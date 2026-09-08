@@ -271,7 +271,7 @@ In `projects/neuro/config.toml`:
 arg-subdir = "Extra Content/DISC 66 - ARG"
 ```
 
-### 3c. `Flags` dataclass still has `neuro` and `evil` as named fields
+### 3c. `Flags` dataclass still has `neuro` and `evil` as named fields — ✅ DONE
 
 In `file_tags.py`, the `Flags` dataclass has:
 ```python
@@ -288,6 +288,10 @@ on `singer_flags: dict[str, bool]`. Update `init_flags()` and any code that read
 
 > This is risky and wide-reaching. Recommend deferring to Phase 8 unless it causes a concrete
 > problem with a new project.
+
+**Status:** Implemented 2026-09-08. Verified zero code reads `flags.neuro`/`flags.evil`
+directly — all access already goes through `flags.singer_flags.get(artist.flag, False)`.
+Removed the two bool fields from the dataclass; `db-check` and `check-group` both pass.
 
 ### 3d. `duet-group-name` default
 

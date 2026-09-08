@@ -58,8 +58,6 @@ class Song:
         """Neuro v2 voice"""
         v3: bool
         """Neuro/Evil v3 voice"""
-        neuro: bool
-        evil: bool
         duet: bool
         duplicate: bool
         """Duplicate song, file doesn't exist in drive, but song was sung that day"""
@@ -78,8 +76,7 @@ class Song:
         singer_flags: dict = None
         """Generic singer flag map {flag_token: bool}, populated from the project artists.
 
-        Provides project-agnostic access to singer flags (e.g. ``singer_flags.get('neuro')``).
-        The individual ``neuro``/``evil`` fields above are kept for backward compatibility."""
+        Provides project-agnostic access to singer flags (e.g. ``singer_flags.get('neuro')``)."""
 
     def init_flags(self, flags: str | None) -> None:
         """Detects song's flags by searching substrings in the flags column.\

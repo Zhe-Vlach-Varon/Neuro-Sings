@@ -131,7 +131,7 @@ def check_are_dbs_identical():
     have_differences = False
     for i, (row_sq, row_csv) in enumerate(zip(sqlite.rows(named=True), csv.rows(named=True))):
         # row is a dictionary with the column names as keys
-        for key in row_sq.keys():
+        for key in row_sq:
             message = f"Row {i} differs between databases in column {key}: {row_sq[key]} != {row_csv[key]}"
             if row_sq[key] != row_csv[key]:
                 logger.error(message)

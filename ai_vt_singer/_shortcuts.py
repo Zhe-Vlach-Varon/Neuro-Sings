@@ -1,6 +1,7 @@
 import json
 import os
 import subprocess
+import sys
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
@@ -57,7 +58,7 @@ def _rclone(command: str, error_label: str) -> None:
     """Run an rclone command, logging it and exiting on failure."""
     if _rclone_command(command):
         logger.error(error_label)
-        exit(1)
+        sys.exit(1)
 
 
 # Each shortcut is one network round-trip to GDrive; keep the pool modest to avoid quota pressure.
@@ -84,7 +85,7 @@ def _remove_broken_shortcuts(out_dir: Path, dest: str, dir_prefix: str) -> None:
     remote_dir = f"{dest}{dir_prefix}{REMOTE_OUT_PREFIX / base.name}"
     cmd = f'rclone lsjson -R "{remote_dir}"'
     logger.info(cmd)
-    result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
+    result = subprocess.run(cmd, shell=True, capture_output=True, text=True, check=False)
     if result.returncode != 0:
         logger.warning(f"Failed to list remote files for broken shortcut check: {result.stderr.strip()}")
         return
@@ -191,7 +192,7 @@ def _create_drive_shortcuts(out_dir: Path, dest: str, dir_prefix: str, error_lab
 
     if failed_file is not None:
         logger.error(error_label)
-        exit(1)
+        sys.exit(1)
 
 
 def setlists_pull() -> None:

@@ -1,6 +1,7 @@
 """Thumbnail generation for the songs"""
 
 import os
+import sys
 from pathlib import Path
 from string import digits
 from time import time
@@ -46,9 +47,9 @@ def apply_text(image: Image.Image,
 
     try:
         font = ImageFont.truetype(font_file, size=font_size)
-    except IOError:
+    except OSError:
         logger.error("Font \"First Coffee\" not found, exitting...")
-        exit(1)
+        sys.exit(1)
 
     text_x = int(w / 2)
     text_y = int(h * 0.8)
@@ -83,7 +84,7 @@ def generate_oldge() -> None:
     format_logger(log_file=project.logs_dir / "thumbnails.log")
     t = time()
     # v1 | v2
-    SOLO_BG = list(map(lambda name: open_image(project.images_bg_dir, name), ["nuero.png", "nwero_v2.png"]))
+    SOLO_BG = [open_image(project.images_bg_dir, name) for name in ["nuero.png", "nwero_v2.png"]]
 
     dates = pl.read_csv(project.data_dir / "dates_v12.csv")
     N_COVERS = len(dates)
@@ -112,7 +113,7 @@ def generate_oldge() -> None:
                 text = 'March 2023'
             else:
                 logger.error(f"How did I get here? neuro.thumbnails.generate_oldge | date == {date} | date[5] == {date[5]}")
-                exit(1)
+                sys.exit(1)
             
             apply_text(base, text).convert("RGB").save(project.images_custom_dir / f"{date}.jpg")
             i_m += 1
@@ -186,7 +187,7 @@ def generate_main() -> None:
             f"Project '{project.name}' has no thumbnail bg images configured. "
             f"Add a [project.thumbnails] section to config.toml."
         )
-        exit(1)
+        sys.exit(1)
 
     # Preload all needed bg images (avoids re-opening files per stream)
     solo_bg: dict[tuple[str, str], Image.Image] = {

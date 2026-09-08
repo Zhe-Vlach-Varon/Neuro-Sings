@@ -1,5 +1,5 @@
 import re
-from datetime import date, datetime
+from datetime import UTC, date, datetime
 
 V1_VERSION_START = date(2023, 1, 3)
 V1_VERSION_END = date(2023, 5, 17)
@@ -30,11 +30,7 @@ def _validate_track(payload: dict[str, str]) -> None:
     
     if '/' in track:
         track_number, total_track = track.split('/')
-        if not (track_number.isdigit() and total_track.isdigit()):
-            raise ValidationError("Invalid track number!")
-        elif int(track_number) > int(total_track):
-            raise ValidationError("Invalid track number!")
-        elif int(track_number) == 0 or int(total_track) == 0:
+        if not (track_number.isdigit() and total_track.isdigit()) or int(track_number) > int(total_track) or int(track_number) == 0 or int(total_track) == 0:
             raise ValidationError("Invalid track number!")
 
     elif (not track.isdigit()) or (int(track) == 0):
@@ -44,14 +40,14 @@ def _validate_date(payload: dict[str, str]) -> date:
     #   validate dates too old
     #   validate future dates
     #   validate specific format
-    today = date.today()
+    today = datetime.now(tz=UTC).date()
     input_date = payload['date']
 
     if not re.match(r'^\d{4}-\d{2}-\d{2}$', input_date):
         raise ValidationError("Invalid date format! Use YYYY-MM-DD (e.g., 2025-06-17)")
 
     try:
-        input_date = datetime.strptime(input_date, "%Y-%m-%d").date()
+        input_date = datetime.strptime(input_date, "%Y-%m-%d").replace(tzinfo=UTC).date()
         if input_date > today:
             raise ValidationError("Future dates are not allowed!")
         elif input_date < OLDEST_DATE_ALLOWED:

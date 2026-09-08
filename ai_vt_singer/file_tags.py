@@ -2,6 +2,7 @@
 
 import os
 import shutil
+import sys
 from dataclasses import dataclass
 from io import BytesIO
 from pathlib import Path
@@ -13,7 +14,7 @@ from mutagen.id3 import ID3
 from mutagen.id3._frames import APIC, COMM, TALB, TBPM, TDRC, TDRL, TIT2, TKEY, TPE1, TPE2, TRCK, TSO2, TYER, TextFrame
 from PIL import Image
 
-from metadata_utils import engraver as engraver
+from metadata_utils import engraver
 
 from . import get_project
 from .artists import Project
@@ -102,7 +103,7 @@ class Song:
         flag_list = (flags or '').split(';')
         self.flags.singer_flags = {a.flag: (a.flag in flag_list) for a in self._project.artists}
 
-    def __init__(self, song_dict: SongEntry, karaoke_dict: dict = {}, project: Project | None = None) -> None:
+    def __init__(self, song_dict: SongEntry, karaoke_dict: dict | None = None, project: Project | None = None) -> None:
         # Lots of asserts, mainly for type checking, but also detects irregular entries in database
         assert song_dict["Title"] is not None
         self.title: str = song_dict["Title"]
@@ -154,7 +155,7 @@ class Song:
         self.lead_singer = str(song_dict["Lead Singer"]).lower()
 
         self.d: SongEntry = song_dict
-        self.k: SongEntry = karaoke_dict
+        self.k: SongEntry = karaoke_dict or {}
 
         # Project reference (must be set before init_flags which populates singer_flags)
         self._project: Project = project if project is not None else get_project()
@@ -231,7 +232,7 @@ class Song:
 
         if not full_existing_path.exists():
             logger.error(f"file does not exist {full_existing_path}")
-            exit(1)
+            sys.exit(1)
 
         if not create and self.outfile.exists():
             return False
@@ -286,9 +287,9 @@ class Song:
         """
         additional = [
             # Title
-            TIT2(text=f"{(self.title if ascii_tags or self.title_og == "None" else self.title_og)}{f" ({self.identify})" if self.identify != "None" else ""}", encoding=3),
+            TIT2(text=f"{(self.title if ascii_tags or self.title_og == 'None' else self.title_og)}{f' ({self.identify})' if self.identify != 'None' else ''}", encoding=3),
             # Artist
-            TPE1(text=(f"{self.cover_artist} - {(self.artist if ascii_tags or self.artist_og == "None" else self.artist_og)}" if not (self.flags.originals or self.flags.official) else self.cover_artist), encoding=3),
+            TPE1(text=(f"{self.cover_artist} - {(self.artist if ascii_tags or self.artist_og == 'None' else self.artist_og)}" if not (self.flags.originals or self.flags.official) else self.cover_artist), encoding=3),
             # Album
             TALB(text=self.album, encoding=3),
             # Year-Month-Day | Using all frames for different software compatibility
@@ -522,7 +523,7 @@ class DriveSong(Song):
 class CustomSong(Song):
     """Metadata for a song added manually (not from the drive)."""
 
-    def __init__(self, song_dict: dict, karaoke_dict: dict = {}, project: Project | None = None) -> None:
+    def __init__(self, song_dict: dict, karaoke_dict: dict | None = None, project: Project | None = None) -> None:
         super().__init__(song_dict, karaoke_dict, project)
 
     @property

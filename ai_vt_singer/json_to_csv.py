@@ -1,4 +1,5 @@
 import json
+import sys
 from pathlib import Path
 
 import polars as pl
@@ -60,7 +61,7 @@ def update_db() -> None:
 
         # get date from song JSON object
         for song in songs:
-            if 'Date' in song.keys():
+            if 'Date' in song:
                 date = song["Date"]
                 named_album = True
             else:
@@ -98,15 +99,15 @@ def update_db() -> None:
 
             date = song["Date"]
 
-            if "duplicate" not in song.keys():
+            if "duplicate" not in song:
                 song["duplicate"] = False
 
-            if not song["duplicate"] and "File_IN" not in song.keys():
+            if not song["duplicate"] and "File_IN" not in song:
                 logger.error("How did we get here?!")
                 logger.error("Song is not duplicate but has no File_IN")
                 logger.debug("")
                 logger.debug(f"Song: {song}")
-                exit(1)
+                sys.exit(1)
 
             if not song["duplicate"]:
                 file = Path(song["File_IN"])
@@ -116,13 +117,13 @@ def update_db() -> None:
 
             if file is not None and str(file) in file_in_set and not song["duplicate"]:
                 remove += 1
-                logger.debug(f"File {str(file)} was already in database")
+                logger.debug(f"File {file!s} was already in database")
                 continue
 
             name = song['Title']
             artist = song['Artist']
 
-            if 'Image' in song.keys() and not song['Image'] == "":
+            if 'Image' in song and song['Image'] != "":
                 cover_image = song["Image"]
             else:
                 cover_image = None
@@ -165,7 +166,7 @@ def update_db() -> None:
                     "Tempo (1/4 beat)": None,
                     "Version": song["Version"],
                     "Special": song["Special"],
-                    "Comment": song["Comment"] if not song["Comment"] == "" else None 
+                    "Comment": song["Comment"] if song["Comment"] != "" else None
                 }
             )
             if song["duplicate"]:
@@ -178,9 +179,8 @@ def update_db() -> None:
                 file_in_set.add(str(file))
                 logger.info(f"[Song][+] {artist} - {name}")
 
-        if remove == len(songs):
-            if named_album:
-                album_names.append(album)
+        if remove == len(songs) and named_album:
+            album_names.append(album)
 
     for dupe in dupes_to_process:
         songs_df.extend(get_most_recent_version(dupe[0].to_dicts()[0], json_data, dupe[1], dupe[2]))
@@ -232,9 +232,9 @@ def get_most_recent_version(song: dict, json_data: utils.SongJSON, encore: bool,
 
     filtered_json_songs = []
 
-    for album, json_songs in json_data.items():
+    for json_songs in json_data.values():
         for json_song in json_songs:
-            if (utils.do_songs_match(song, json_song, ignore_date=True)) and ((song["Date"] >= json_song["Date"]) or (not json_song["id"] == song['Album_ID'])) and "File_IN" in json_song.keys():
+            if (utils.do_songs_match(song, json_song, ignore_date=True)) and ((song["Date"] >= json_song["Date"]) or (json_song["id"] != song['Album_ID'])) and "File_IN" in json_song:
                 filtered_json_songs.append(json_song)
 
     sorted_filtered_json_songs = sorted(filtered_json_songs, key=lambda d:  d['Date'])                              
@@ -266,9 +266,9 @@ def get_most_recent_version(song: dict, json_data: utils.SongJSON, encore: bool,
         logger.error("How did we get here?!")
         logger.error("check for typos in setlists")
         logger.error(f"Album: {song['Album']}")
-        for key in song.keys():
-            logger.error(f"{key}: {song[key]}")
-        exit(1)
+        for key, value in song.items():
+            logger.error(f"{key}: {value}")
+        sys.exit(1)
 
     flags += "duplicate;"
     
@@ -305,7 +305,7 @@ def get_most_recent_version(song: dict, json_data: utils.SongJSON, encore: bool,
     else:
         logger.error("How did we get here?!")
         logger.error("unable to get latest version")
-        exit(1)
+        sys.exit(1)
 
     new_duplicate_song = pl.DataFrame(
             {
@@ -328,7 +328,7 @@ def get_most_recent_version(song: dict, json_data: utils.SongJSON, encore: bool,
                 "Tempo (1/4 beat)": tempo,
                 "Version": latest_version["Version"],
                 "Special": latest_version["Special"],
-                "Comment": latest_version["Comment"] if not latest_version["Comment"] == "" else None,
+                "Comment": latest_version["Comment"] if latest_version["Comment"] != "" else None,
             }
         )
 

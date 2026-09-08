@@ -7,7 +7,7 @@ import re
 import sys
 import unicodedata
 from concurrent.futures import ThreadPoolExecutor
-from datetime import datetime
+from datetime import UTC, datetime
 from enum import Enum
 from pathlib import Path
 from typing import TextIO
@@ -53,7 +53,7 @@ def rotation_fn(_msg: loguru.Message, file_opened: TextIO) -> bool:
     """
     file = Path(file_opened.name)
     # File is more than 1 week old
-    is_old = datetime.now().timestamp() - file.stat().st_ctime > 7 * 86400
+    is_old = datetime.now(tz=UTC).timestamp() - file.stat().st_ctime > 7 * 86400
     # File is >2MiB
     is_big = file.stat().st_size > (2 << 20)  # Multiplies by 1024 instead of 1000
     return is_old or is_big
@@ -114,7 +114,7 @@ def file_check(file_: Path | str, /) -> None:
     """
     file: Path = Path(file_)
     if not file.exists():
-        err = f"File '{str(file)}' not found."
+        err = f"File '{file!s}' not found."
         logger.error(err)
         raise FileNotFoundError(err)
 
@@ -228,7 +228,7 @@ def get_audio_hash(file_path: Path) -> (str | None):
         # 4. Hash the raw audio
         return xxhash.xxh64(raw_audio).hexdigest()
 
-    except Exception as e:
+    except (OSError, ValueError) as e:
         logger.error(f"Error processing {file_path}: {e}")
         return None
 
@@ -399,7 +399,7 @@ def do_songs_match(s1: SongEntry, s2: SongEntry, ignore_date: bool = False) -> b
     artists_match = get_song_artists_match_count(s1['Artist'], s2['Artist']) > 0 or get_song_artists_match_count(s2['Artist'], s1['Artist']) > 0
     titles_match = do_song_titles_match(s1['Title'], s2['Title']) or do_song_titles_match(s2['Title'], s1['Title'])
     identifys_match = do_song_titles_match(s1['Identify'], s2['Identify']) or do_song_titles_match(s2['Identify'], s1['Identify'])
-    dates_match = ('Date' not in s2.keys() or s1['Date'] == s2['Date']) or ignore_date
+    dates_match = ('Date' not in s2 or s1['Date'] == s2['Date']) or ignore_date
     cover_artists_match = s1['Cover Artist'] == s2['Cover Artist']
     final_result = artists_match and titles_match and dates_match and cover_artists_match and identifys_match
 
@@ -419,7 +419,7 @@ non_karaoke_albums = []
 def get_non_karaoke_album_names() -> list:
     if not len(non_karaoke_albums):
         setlists_dir = get_project().setlists_dir
-        setlists = list(setlists_dir.glob(f"**/*"))
+        setlists = list(setlists_dir.glob("**/*"))
         for setlist in setlists:
             if setlist.name == 'Setlists.md' or setlist.is_dir():
                 continue
@@ -524,8 +524,6 @@ def get_flags(song: SongEntry, project: Project | None = None) -> str:
 
     cover_artist = song['Cover Artist']
     lead_singer = song['Lead Singer']
-    duplicate = song['duplicate']
-    encore = song['encore']
 
     if lead_singer in project.arg_singers:
         return 'arg;'

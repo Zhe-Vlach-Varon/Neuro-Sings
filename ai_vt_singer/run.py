@@ -1,6 +1,7 @@
 import os
 import shlex
 import subprocess
+import sys
 import tomllib as toml
 from pathlib import Path
 from time import time
@@ -148,7 +149,7 @@ def generate_from_preset(preset: Preset, dates_dict: DateDict, create_placeholde
         final_out_paths = resolve_output_paths(s, preset.root, preset.subdir)
 
         ensure_dir(final_out_paths['song_files'])
-        if s.hash_in in g_hash_to_file_dict.keys():
+        if s.hash_in in g_hash_to_file_dict:
             if make_links:
                 # Use the album path that generate_albums would use as the source.
                 # preset.root is None when use-root = false: fall back to CWD like resolve_output_paths() does,
@@ -175,7 +176,7 @@ def generate_from_preset(preset: Preset, dates_dict: DateDict, create_placeholde
             continue
         else:
             logger.error(f"[GEN] [{preset.name}] [{i + 1:3d}/{N_SONGS}] ERROR {song_dict['Title']} unofficial song file not found: {song_dict['File_IN']}")
-            exit(1)
+            sys.exit(1)
     run_mp3gain(preset)
     logger.success(f"[GEN] Done converting {N_SONGS} songs in {time_format(time() - t)} !")
 
@@ -259,9 +260,9 @@ def _generate_presets(presets: list[dict], create_placeholders: bool = False) ->
     # Avoids wrong generations due to inconsistent databases
     try:
         check_are_dbs_identical()
-    except ValueError as e:
+    except ValueError:
         logger.error("[GEN] Error while comparing Databases")
-        raise e
+        raise
 
     config, OUT_ROOT = load_config()
 
@@ -303,16 +304,14 @@ def generate_albums(create_placeholders: bool = False) -> None:
     # Avoids wrong generations due to inconsistent databases
     try:
         check_are_dbs_identical()
-    except ValueError as e:
+    except ValueError:
         logger.error("[GEN] Error while comparing Databases")
-        raise e
+        raise
 
     config, OUT_ROOT = load_config()
 
-    mp3gain = parse_mp3gain(config)
-
-    # Start time
-    t = time()
+    # Validate the mp3gain config (its value is not needed for the albums tree).
+    parse_mp3gain(config)
 
     songDB = load_db()
 
@@ -334,7 +333,7 @@ def generate_albums(create_placeholders: bool = False) -> None:
         final_out_paths = resolve_output_paths(s, OUT_ROOT, f"albums/{album}")
 
         ensure_dir(final_out_paths['song_files'])
-        if s.hash_in in g_hash_to_file_dict.keys():
+        if s.hash_in in g_hash_to_file_dict:
             created = s.create_out_file(create=False, out_dir=final_out_paths['song_files'])
             if created:
                 s.apply_tags(True)
@@ -350,7 +349,7 @@ def generate_albums(create_placeholders: bool = False) -> None:
             continue
         else:
             logger.error(f"[GEN] [{i+1:4d}/{N_SONGS}] [{album}] ERROR {song_dict['Title']} unofficial song file not found: {song_dict['File_IN']}")
-            exit(1)
+            sys.exit(1)
 
 
 def parse_mp3gain(config: dict) -> MP3ModeTuple:
@@ -435,7 +434,7 @@ def mp3gain_standalone() -> None:
     if mp3gain[1] not in (MP3GainMode.GAIN, MP3GainMode.TAG):
         logger.error("[MP3G] No valid mp3gain type configured: add 'mp3gain' to [features].activated and set "
                      "[features.mp3gain].type to 'gain' or 'tag'")
-        exit(1)
+        sys.exit(1)
 
     # Force ON_ALL so the per-preset booleans (currently all false) don't disable everything
     preset_mp3gain = (MP3GainMode.ON_ALL, mp3gain[1])

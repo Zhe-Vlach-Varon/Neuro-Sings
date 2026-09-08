@@ -2,7 +2,8 @@
 
 import json
 import re
-from datetime import datetime
+import sys
+from datetime import UTC, datetime
 from pathlib import Path
 
 import polars as pl
@@ -33,12 +34,12 @@ def get_files(songs: pl.DataFrame) -> dict[str, list[Path]]:
     # Set of all files already treated and registered
     # TODO add error checking for if a empty entry was accidentally added to the DB
     # TODO switch to using audio hash to check if song is already in database
-    existing = set(map(lambda x: Path(x), songs.get_column("File_IN").to_list()))
+    existing = {Path(x) for x in songs.get_column("File_IN").to_list()}
 
-    def get_audios(p: Path, *, filetype: str = "mp3", exclude_dirs = []) -> list[Path]:
+    def get_audios(p: Path, *, filetype: str = "mp3", exclude_dirs: list[str] | None = None) -> list[Path]:
         files = list(p.glob(f"**/*.{filetype}"))
         files_without_existing = list(filter(lambda f: f not in existing, files))
-        filtered_files = [f for f in files_without_existing if not any(d in f.parts for d in exclude_dirs)]
+        filtered_files = [f for f in files_without_existing if not any(d in f.parts for d in (exclude_dirs or []))]
         if len(files) == 0:
             logger.warning(f"no files found in {p} of filetype {filetype}")
         return filtered_files
@@ -55,12 +56,12 @@ def get_files(songs: pl.DataFrame) -> dict[str, list[Path]]:
         "Custom": get_audios(custom_dir) + get_audios(custom_dir, filetype="flac"),
         "UnofficialV3": get_audios(unofficialv3_dir, exclude_dirs=[project.arg_subdir.split("/")[0]] if project.arg_subdir else []),
         "ARG": get_audios(arg_dir) if arg_dir else [],
-        "Official": list(official_dir.glob(f"*/**/*.mp3")), # search in all subdirectories recursively, can't use this glob pattern for UnofficialV3 as that would also get the ARG songs a second time
+        "Official": list(official_dir.glob("*/**/*.mp3")), # search in all subdirectories recursively, can't use this glob pattern for UnofficialV3 as that would also get the ARG songs a second time
         "Copyright": get_audios(copyright_issues_dir),
     }
 
 
-def extract_custom(files: list[Path], out: utils.SongJSON = {}) -> utils.SongJSON:
+def extract_custom(files: list[Path], out: utils.SongJSON | None = None) -> utils.SongJSON:
     """Function on the same level as `extract_list`, but specialized for treatment of 
     custom files.
 
@@ -70,6 +71,9 @@ def extract_custom(files: list[Path], out: utils.SongJSON = {}) -> utils.SongJSO
 
     Returns:
         SongJSON: Dictionary with at least these files' information."""
+
+    if out is None:
+        out = {}
 
     # there are a lot less custom songs, since most of the ones that were are included in the Unofficial Archive that is the new source for mp3 files
     for file in files:
@@ -97,13 +101,13 @@ def extract_custom(files: list[Path], out: utils.SongJSON = {}) -> utils.SongJSO
             'Hash_IN': utils.get_audio_hash(Path(file)),
         }
 
-        if album in out.keys():
+        if album in out:
             out[album].append(data)
         else:
             out[album] = [data]
 
 
-def extract_unofficialV3(files: list[Path], out: utils.SongJSON = {}) -> utils.SongJSON:
+def extract_unofficialV3(files: list[Path], out: utils.SongJSON | None = None) -> utils.SongJSON:
     """extract files from the Unofficial Neuro Karaoke Archvie v3
 
     Args:
@@ -113,6 +117,8 @@ def extract_unofficialV3(files: list[Path], out: utils.SongJSON = {}) -> utils.S
     Returns:
         SongJSON: Dictionary with at least these files' information."""
 
+    if out is None:
+        out = {}
     songs_df = load_db()
     project = get_project()
     first_artist_name = project.artists[0].name
@@ -140,7 +146,7 @@ def extract_unofficialV3(files: list[Path], out: utils.SongJSON = {}) -> utils.S
             title = trackJSon['Title']
             title_og = trackJSon['TitleOG']
             identify = trackJSon['Identify']
-        elif 'comment' in trackInfo.other.keys():
+        elif 'comment' in trackInfo.other:
             found_json = False
             assert len(trackInfo.other['comment'])
             for comment in trackInfo.other['comment']:
@@ -192,7 +198,9 @@ def extract_unofficialV3(files: list[Path], out: utils.SongJSON = {}) -> utils.S
     return out
 
 
-def extract_arg(files: list[Path], out: utils.SongJSON ={}) -> utils.SongJSON:
+def extract_arg(files: list[Path], out: utils.SongJSON | None = None) -> utils.SongJSON:
+    if out is None:
+        out = {}
     project = get_project()
     if not project.arg_singers:
         logger.info("no arg-singers configured; skipping ARG extraction")
@@ -227,7 +235,7 @@ def extract_arg(files: list[Path], out: utils.SongJSON ={}) -> utils.SongJSON:
             'Hash_IN': utils.get_audio_hash(Path(file)),
         }
 
-        if album_key in out.keys():
+        if album_key in out:
             out[album_key].append(data)
         else:
             out[album_key] = [data]
@@ -258,7 +266,10 @@ def _make_song_entry(artist: str, cover_artist: str, title: str, file: Path, dat
     }
 
 
-def extract_official(files: list[Path], out: utils.SongJSON ={}) -> utils.SongJSON:
+def extract_official(files: list[Path], out: utils.SongJSON | None = None) -> utils.SongJSON:
+    if out is None:
+        out = {}
+
     # load original_songs.csv and official_covers.csv (both optional — a project may not have either)
     # search files for each song
     project = get_project()
@@ -302,10 +313,10 @@ def extract_official(files: list[Path], out: utils.SongJSON ={}) -> utils.SongJS
                         break
                 if lead_singer is None:
                     logger.error(f"how did we get here: neuro/detection.py: unexpected Cover Artist '{cover_artist}'")
-                    exit(1)
+                    sys.exit(1)
                 version = project.song_version_overrides.get(title, '1')
                 data = _make_song_entry(artist, cover_artist, title, file, date, id, lead_singer, version)
-                if 'custom' in out.keys():
+                if 'custom' in out:
                     out['custom'].append(data)
                 else:
                     out['custom'] = [data]
@@ -321,7 +332,7 @@ def extract_official(files: list[Path], out: utils.SongJSON ={}) -> utils.SongJS
                 title = song['Title']
                 date = song['Date']
                 data = _make_song_entry(artist, artist, title, file, date, id, artist, '1')
-                if 'custom' in out.keys():
+                if 'custom' in out:
                     out['custom'].append(data)
                 else:
                     out['custom'] = [data]
@@ -377,8 +388,8 @@ def parse_setlist(p: Path) -> tuple[utils.SongJSON, list[str]]:
 
         date_format = "%Y-%m-%d"
         try:
-            is_album_info_line = bool(datetime.strptime(fields[0], date_format))
-        except:
+            is_album_info_line = bool(datetime.strptime(fields[0], date_format).replace(tzinfo=UTC))
+        except ValueError:
             is_album_info_line = False
 
 
@@ -399,7 +410,7 @@ def parse_setlist(p: Path) -> tuple[utils.SongJSON, list[str]]:
             if len(fields) == 1:
                 if found_album_line == False:
                     logger.error(f'first album info line only has date field: {p}')
-                    exit(1)
+                    sys.exit(1)
                 else:
                     continue
             else:
@@ -408,14 +419,14 @@ def parse_setlist(p: Path) -> tuple[utils.SongJSON, list[str]]:
                 lead_singer = singer
                 if len(fields) < 2:
                     logger.error("not enough fields in album info line in setlist file: " + str(p))
-                    exit(1)
+                    sys.exit(1)
                 if len(fields) == 2:
                     album = get_default_album_name(album_song_count, singer, date)
-                elif len(fields) >= 3 and not fields[2] == '':
+                elif len(fields) >= 3 and fields[2] != '':
                     album = fields[2]
                 else:
                     album = get_default_album_name(album_song_count, singer, date)
-                if album not in songs.keys():
+                if album not in songs:
                     songs[album] = []
                 if len(fields) >= 4:
                     album_art = fields[3]
@@ -431,14 +442,14 @@ def parse_setlist(p: Path) -> tuple[utils.SongJSON, list[str]]:
             id = int(fields[0])
             song_title, identify = utils.split_title_and_identify(fields[1])
             artist = fields[2]
-            if not fields[3] == '':
+            if fields[3] != '':
                 cover_artist = fields[3]
             else:
                 cover_artist = lead_singer
             dupe = False
             encore = False
 
-            if len(fields) >= 5 and not fields[4] == '':
+            if len(fields) >= 5 and fields[4] != '':
                 song_art = fields[4]
             else:
                 song_art = album_art
@@ -493,7 +504,7 @@ def song_entry_sort_by_id(e):
 
 def get_setlist_files() -> list[Path]:
     project = get_project()
-    files = list(project.setlists_dir.glob(f"**/*"))
+    files = list(project.setlists_dir.glob("**/*"))
     karaoke_setlists = [f for f in files if 'non-karaoke' not in f.parts and not f.is_dir()]
     non_karaoke_setlists = [f for f in files if 'non-karaoke' in f.parts and not f.is_dir()]
     karaoke_setlists.sort()
@@ -556,7 +567,7 @@ def fill_in_setlists(out: utils.SongJSON | None = None) -> utils.SongJSON:
                 date_match = ('Date' in song and 'Date' in entry and song['Date'] == entry['Date']) or ('Date' not in song)
 
                 if artist_match and title_match and cover_match and date_match:
-                    for key in entry.keys():
+                    for key in entry:
                         if key not in song:
                             song[key] = entry[key]
                     song['id'] = entry['id']
@@ -596,7 +607,7 @@ def fill_in_setlists(out: utils.SongJSON | None = None) -> utils.SongJSON:
             contains_new_songs = any(not song['duplicate'] for song in songs)
 
             if not contains_new_songs:
-                out[album] = albums[album][existing_song_count:]
+                out[album] = songs[existing_song_count:]
                 continue
 
             if album not in out:
@@ -722,7 +733,7 @@ def check_missing_setlist_entries() -> list[dict]:
         if file.name == 'Setlists.md' or file.is_dir():
             continue
 
-        albums, dates = parse_setlist(file)
+        albums, _dates = parse_setlist(file)
         if not albums:
             continue
 
@@ -732,7 +743,7 @@ def check_missing_setlist_entries() -> list[dict]:
 
             total_setlist_song_count += len(songs)
 
-            db_songs = songs_df.filter((pl.col('Album') == album_name)).to_dicts()
+            db_songs = songs_df.filter(pl.col('Album') == album_name).to_dicts()
 
             db_tracks = [
                 {
@@ -902,15 +913,15 @@ def export_json(all_songs: utils.SongJSON) -> None:
             all_keys.remove(key)
 
     for key, songs in all_songs.items():
-        if not key == 'custom':
+        if key != 'custom':
             for song in songs:
-                assert 'Date' in song.keys()
+                assert 'Date' in song
 
     keys_to_exclude = ['custom']
     dated_songs = {k:v for k,v in all_songs.items() if k not in keys_to_exclude}
 
     # Sorting songs by date for easier treatment
-    assert 'custom' not in dated_songs.keys()
+    assert 'custom' not in dated_songs
     sorted_songs = dict(sorted(dated_songs.items(), key=lambda item: item[1][0]['Date']))
 
     with open(project.songs_json, "w") as f:

@@ -1,8 +1,8 @@
 """Utils functions dedicated to interacting with the polars library."""
 
+from collections.abc import Callable
 from functools import reduce
 from pathlib import Path
-from typing import Callable
 
 import polars as pl
 

@@ -21,19 +21,19 @@ def create_payload_from_dict(hjson_data: dict[str, (str | int | float)], song_pa
         "xxHash": "xxhash"
     }
 
-    if "Comment" not in hjson_data.keys():
+    if "Comment" not in hjson_data:
         hjson_data["Comment"] = "None"
 
-    if "TitleOG" not in hjson_data.keys():
+    if "TitleOG" not in hjson_data:
         hjson_data["TitleOG"] = "None"
 
-    if "Identify" not in hjson_data.keys():
+    if "Identify" not in hjson_data:
         hjson_data["Identify"] = "None"
 
-    if "ArtistOG" not in hjson_data.keys():
+    if "ArtistOG" not in hjson_data:
         hjson_data["ArtistOG"] = "None"
 
-    if "Special" not in hjson_data.keys():
+    if "Special" not in hjson_data:
         hjson_data["Special"] = "0"
 
     payload_kwargs = {

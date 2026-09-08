@@ -6,23 +6,23 @@
 # Neuro-sing-DB
 
 <div style="display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap;">
-    <a href="images/github/Album-1.png">
-        <img src="images/github/Album-1.png" width=125px alt="Album generated">
+    <a href="projects/neuro/images/github/Album-1.png">
+        <img src="projects/neuro/images/github/Album-1.png" width=125px alt="Album generated">
     </a>
-    <a href="images/github/Playlist-1.png">
-        <img src="images/github/Playlist-1.png" width=125px alt="Glimpse of the whole laylist">
+    <a href="projects/neuro/images/github/Playlist-1.png">
+        <img src="projects/neuro/images/github/Playlist-1.png" width=125px alt="Glimpse of the whole laylist">
     </a>
-    <a href="images/github/Song-1.png">
-        <img src="images/github/Song-1.png" width=125px alt="Song generated (LIFE)">
+    <a href="projects/neuro/images/github/Song-1.png">
+        <img src="projects/neuro/images/github/Song-1.png" width=125px alt="Song generated (LIFE)">
     </a>
-    <a href="images/github/Song-2.png">
-        <img src="images/github/Song-2.png" width=125px alt="Song generated (BOOM)">
+    <a href="projects/neuro/images/github/Song-2.png">
+        <img src="projects/neuro/images/github/Song-2.png" width=125px alt="Song generated (BOOM)">
     </a>
-    <a href="images/github/Playlist-2.png">
-        <img src="images/github/Playlist-2.png" width=125px alt="Glimpse of the whole laylist">
+    <a href="projects/neuro/images/github/Playlist-2.png">
+        <img src="projects/neuro/images/github/Playlist-2.png" width=125px alt="Glimpse of the whole laylist">
     </a>
-    <a href="images/github/Album-2.png">
-        <img src="images/github/Album-2.png" width=125px alt="Album generated">
+    <a href="projects/neuro/images/github/Album-2.png">
+        <img src="projects/neuro/images/github/Album-2.png" width=125px alt="Album generated">
     </a>
 </div>
 
@@ -65,7 +65,7 @@ It also has an `_inputs` directory; its content can be copied into the root dire
 - [x] Post update on Discord
 - [x] Profit
 
-*Note*: filenames are sanitized automatically (`neuro/utils.py::sanitize_filename` replaces characters that are forbidden/awkward in filenames), so you no longer need to hand-write a sanitized "ASCII" variant of a title/artist in the JSON.
+*Note*: filenames are sanitized automatically (`ai_vt_singer/utils.py::sanitize_filename` replaces characters that are forbidden/awkward in filenames), so you no longer need to hand-write a sanitized "ASCII" variant of a title/artist in the JSON.
 
 *Another Note*: the setlist for the most recent karaoke is often added **before** the audio files are available in the archive. In that case `update-db` may fail on brand-new songs of that stream (a `duplicate` with no source file anywhere, see `"How did we get here?!"` in `json_to_csv.get_most_recent_version`). That is a data gap, not a code bug: wait for the files and re-run. To test the whole pipeline from scratch use: `clear-db` → `update-json` → `update-db` → `db-check`.
 
@@ -80,7 +80,7 @@ So even if the audio files are identical, it is possible to generate those "dupl
 - I don't have extended knowledge about vocaloids, so if I put a producer or lyricist or singer as the "Artist" it does not mean anyting, I just probably took the name indicated or did some very basic research and put the first name I found as the artist. If a name is more appropriate for a song please tell me.
 - This lack of knowledge extends to pretty much all the artists that I don't know that well. So if a title or artist is incorrect, please tell me.
 - There may be some exceptions but I don't intend to put all the Japanese titles in kana or kanji.
-- You can create flags in the database, but they must be spelled exactly and kept consistent everywhere: the `Flags` column is a semicolon-separated string (e.g. `v3;neuro;` with a trailing separator) and matching is **exact** (the string is split on `;` and each token compared), not substring. So a flag only works if it is spelled correctly and the `;` separator is consistent between the writer (`neuro/utils.py::get_flags`) and the readers (`config.toml` presets, `neuro/file_tags.py`, `neuro/polars_utils.py`).
+- You can create flags in the database, but they must be spelled exactly and kept consistent everywhere: the `Flags` column is a semicolon-separated string (e.g. `v3;neuro;` with a trailing separator) and matching is **exact** (the string is split on `;` and each token compared), not substring. So a flag only works if it is spelled correctly and the `;` separator is consistent between the writer (`ai_vt_singer/utils.py::get_flags`) and the readers (`config.toml` presets, `ai_vt_singer/file_tags.py`, `ai_vt_singer/polars_utils.py`).
 - There may be instances of DD-MM-YYYY and YYYY-MM-DD dates format in the code, I may someday go through all the code to be more consistent but I'm too lazy for now.
 - I do not own any of the images used for covers, I think I've given proper credit in the README file in the `images/` directory. If credit is missing please notify me.
 
@@ -136,7 +136,9 @@ NOT TESTED
 4. The lockfile may be linux-specific, if you encounter any problems, you may delete the lockfile.
 
 ## Config file
-There is a config file in the root directory: `config.toml`. Proper documentation is given in the file.
+Each project has its own `config.toml` in its project directory (e.g. `projects/neuro/config.toml`;
+the active one is simply the `config.toml` in the directory you run the command from, or the one
+named by `--project`). Proper documentation is given in the file.
 
 > [!WARNING]
 > The mp3gain features requires to have the [`mp3gain`](https://mp3gain.sourceforge.net) software installed and accessible in your path. Run the `db-check` script to ensure it's working. Otherwise disable the feature.
@@ -168,10 +170,10 @@ without mixing their data.
 
 - **`[project]` config section** (`config.toml`): defines the project's identity — singer
   names, flag tokens, voice versions, duet group name, drive remotes, and all paths.
-- **`neuro/artists.py`**: `CoverArtist` (one singer) and `Project` (one full project) dataclasses.
-- **`neuro/config.py`**: `load_project()` parses `config.toml` → `Project`.
-- **`neuro/__init__.py`**: `get_project()` returns the cached active project.
-- **`neuro/cli.py`**: `chdir_to_project()` enables the `--project <dir>` flag on all commands.
+- **`ai_vt_singer/artists.py`**: `CoverArtist` (one singer) and `Project` (one full project) dataclasses.
+- **`ai_vt_singer/config.py`**: `load_project()` parses `config.toml` → `Project` (the config **must** contain a `[project]` section).
+- **`ai_vt_singer/__init__.py`**: `get_project()` returns the cached active project.
+- **`ai_vt_singer/cli.py`**: `chdir_to_project()` enables the `--project <dir>` flag on all commands.
 
 ### Using multiple projects
 
@@ -233,29 +235,36 @@ Each `[[project.artists]]` entry:
 | `album-artist` | string | TPE2/TSO2 album-artist value |
 
 ## Repo organization
-### Folders
+### Top level
+- `ai_vt_singer/`: The core, project-agnostic source code package (formerly `neuro/`).
+- `metadata_utils/`: Unofficial-Archive helpers (enables writing/reading the JSON metadata payload in the ID3 comment frame).
+- `projects/`: One directory per cover-artist project.
+  - `projects/neuro/`: The Neuro Twins project (the one this README documents in detail).
+  - `projects/_template/`: The scaffold for bootstrapping a new project (see its README).
+- `pyproject.toml`: Package definition, dependencies, and the `pdm run` command entrypoints.
+- `AGENTS.md`: Guide for AI coding agents working on this repo.
+
+### Per project (e.g. `projects/neuro/`)
+Every project is self-contained with its own `config.toml` and data. For the Neuro project:
+- `config.toml`: The project's configuration (presets, artists, drive remotes). Details [here](#config-file).
+- `data/`: Databases and reference data. The song library exists in two formats that must stay identical: `songs.csv` and `songs.db` (sqlite). `songs_new.json` is the review buffer (not the DB). Also `dates.csv`, `official_covers.csv`, `original_songs.csv`, `copyright_issues.csv`, `microphones.csv` and `dates_v12.csv`.
 - `setlists/`: The setlists (source of truth for each karaoke), grouped by voice version (`v1 voice/`, `v2 voice/`, `v3 voice/`). The code also recognizes a `non-karaoke/` subfolder (e.g. `v3 voice/non-karaoke/`) for non-karaoke streams, which is currently empty.
 - `songs/`: Input audio (not on GitHub, pulled from the drive): `custom/`, `unofficialV3/`, `officially_released_songs/`, `copyright_issues/`. A song's `File_IN` is stored relative to the project root.
-- `images/`: Cover images, not hosted on GitHub, should be available on my drive (see [This section](#for-someone-using-this-project)). Subdirs: `bg/` (backgrounds), `cover/` (dated covers), `custom/`, `github/` (the README images). The date text on thumbnails is generated by `thumbnails-generate` by drawing onto `images/cover/`.
-- `out/`: The generated output (not on GitHub): `unofficial_releases/` and `official_releases/`, each with per-preset subdirs plus an `albums/` tree.
-- `data/`: Databases and reference data. The song library exists in two formats that must stay identical: `songs.csv` and `songs.db` (sqlite). `songs_new.json` is the review buffer (not the DB). Also `dates.csv`, `official_covers.csv`, `original_songs.csv`, `copyright_issues.csv`, `microphones.csv` and `dates_v12.csv`.
-- `neuro/`: Source code folder
-- `projects/`: Multi-project support — `_template/` is the scaffold for bootstrapping new projects
-- `metadata_utils/`: Unofficial-Archive helpers (enables writing/reading the JSON metadata payload in the ID3 comment frame).
+- `images/`: Cover images, not hosted on GitHub, should be available on my drive (see [This section](#for-someone-using-this-project)). Subdirs: `bg/` (backgrounds), `cover/` (dated covers), `custom/`, `github/` (the README screenshots). The date text on thumbnails is generated by `thumbnails-generate` by drawing onto `images/cover/`.
 - `fonts/`: Fonts used for the date text on thumbnails.
 - `logs/`: Run logs.
+- `out/`: The generated output (not on GitHub): `unofficial_releases/` and `official_releases/`, each with per-preset subdirs plus an `albums/` tree.
+
 ### Markdown
 - `Song List.md`: List of all (I think?) the songs present, grouped by date mostly
 - `Duplicates.md`: List of duplicates, see [what are duplicates](#what-are-duplicates)
-### Other
-- `config.toml`: Configuration file, details on it [here](#config-file)
-- `pyproject.toml`: Project definition, requirements, etc...
 
 ### Code files
-- `__init__.py`: Centralizes all the project paths + `get_project()` accessor
+All of these live in the `ai_vt_singer/` package.
+- `__init__.py`: `get_project()` accessor (loads + caches the active `Project`) and public re-exports
 - `artists.py`: `CoverArtist` and `Project` dataclasses (multi-project data model)
 - `cli.py`: `chdir_to_project()` — shared helper for the `--project <dir>` CLI flag
-- `config.py`: `load_project()` — parses `config.toml` into a `Project` instance
+- `config.py`: `load_project()` — parses `config.toml` into a `Project` instance (requires a `[project]` section)
 - `_shortcuts.py`: Quick CLI shortcuts (drive pull/push, etc.)
 - `checks.py`: Various checks on database
 - `detection.py`: Searches files matching regex patterns
@@ -267,7 +276,7 @@ Each `[[project.artists]]` entry:
 - `utils.py`: Utilitary common functions
 
 ## Credits
-- All artists for thumbnails are (to my knowledge) cited in [the images README](./images/README.md)
+- All artists for thumbnails are (to my knowledge) cited in [the images README](./projects/neuro/images/README.md)
 
 ### From Discord
 - Thanks to fujinshu for their work on identifying the key and tempo of songs

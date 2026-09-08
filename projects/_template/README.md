@@ -1,6 +1,12 @@
 # Project Template
 
 This directory contains the minimal scaffolding to bootstrap a new cover-artist project.
+The **Neuro Twins project** at `projects/neuro/` is a complete, working reference — diff
+against its `config.toml` and directory layout if you're unsure about any field.
+
+> Note: the `ai_vt_singer/` package is project-agnostic and lives at the repo root. A project
+> is selected simply by `cd`-ing into its directory (or passing `--project <dir>`) — the active
+> project's `config.toml` is read from the current working directory.
 
 ## How to create a new project
 

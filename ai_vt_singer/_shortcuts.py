@@ -271,15 +271,17 @@ def drive_push() -> None:
     # public out files — albums (real files, no shortcuts)
     _rclone(f"{DRIVE_RCLONE_COMMAND} {project.out_unofficial / 'albums'} {public_dest}{public_dir}{REMOTE_OUT_PREFIX / 'albums'}", "drive push failed: public albums")
     # public out files — preset folders (symlinks → GDrive shortcuts)
-    _rclone(f"{DRIVE_RCLONE_COMMAND} --exclude 'albums/' {project.out_unofficial} {public_dest}{public_dir}{REMOTE_OUT_PREFIX}{LINK_OPTIONS}", "drive push failed: public preset folders")
-    if remote_links:
+    if not remote_links:
+        _rclone(f"{DRIVE_RCLONE_COMMAND} --exclude 'albums/' {project.out_unofficial} {public_dest}{public_dir}{REMOTE_OUT_PREFIX}{LINK_OPTIONS}", "drive push failed: public preset folders")
+    else:
         _create_drive_shortcuts(project.out_unofficial, public_dest, public_dir, "drive push failed: public out make GDrive shortcuts")
 
     # private out files — albums (real files, no shortcuts)
     _rclone(f"{DRIVE_RCLONE_COMMAND} {project.out_official / 'albums'} {private_dest}{private_dir}{REMOTE_OUT_PREFIX / 'albums'}", "drive push failed: private albums")
     # private out files — preset folders (symlinks → GDrive shortcuts)
-    _rclone(f"{DRIVE_RCLONE_COMMAND} --exclude 'albums/' {project.out_official} {private_dest}{private_dir}{REMOTE_OUT_PREFIX}{LINK_OPTIONS}", "drive push failed: private preset folders")
-    if remote_links:
+    if not remote_links:
+        _rclone(f"{DRIVE_RCLONE_COMMAND} --exclude 'albums/' {project.out_official} {private_dest}{private_dir}{REMOTE_OUT_PREFIX}{LINK_OPTIONS}", "drive push failed: private preset folders")
+    else:
         _create_drive_shortcuts(project.out_official, private_dest, private_dir, "drive push failed: private out make GDrive shortcuts")
 
     logger.success("finished uploading to gdrive")

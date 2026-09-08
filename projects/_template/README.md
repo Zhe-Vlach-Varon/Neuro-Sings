@@ -5,7 +5,7 @@ The **Neuro Twins project** at `projects/neuro/` is a complete, working referenc
 against its `config.toml` and directory layout if you're unsure about any field.
 
 > Note: the `ai_vt_singer/` package is project-agnostic and lives at the repo root. A project
-> is selected simply by `cd`-ing into its directory (or passing `--project <dir>`) — the active
+> is selected simply by `cd`-ing into its directory (or passing `--project <name>`) — the active
 > project's `config.toml` is read from the current working directory.
 
 ## How to create a new project
@@ -51,12 +51,12 @@ against its `config.toml` and directory layout if you're unsure about any field.
    pdm run db-check
    pdm run songs-generate
 
-   # Option B: use --project from the main repo
-   pdm run clear-db --project projects/my-new-project
-   pdm run update-json --project projects/my-new-project
-   pdm run update-db --project projects/my-new-project
-   pdm run db-check --project projects/my-new-project
-   pdm run songs-generate --project projects/my-new-project
+   # Option B: use --project from the main repo (projects/ prefix is optional)
+   pdm run clear-db --project my-new-project
+   pdm run update-json --project my-new-project
+   pdm run update-db --project my-new-project
+   pdm run db-check --project my-new-project
+   pdm run songs-generate --project my-new-project
    ```
 
 ## Requirements for a working project

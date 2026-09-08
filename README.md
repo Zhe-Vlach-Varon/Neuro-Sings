@@ -59,7 +59,7 @@ It also has an `_inputs` directory; its content can be copied into the root dire
 - [x] Check for errors again
 - [x] Run all checks `db-check`
 - [x] Generate new thumbnails `thumbnails-generate`
-- [x] Generate the albums tree `albums-generate`
+- [x] Generate the albums tree `albums-generate` (run before songs-generate or songs-generate-group if local_links is True)
 - [x] Generate songs `songs-generate` (presets symlink to the albums tree)
 - [x] Upload the result to the drive `drive-push`
 - [x] Post update on Discord
@@ -173,7 +173,7 @@ without mixing their data.
 - **`ai_vt_singer/artists.py`**: `CoverArtist` (one singer) and `Project` (one full project) dataclasses.
 - **`ai_vt_singer/config.py`**: `load_project()` parses `config.toml` → `Project` (the config **must** contain a `[project]` section).
 - **`ai_vt_singer/__init__.py`**: `get_project()` returns the cached active project.
-- **`ai_vt_singer/cli.py`**: `chdir_to_project()` enables the `--project <dir>` flag on all commands.
+- **`ai_vt_singer/cli.py`**: `chdir_to_project()` enables the `--project <name>` flag on all commands.
 
 ### Using multiple projects
 
@@ -186,12 +186,13 @@ cd projects/my-project
 pdm run db-check
 pdm run songs-generate
 
-# Option 2: --project flag from the main repo
-pdm run db-check --project projects/my-project
-pdm run songs-generate --project projects/my-project
+# Option 2: --project flag from the main repo (projects/ prefix is optional)
+pdm run db-check --project my-project
+pdm run songs-generate --project my-project
 ```
 
-The `--project` flag can appear in any position (before or after other arguments).
+The `--project` flag accepts a bare name (resolved as `projects/<name>`) or a full path.
+It can appear in any position (before or after other arguments).
 
 ### Creating a new project
 
@@ -206,11 +207,11 @@ $EDITOR projects/my-new-project/config.toml
 mkdir -p projects/my-new-project/{data,songs/{custom,unofficialV3,officially_released_songs,copyright_issues},setlists,images/{bg,cover,custom},logs}
 
 # 4. Run the pipeline
-pdm run clear-db --project projects/my-new-project
-pdm run update-json --project projects/my-new-project
-pdm run update-db --project projects/my-new-project
-pdm run db-check --project projects/my-new-project
-pdm run songs-generate --project projects/my-new-project
+pdm run clear-db --project my-new-project
+pdm run update-json --project my-new-project
+pdm run update-db --project my-new-project
+pdm run db-check --project my-new-project
+pdm run songs-generate --project my-new-project
 ```
 
 See [`projects/_template/README.md`](projects/_template/README.md) for the full checklist.
@@ -263,7 +264,7 @@ Every project is self-contained with its own `config.toml` and data. For the Neu
 All of these live in the `ai_vt_singer/` package.
 - `__init__.py`: `get_project()` accessor (loads + caches the active `Project`) and public re-exports
 - `artists.py`: `CoverArtist` and `Project` dataclasses (multi-project data model)
-- `cli.py`: `chdir_to_project()` — shared helper for the `--project <dir>` CLI flag
+- `cli.py`: `chdir_to_project()` — shared helper for the `--project <name>` CLI flag
 - `config.py`: `load_project()` — parses `config.toml` into a `Project` instance (requires a `[project]` section)
 - `_shortcuts.py`: Quick CLI shortcuts (drive pull/push, etc.)
 - `checks.py`: Various checks on database

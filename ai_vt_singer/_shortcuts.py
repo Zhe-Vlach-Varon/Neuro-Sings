@@ -1,5 +1,4 @@
 import json
-import os
 import subprocess
 import sys
 from concurrent.futures import ThreadPoolExecutor
@@ -51,7 +50,7 @@ RCLONE_BACKEND_COMMAND = f"rclone backend shortcut{V}{DR}"
 def _rclone_command(command: str) -> int:
     """Run an rclone command, logging it. Returns the process exit code."""
     logger.info(command)
-    return os.system(command)
+    return subprocess.run(command, shell=True, check=False).returncode
 
 
 def _rclone(command: str, error_label: str) -> None:
@@ -175,7 +174,7 @@ def _create_drive_shortcuts(out_dir: Path, dest: str, dir_prefix: str, error_lab
 
     def _run(item: tuple[Path, str]) -> tuple[Path, int]:
         file, cmd = item
-        # os.system is fork+exec → safe to call from multiple threads (loguru too)
+        # subprocess.run is fork+exec → safe to call from multiple threads (loguru too)
         return file, _rclone_command(cmd)
 
     failed_file: Path | None = None

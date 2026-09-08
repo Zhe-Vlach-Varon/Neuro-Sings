@@ -74,7 +74,7 @@
   ~~- [ ] find out if they plan to update the metadata customizer, and if not do it myself~~ they discontinued it
 - [ ] add support for metadata customizer presets
 - [ ] automatically update duplicates.md
-- [ ] replace os.system calls with the preferred way to call other programs
+- [x] replace os.system calls with the preferred way to call other programs
 - [x] lint the codebase (ruff configured in pyproject.toml)
 
 

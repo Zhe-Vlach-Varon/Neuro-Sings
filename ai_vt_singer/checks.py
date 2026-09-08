@@ -1,6 +1,6 @@
 """Some checks to run on files"""
 
-import os
+import subprocess
 import tomllib as toml
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
@@ -98,7 +98,7 @@ def check_mp3gain() -> None:
     with open("config.toml", "rb") as file:
         config = toml.load(file)
     if "mp3gain" in config["features"]["activated"]:
-        if os.system("mp3gain -q") != 0:
+        if subprocess.run(["mp3gain", "-q"], check=False).returncode != 0:
             logger.error("mp3gain activated, but executable not found")
         else:
             logger.success("mp3gain executable found")

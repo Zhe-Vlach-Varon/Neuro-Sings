@@ -1,4 +1,6 @@
+import json
 import os
+import subprocess
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
@@ -12,8 +14,6 @@ from .utils import format_logger
 # Path constants for local and remote Paths
 REMOTE_INPUT_PREFIX = Path("_inputs")
 REMOTE_OUT_PREFIX = Path("out")
-
-DOT_VSCODE_DIR = Path(".vscode")
 
 # rclone command
 RCLONE_SYNC = "rclone sync"
@@ -68,27 +68,45 @@ def _remove_broken_shortcuts(out_dir: Path, dest: str, dir_prefix: str) -> None:
     """Check for broken GDrive shortcuts under out_dir and remove them.
 
     A shortcut is broken if its target file no longer exists on the remote.
-    Existence checks are parallelized; removals are sequential.
+    Uses a single recursive listing (rclone lsjson -R) to check all targets at once.
     """
     base = out_dir.resolve()
     files = [f for f in base.rglob("*.mp3") if f.is_symlink()]
     if not files:
         return
 
-    def _check_target_exists(file: Path) -> tuple[Path, bool]:
-        source_drive_path = file.resolve().relative_to(base)
-        target_remote = f"{dest}{dir_prefix}{REMOTE_OUT_PREFIX / source_drive_path}"
-        cmd = f'rclone size "{target_remote}"'
-        return file, _rclone_command(cmd) == 0
+    # Collect all expected target paths (relative to base)
+    expected_targets: set[str] = set()
+    for file in files:
+        expected_targets.add(file.resolve().relative_to(base).as_posix())
 
-    broken: list[Path] = []
-    executor = ThreadPoolExecutor(max_workers=SHORTCUT_MAX_WORKERS, thread_name_prefix="check-shortcut")
+    # Get a single recursive listing of all files on the remote
+    remote_dir = f"{dest}{dir_prefix}{REMOTE_OUT_PREFIX / base.name}"
+    cmd = f'rclone lsjson -R "{remote_dir}"'
+    logger.info(cmd)
+    result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
+    if result.returncode != 0:
+        logger.warning(f"Failed to list remote files for broken shortcut check: {result.stderr.strip()}")
+        return
+
+    # Build a set of existing file paths from the listing
     try:
-        for file, target_exists in executor.map(_check_target_exists, files):
-            if not target_exists:
-                broken.append(file)
-    finally:
-        executor.shutdown(wait=False, cancel_futures=True)
+        entries = json.loads(result.stdout)
+    except json.JSONDecodeError as e:
+        logger.warning(f"Failed to parse rclone lsjson output: {e}")
+        return
+
+    existing: set[str] = set()
+    for entry in entries:
+        if not entry.get("IsDir", False):
+            existing.add(entry["Path"])
+
+    # Find broken shortcuts: targets that don't exist on remote
+    broken: list[Path] = []
+    for file in files:
+        target_rel = file.resolve().relative_to(base).as_posix()
+        if target_rel not in existing:
+            broken.append(file)
 
     if not broken:
         return
@@ -222,7 +240,6 @@ def inputs_pull() -> None:
     _rclone(f"{DRIVE_RCLONE_COMMAND} {private_drive}:{REMOTE_INPUT_PREFIX}/{project.song_root / 'officially_released_songs'} {project.song_root / 'officially_released_songs'}", "drive pull failed: official releases")
     _rclone(f"{DRIVE_RCLONE_COMMAND} {private_drive}:{REMOTE_INPUT_PREFIX}/{project.song_root / 'copyright_issues'} {project.song_root / 'copyright_issues'}", "drive pull failed: copyright issues")
     _rclone(f"{DRIVE_RCLONE_COMMAND} {private_drive}:{REMOTE_INPUT_PREFIX}/{project.fonts_dir} {project.fonts_dir}", "drive pull failed: fonts")
-    #_rclone(f"{DRIVE_RCLONE_COMMAND} {private_drive}:{REMOTE_INPUT_PREFIX}/{DOT_VSCODE_DIR} {DOT_VSCODE_DIR}", "drive pull failed: .vscode")
 
     logger.success("finished downloading input files from gdrive")
 
@@ -250,19 +267,18 @@ def drive_push() -> None:
     _rclone(f"{DRIVE_RCLONE_COMMAND} {project.song_root / 'officially_released_songs'} {private_dest}{private_dir}{REMOTE_INPUT_PREFIX}/{project.song_root / 'officially_released_songs'}", "drive push failed: official releases")
     _rclone(f"{DRIVE_RCLONE_COMMAND} {project.song_root / 'copyright_issues'} {private_dest}{private_dir}{REMOTE_INPUT_PREFIX}/{project.song_root / 'copyright_issues'}", "drive push failed: copyright issues")
     _rclone(f"{DRIVE_RCLONE_COMMAND} {project.fonts_dir} {private_dest}{private_dir}{REMOTE_INPUT_PREFIX}/{project.fonts_dir}", "drive push failed: fonts")
-    #_rclone(f"{DRIVE_RCLONE_COMMAND} {DOT_VSCODE_DIR} {private_dest}{private_dir}{REMOTE_INPUT_PREFIX}/{DOT_VSCODE_DIR}", "drive push failed: .vscode")
 
     # public out files — albums (real files, no shortcuts)
-    _rclone(f"{DRIVE_RCLONE_COMMAND} {project.out_unofficial / 'albums'} {public_dest}{public_dir}{REMOTE_OUT_PREFIX / project.out_unofficial.name / 'albums'}", "drive push failed: public albums")
+    _rclone(f"{DRIVE_RCLONE_COMMAND} {project.out_unofficial / 'albums'} {public_dest}{public_dir}{REMOTE_OUT_PREFIX / 'albums'}", "drive push failed: public albums")
     # public out files — preset folders (symlinks → GDrive shortcuts)
-    _rclone(f"{DRIVE_RCLONE_COMMAND} --exclude 'albums/' {project.out_unofficial} {public_dest}{public_dir}{REMOTE_OUT_PREFIX / project.out_unofficial.name}{LINK_OPTIONS}", "drive push failed: public preset folders")
+    _rclone(f"{DRIVE_RCLONE_COMMAND} --exclude 'albums/' {project.out_unofficial} {public_dest}{public_dir}{REMOTE_OUT_PREFIX}{LINK_OPTIONS}", "drive push failed: public preset folders")
     if remote_links:
         _create_drive_shortcuts(project.out_unofficial, public_dest, public_dir, "drive push failed: public out make GDrive shortcuts")
 
     # private out files — albums (real files, no shortcuts)
-    _rclone(f"{DRIVE_RCLONE_COMMAND} {project.out_official / 'albums'} {private_dest}{private_dir}{REMOTE_OUT_PREFIX / project.out_official.name / 'albums'}", "drive push failed: private albums")
+    _rclone(f"{DRIVE_RCLONE_COMMAND} {project.out_official / 'albums'} {private_dest}{private_dir}{REMOTE_OUT_PREFIX / 'albums'}", "drive push failed: private albums")
     # private out files — preset folders (symlinks → GDrive shortcuts)
-    _rclone(f"{DRIVE_RCLONE_COMMAND} --exclude 'albums/' {project.out_official} {private_dest}{private_dir}{REMOTE_OUT_PREFIX / project.out_official.name}{LINK_OPTIONS}", "drive push failed: private preset folders")
+    _rclone(f"{DRIVE_RCLONE_COMMAND} --exclude 'albums/' {project.out_official} {private_dest}{private_dir}{REMOTE_OUT_PREFIX}{LINK_OPTIONS}", "drive push failed: private preset folders")
     if remote_links:
         _create_drive_shortcuts(project.out_official, private_dest, private_dir, "drive push failed: private out make GDrive shortcuts")
 

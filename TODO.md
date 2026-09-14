@@ -65,6 +65,7 @@
 - [x] update to use the new metadata format from Unofficial Archive that separates english and original language titles and artist names, and splits out the song version identifiers (Neuro Ver., Evil Ver., etc)
 - [ ] get list of all output files, and remove all files in out folder not in the list prior to generating
 - [ ] add function that can update the database based on the output of the setlist check
+- [ ] add a generate-all command that generates all thumbnails, then albums-generate, then songs-generate
 
 ## later plans
 - [ ] figure out how to package as a graphical program that does everything except download/upload

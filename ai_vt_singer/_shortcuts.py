@@ -53,6 +53,13 @@ def _rclone_command(command: str) -> int:
     return subprocess.run(command, shell=True, check=False).returncode
 
 
+def _rclone_captured(command: str) -> tuple[int, str]:
+    """Run an rclone command, logging it. Returns (exit code, stripped stderr)."""
+    logger.info(command)
+    result = subprocess.run(command, shell=True, capture_output=True, text=True, check=False)
+    return result.returncode, (result.stderr or "").strip()
+
+
 def _rclone(command: str, error_label: str) -> None:
     """Run an rclone command, logging it and exiting on failure."""
     if _rclone_command(command):
@@ -81,7 +88,8 @@ def _remove_broken_shortcuts(out_dir: Path, dest: str, dir_prefix: str) -> None:
         expected_targets.add(file.resolve().relative_to(base).as_posix())
 
     # Get a single recursive listing of all files on the remote
-    remote_dir = f"{dest}{dir_prefix}{REMOTE_OUT_PREFIX / base.name}"
+    # The remote layout is flat under out/ (albums + preset folders), not under out/<release_name>/
+    remote_dir = f"{dest}{dir_prefix}{REMOTE_OUT_PREFIX}"
     cmd = f'rclone lsjson -R "{remote_dir}"'
     logger.info(cmd)
     result = subprocess.run(cmd, shell=True, capture_output=True, text=True, check=False)
@@ -117,12 +125,48 @@ def _remove_broken_shortcuts(out_dir: Path, dest: str, dir_prefix: str) -> None:
         _rclone(f'rclone delete "{shortcut_remote}"', f"failed to remove broken shortcut for {file}")
 
 
+# rclone's error when a file already occupies the shortcut destination path, e.g.:
+#   Failed to backend: command "shortcut" failed: not overwriting shortcut target: existing file
+EXISTING_SHORTCUT_ERROR = "not overwriting shortcut target"
+
+
+def _remote_file_id(remote_path: str) -> str | None:
+    """Return the ID of a single remote file via `rclone lsjson`, or None if it can't be listed."""
+    result = subprocess.run(f'rclone lsjson "{remote_path}"', shell=True, capture_output=True, text=True, check=False)
+    if result.returncode != 0:
+        return None
+    try:
+        entries = json.loads(result.stdout)
+    except json.JSONDecodeError:
+        return None
+    for entry in entries:
+        if not entry.get("IsDir", False):
+            return entry.get("ID")
+    return None
+
+
+def _existing_shortcut_points_to_same_target(shortcut_remote: str, source_remote: str) -> bool:
+    """True if the file at shortcut_remote is a GDrive shortcut pointing to the same target as source_remote.
+
+    rclone reports a GDrive shortcut's ID as "<shortcut-id>\\t<target-id>"; regular files have a single ID.
+    """
+    shortcut_id = _remote_file_id(shortcut_remote)
+    source_id = _remote_file_id(source_remote)
+    if not shortcut_id or not source_id:
+        return False
+    return source_id in shortcut_id.split("\t")
+
+
 def _create_drive_shortcuts(out_dir: Path, dest: str, dir_prefix: str, error_label: str, max_workers: int = SHORTCUT_MAX_WORKERS) -> None:
     """Create GDrive shortcuts for all symlinked .mp3 files under out_dir.
 
     The calls are independent → run through a small thread pool instead of sequentially
     (thousands of symlinks would otherwise mean thousands of serial round-trips).
-    Fails fast like before: the first rclone error cancels the pending ones and exits 1.
+
+    A shortcut that already exists at its destination pointing to the same target file is kept
+    as-is and counted, so re-runs are idempotent (rclone refuses to overwrite an existing
+    shortcut: "not overwriting shortcut target: existing file"). Any other rclone error still
+    fails fast: the pending ones are cancelled and it exits 1.
 
     Before creating shortcuts, the target directory structure is created on the remote
     (sequentially, parents before children) to avoid a race condition where multiple
@@ -136,7 +180,7 @@ def _create_drive_shortcuts(out_dir: Path, dest: str, dir_prefix: str, error_lab
         max_workers (int, optional): Concurrent shortcut creations. Defaults to SHORTCUT_MAX_WORKERS.
 
     Raises:
-        SystemExit: If any rclone call fails (exit code 1), after cancelling pending work.
+        SystemExit: If any rclone call fails with an unexpected error, after cancelling pending work.
     """
     base = out_dir.resolve()
     files = [f for f in base.rglob("*.mp3") if f.is_symlink()]
@@ -146,20 +190,18 @@ def _create_drive_shortcuts(out_dir: Path, dest: str, dir_prefix: str, error_lab
 
     _remove_broken_shortcuts(out_dir, dest, dir_prefix)
 
-    commands: list[tuple[Path, str]] = []
+    # (local file, rclone command, full source remote path, full shortcut remote path)
+    commands: list[tuple[Path, str, str, str]] = []
     parent_dirs: set[Path] = set()
+    remote_prefix = f"{dest}{dir_prefix}"
     for file in files:
-        source_drive_path = file.resolve().relative_to(base)
-        shortcut_drive_path = file.relative_to(base)
-        parent = shortcut_drive_path.parent
+        source_path = REMOTE_OUT_PREFIX / file.resolve().relative_to(base)
+        shortcut_path = REMOTE_OUT_PREFIX / file.relative_to(base)
+        parent = (file.relative_to(base)).parent
         if str(parent) != ".":
             parent_dirs.add(parent)
-        cmd = (
-            f"{RCLONE_BACKEND_COMMAND} {dest}{dir_prefix}"
-            f" \"{REMOTE_OUT_PREFIX / source_drive_path}\""
-            f" \"{REMOTE_OUT_PREFIX / shortcut_drive_path}\""
-        )
-        commands.append((file, cmd))
+        cmd = f'{RCLONE_BACKEND_COMMAND} {remote_prefix} "{source_path}" "{shortcut_path}"'
+        commands.append((file, cmd, f"{remote_prefix}{source_path}", f"{remote_prefix}{shortcut_path}"))
 
     # Create the directory structure on the remote first (sequentially, parents before
     # children) to avoid a race condition where multiple workers creating shortcuts in
@@ -172,19 +214,31 @@ def _create_drive_shortcuts(out_dir: Path, dest: str, dir_prefix: str, error_lab
                 f"failed to create directory '{d}' on the remote",
             )
 
-    def _run(item: tuple[Path, str]) -> tuple[Path, int]:
-        file, cmd = item
+    def _run(item: tuple[Path, str, str, str]) -> tuple[tuple[Path, str, str, str], int, str]:
         # subprocess.run is fork+exec → safe to call from multiple threads (loguru too)
-        return file, _rclone_command(cmd)
+        code, stderr = _rclone_captured(item[1])
+        return item, code, stderr
 
     failed_file: Path | None = None
+    skipped_existing = 0
     executor = ThreadPoolExecutor(max_workers=max_workers, thread_name_prefix="shortcut")
     try:
-        for file, code in executor.map(_run, commands):
-            if code != 0:
-                logger.error(f"rclone shortcut creation failed for {file} (exit code {code})")
-                failed_file = file
-                break
+        for (file, _cmd, source_remote, shortcut_remote), code, stderr in executor.map(_run, commands):
+            if code == 0:
+                continue
+            # A previous run may have already created this exact shortcut. rclone refuses to
+            # overwrite it; verify the existing file points to the same target and keep it.
+            already_exists = (
+                EXISTING_SHORTCUT_ERROR in stderr
+                and _existing_shortcut_points_to_same_target(shortcut_remote, source_remote)
+            )
+            if already_exists:
+                logger.debug(f"shortcut for {file} already exists pointing to the same target — skipping")
+                skipped_existing += 1
+                continue
+            logger.error(f"rclone shortcut creation failed for {file} (exit code {code}): {stderr}")
+            failed_file = file
+            break
     finally:
         # Stop scheduling the rest; the ≤ max_workers calls already in flight finish on their own
         executor.shutdown(wait=False, cancel_futures=True)
@@ -192,6 +246,9 @@ def _create_drive_shortcuts(out_dir: Path, dest: str, dir_prefix: str, error_lab
     if failed_file is not None:
         logger.error(error_label)
         sys.exit(1)
+
+    if skipped_existing:
+        logger.info(f"kept {skipped_existing} existing shortcut(s) that already pointed to the same target")
 
 
 def setlists_pull() -> None:

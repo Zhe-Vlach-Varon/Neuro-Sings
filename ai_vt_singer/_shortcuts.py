@@ -71,21 +71,20 @@ def _rclone(command: str, error_label: str) -> None:
 SHORTCUT_MAX_WORKERS = 4
 
 
-def _remove_broken_shortcuts(out_dir: Path, dest: str, dir_prefix: str) -> None:
+def _remove_broken_shortcuts(out_dir: Path, dest: str, dir_prefix: str) -> dict[str, str] | None:
     """Check for broken GDrive shortcuts under out_dir and remove them.
 
     A shortcut is broken if its target file no longer exists on the remote.
     Uses a single recursive listing (rclone lsjson -R) to check all targets at once.
+
+    Returns a map of remote file path (relative to out/) → GDrive file ID,
+    or None if the listing failed. Callers can reuse this map to avoid extra
+    API calls when verifying existing shortcuts.
     """
     base = out_dir.resolve()
     files = [f for f in base.rglob("*.mp3") if f.is_symlink()]
     if not files:
-        return
-
-    # Collect all expected target paths (relative to base)
-    expected_targets: set[str] = set()
-    for file in files:
-        expected_targets.add(file.resolve().relative_to(base).as_posix())
+        return {}
 
     # Get a single recursive listing of all files on the remote
     # The remote layout is flat under out/ (albums + preset folders), not under out/<release_name>/
@@ -95,19 +94,20 @@ def _remove_broken_shortcuts(out_dir: Path, dest: str, dir_prefix: str) -> None:
     result = subprocess.run(cmd, shell=True, capture_output=True, text=True, check=False)
     if result.returncode != 0:
         logger.warning(f"Failed to list remote files for broken shortcut check: {result.stderr.strip()}")
-        return
+        return None
 
-    # Build a set of existing file paths from the listing
     try:
         entries = json.loads(result.stdout)
     except json.JSONDecodeError as e:
         logger.warning(f"Failed to parse rclone lsjson output: {e}")
-        return
+        return None
 
-    existing: set[str] = set()
+    # Build path → ID map and set of existing paths
+    file_ids: dict[str, str] = {}
     for entry in entries:
         if not entry.get("IsDir", False):
-            existing.add(entry["Path"])
+            file_ids[entry["Path"]] = entry.get("ID", "")
+    existing = set(file_ids)
 
     # Find broken shortcuts: targets that don't exist on remote
     broken: list[Path] = []
@@ -116,13 +116,13 @@ def _remove_broken_shortcuts(out_dir: Path, dest: str, dir_prefix: str) -> None:
         if target_rel not in existing:
             broken.append(file)
 
-    if not broken:
-        return
+    if broken:
+        logger.info(f"Found {len(broken)} broken shortcuts, removing them")
+        for file in broken:
+            shortcut_remote = f"{dest}{dir_prefix}{REMOTE_OUT_PREFIX / file.relative_to(base)}"
+            _rclone(f'rclone delete "{shortcut_remote}"', f"failed to remove broken shortcut for {file}")
 
-    logger.info(f"Found {len(broken)} broken shortcuts, removing them")
-    for file in broken:
-        shortcut_remote = f"{dest}{dir_prefix}{REMOTE_OUT_PREFIX / file.relative_to(base)}"
-        _rclone(f'rclone delete "{shortcut_remote}"', f"failed to remove broken shortcut for {file}")
+    return file_ids
 
 
 # rclone's error when a file already occupies the shortcut destination path, e.g.:
@@ -188,20 +188,38 @@ def _create_drive_shortcuts(out_dir: Path, dest: str, dir_prefix: str, error_lab
     if not files:
         return
 
-    _remove_broken_shortcuts(out_dir, dest, dir_prefix)
+    file_ids = _remove_broken_shortcuts(out_dir, dest, dir_prefix)
 
-    # (local file, rclone command, full source remote path, full shortcut remote path)
-    commands: list[tuple[Path, str, str, str]] = []
+    # (local file, rclone command)
+    commands: list[tuple[Path, str]] = []
     parent_dirs: set[Path] = set()
     remote_prefix = f"{dest}{dir_prefix}"
+    pre_skipped = 0
     for file in files:
-        source_path = REMOTE_OUT_PREFIX / file.resolve().relative_to(base)
-        shortcut_path = REMOTE_OUT_PREFIX / file.relative_to(base)
-        parent = (file.relative_to(base)).parent
+        shortcut_rel = file.relative_to(base).as_posix()
+        source_rel = file.resolve().relative_to(base).as_posix()
+
+        # Pre-filter: if the shortcut already exists pointing to the same target, skip it
+        # entirely (avoids the rclone API call). Uses the ID map from the listing above.
+        if file_ids:
+            shortcut_id = file_ids.get(shortcut_rel)
+            source_id = file_ids.get(source_rel)
+            if shortcut_id and source_id and source_id in shortcut_id.split("\t"):
+                pre_skipped += 1
+                continue
+
+        parent = Path(shortcut_rel).parent
         if str(parent) != ".":
             parent_dirs.add(parent)
+        source_path = REMOTE_OUT_PREFIX / Path(source_rel)
+        shortcut_path = REMOTE_OUT_PREFIX / Path(shortcut_rel)
         cmd = f'{RCLONE_BACKEND_COMMAND} {remote_prefix} "{source_path}" "{shortcut_path}"'
-        commands.append((file, cmd, f"{remote_prefix}{source_path}", f"{remote_prefix}{shortcut_path}"))
+        commands.append((file, cmd))
+
+    if pre_skipped:
+        logger.info(f"skipped {pre_skipped} shortcuts that already exist pointing to the same target")
+    if not commands:
+        return
 
     # Create the directory structure on the remote first (sequentially, parents before
     # children) to avoid a race condition where multiple workers creating shortcuts in
@@ -214,24 +232,39 @@ def _create_drive_shortcuts(out_dir: Path, dest: str, dir_prefix: str, error_lab
                 f"failed to create directory '{d}' on the remote",
             )
 
-    def _run(item: tuple[Path, str, str, str]) -> tuple[tuple[Path, str, str, str], int, str]:
+    def _run(item: tuple[Path, str]) -> tuple[Path, int, str]:
+        file, cmd = item
         # subprocess.run is fork+exec → safe to call from multiple threads (loguru too)
-        code, stderr = _rclone_captured(item[1])
-        return item, code, stderr
+        code, stderr = _rclone_captured(cmd)
+        return file, code, stderr
+
+    def _same_target(file: Path) -> bool:
+        """Check if the existing file at the shortcut path points to the same target.
+
+        Uses the pre-fetched ID map (O(1)) with a fallback to individual lsjson calls
+        (only needed if the listing was stale or unavailable).
+        """
+        shortcut_rel = file.relative_to(base).as_posix()
+        source_rel = file.resolve().relative_to(base).as_posix()
+        if file_ids:
+            shortcut_id = file_ids.get(shortcut_rel)
+            source_id = file_ids.get(source_rel)
+            if shortcut_id and source_id:
+                return source_id in shortcut_id.split("\t")
+        # Fallback: individual API calls (rare — only if listing was None or missing the entry)
+        shortcut_remote = f"{remote_prefix}{REMOTE_OUT_PREFIX / Path(shortcut_rel)}"
+        source_remote = f"{remote_prefix}{REMOTE_OUT_PREFIX / Path(source_rel)}"
+        return _existing_shortcut_points_to_same_target(shortcut_remote, source_remote)
 
     failed_file: Path | None = None
     skipped_existing = 0
     executor = ThreadPoolExecutor(max_workers=max_workers, thread_name_prefix="shortcut")
     try:
-        for (file, _cmd, source_remote, shortcut_remote), code, stderr in executor.map(_run, commands):
+        for file, code, stderr in executor.map(_run, commands):
             if code == 0:
                 continue
-            # A previous run may have already created this exact shortcut. rclone refuses to
-            # overwrite it; verify the existing file points to the same target and keep it.
-            already_exists = (
-                EXISTING_SHORTCUT_ERROR in stderr
-                and _existing_shortcut_points_to_same_target(shortcut_remote, source_remote)
-            )
+            # A previous run may have already created this exact shortcut.
+            already_exists = EXISTING_SHORTCUT_ERROR in stderr and _same_target(file)
             if already_exists:
                 logger.debug(f"shortcut for {file} already exists pointing to the same target — skipping")
                 skipped_existing += 1

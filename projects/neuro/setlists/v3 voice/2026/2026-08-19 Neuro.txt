@@ -13,7 +13,7 @@
 12 | Oh No | MARINA | Neuro
 13 | No Mercy | The Living Tombstone | Neuro & Evil 
 14 | Poltergeist | CircusP | Neuro
-15 | The Model | Astrophysics (Original by Kraftwerk} | Neuro
+15 | The Model | Astrophysics (Original by Kraftwerk) | Neuro
 16 | cpu_crush | ePiaeon | Neuro
 17 | 9 8 7 | Bill Wurtz | Neuro
 !! leaked in Starting Soon screen

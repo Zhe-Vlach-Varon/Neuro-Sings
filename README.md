@@ -92,6 +92,8 @@ All the scripts can be run with `pdm run <script-name>` after you ran `pdm insta
 - `songs-generate-group <group>`: Generates only the presets belonging to a single group (see the `group` field in the Presets section). Use `all` to generate everything, or `default` for presets with no explicit group.
 - `check-group [group]`: Verifies that a group's presets **partition** the database — every song appears in exactly one preset of the group — and reports any **missing** (in no preset) or **duplicated** (in more than one preset) songs. With no argument (or `all`) it checks every group in the config; otherwise pass a group name (e.g. `zvv_sort`).
 - `albums-generate`: Generates the "sorted by album" tree that `songs-generate` links into
+- `clear-out`: Deletes the whole generated `out/` tree (official + unofficial) so it can be regenerated from scratch
+- `copy-out <albums|group> <dest>`: Copies the albums tree or one preset group into `<dest>`, merging official+unofficial into a single tree (symlinks dereferenced to real files)
 - `thumbnails-generate`: Generates all thumbnails with dates
 - `thumbnails-old`: Generates the older style of thumbnails
 #### New batch
@@ -107,7 +109,7 @@ All the scripts can be run with `pdm run <script-name>` after you ran `pdm insta
 - `setlists-push`: Pushes the setlists to my drive
 #### Others
 - `db-sync`: Loads the CSV database (the source of truth) and rewrites both the CSV and DB databases, syncing them
-- `mp3gain_standalone`: Runs mp3gain (takes a long time) on the music files, useful for running it after generating a preset where it wasn't applied
+- `mp3gain-standalone`: Runs mp3gain (takes a long time) on the music files, useful for running it after generating a preset where it wasn't applied
 
 ## Setup
 All this setup assumes a Linux environment, I don't have a Windows environment to test it right now.

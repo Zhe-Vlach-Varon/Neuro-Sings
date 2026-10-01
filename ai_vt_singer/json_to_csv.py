@@ -170,7 +170,7 @@ def update_db() -> None:
                 }
             )
             if song["duplicate"]:
-                dupes_to_process.append((df, song['encore'], song['Lead Singer']))
+                dupes_to_process.append((df, song['encore'], song['Lead Singer'], twin_duet_stream))
 
             id += 1
             remove += 1
@@ -183,7 +183,7 @@ def update_db() -> None:
             album_names.append(album)
 
     for dupe in dupes_to_process:
-        songs_df.extend(get_most_recent_version(dupe[0].to_dicts()[0], json_data, dupe[1], dupe[2]))
+        songs_df.extend(get_most_recent_version(dupe[0].to_dicts()[0], json_data, dupe[1], dupe[2], is_twin_duet=dupe[3]))
         logger.info(f"[Song][+] {dupe[0]['Artist'][0]} - {dupe[0]['Title'][0]}")
 
     for album in album_names:
@@ -214,7 +214,7 @@ def update_db() -> None:
     check_missing_setlist_entries()
 
 
-def get_most_recent_version(song: dict, json_data: utils.SongJSON, encore: bool, lead_singer: str) -> pl.DataFrame:
+def get_most_recent_version(song: dict, json_data: utils.SongJSON, encore: bool, lead_singer: str, *, is_twin_duet: bool = False) -> pl.DataFrame:
     # if json for song has duplicate true, search database for most recent version of song with same singer
     # either detect singer from existing data, or add cover_artist field to database
     project = get_project()
@@ -276,7 +276,8 @@ def get_most_recent_version(song: dict, json_data: utils.SongJSON, encore: bool,
         flags += 'encore;'
 
     # Replace any non-lead-singer flag with the lead singer's flag (the duplicate inherits the lead's voice).
-    if lead_singer in project.singer_names():
+    # Twin-duet streams carry no per-voice flags at all, so skip this.
+    if not is_twin_duet and lead_singer in project.singer_names():
         lead_flag = project.flag_for(lead_singer)
         for a in project.artists:
             if a.flag != lead_flag and a.flag + ';' in flags:
@@ -287,7 +288,7 @@ def get_most_recent_version(song: dict, json_data: utils.SongJSON, encore: bool,
         if fl not in flags:
             flags += f'{fl};'
 
-    flags = utils.post_process_flags(flags, song['Cover Artist'], project=project)
+    flags = utils.post_process_flags(flags, song['Cover Artist'], project=project, is_twin_duet=is_twin_duet)
 
     # Both branches build the same row; only File_IN/Hash_IN/Key/Tempo come from different sources.
     if filtered_songs.height > 0 and latest_version == latest_db_version:

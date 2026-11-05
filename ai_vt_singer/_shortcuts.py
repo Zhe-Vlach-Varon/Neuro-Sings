@@ -306,7 +306,7 @@ def drive_pull() -> None:
     chdir_to_project()
     project = get_project()
     format_logger(log_file=project.logs_dir / "sync.log")
-    drive_pull_command = f"{DRIVE_RCLONE_COMMAND} {project.drive_source}: {LOCAL_TEST_IN_DIR}/{project.song_root.name}/{project.song_dirs['unofficialv3']}"
+    drive_pull_command = f"{DRIVE_RCLONE_COMMAND} {project.drive_source}: {project.song_root / project.song_dirs['unofficialv3']}"
     _rclone(drive_pull_command, "drive pull failed")
 
 # TODO command to apply my changes to unofficial archive metadata

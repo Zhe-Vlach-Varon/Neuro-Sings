@@ -11,8 +11,8 @@
 8 | Dracula | Tame Impala | Evil
 9 | Dragula | Rob Zombie | Evil
 10 | How To Pretend | VocaCircus | Neuro & Evil
-11 | Mx. Sinister | I DON'T KNOW HOW BUT THEY FOUND ME | Evil
-12 | Mz. Hyde | Halelstorm | Evil
+11 | Mx. Sinister | I DONT KNOW HOW BUT THEY FOUND ME | Evil
+12 | Mz. Hyde | Halestorm | Evil
 13 | Creating Monsters | Set it Off | Evil
 14 | This is Halloween | Izzy Reign | Neuro & Evil || halloween;
 15 | Thing | Steampianist | Evil

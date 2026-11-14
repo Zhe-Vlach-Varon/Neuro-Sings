@@ -418,12 +418,12 @@ non_karaoke_albums = []
 
 def get_non_karaoke_album_names() -> list:
     if not len(non_karaoke_albums):
-        setlists_dir = get_project().setlists_dir
-        setlists = list(setlists_dir.glob("**/*"))
-        for setlist in setlists:
-            if setlist.name == 'Setlists.md' or setlist.is_dir():
-                continue
-            if setlist.is_relative_to(setlists_dir / 'v3 voice' / 'non-karaoke'):
+        for nk_dir in get_project().non_karaoke_dirs.values():
+            if not nk_dir.is_dir():
+                continue  # configured but doesn't exist on disk yet
+            for setlist in nk_dir.glob("**/*"):
+                if setlist.name == 'Setlists.md' or setlist.is_dir():
+                    continue
                 non_karaoke_albums.append(setlist.stem)
     return non_karaoke_albums
 

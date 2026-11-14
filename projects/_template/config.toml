@@ -10,6 +10,9 @@ arg-singers = []
 # Album name assigned to ARG rows in the DB (only used if arg-singers is non-empty;
 # defaults to "<display-name> ARG" when unset)
 # arg-album = "My Project ARG"
+# Path to the ARG subdirectory within the unofficial archive, relative to
+# songs/<unofficialv3 dir>. Only used if arg-singers is non-empty; omit if no ARG songs.
+# arg-subdir = "Extra Content/DISC 66 - ARG"
 
 [[project.artists]]
 name = "SingerA"
@@ -32,6 +35,30 @@ album-artist = "Singer A"
 
 # [project.song-overrides.version]
 # "Some Song Title" = "2"
+
+# Font used for thumbnail date text (file inside fonts/). Default: "First Coffee.ttf".
+# font-file = "MyFont.ttf"
+
+# Image subdirectories, relative to the project root. Defaults shown — override only if needed.
+# [project.images]
+# covers = "images/cover"   # dated cover art written/read here
+# custom = "images/custom"  # custom-song cover images
+# bg = "images/bg"          # thumbnail background images
+
+# Non-karaoke setlist folders, keyed by voice version (paths relative to setlists/).
+# Omit the whole table if the project has no non-karaoke setlists.
+# [project.setlists.non-karaoke]
+# v1 = "v1 voice/non-karaoke"
+# v2 = "v2 voice/non-karaoke"
+
+# Input audio subdirectories under songs/, keyed by semantic name. Defaults shown —
+# override only if your archive uses different folder names.
+# [project.song-dirs]
+# drive = "drive"
+# custom = "custom"
+# unofficialv3 = "unofficialV3"
+# official = "officially_released_songs"
+# copyright = "copyright_issues"
 
 # Thumbnail background images (optional — omit if this project doesn't generate thumbnails)
 # solo: singer_name → {duet_version: filename}
@@ -72,9 +99,12 @@ activated = []
 #
 # [[Presets]]
 # name = "All Songs"
+# group = "default"          # optional; groups presets for songs-generate-group / check-group
+#                            # and becomes the parent folder of the output (path → group/path).
+#                            # Presets without a group belong to the implicit "default" group.
 # path = "all"
 # include-flags = ["singer_a", "singer_b"]
 # exclude-flags = []
-# include-type = "or"
-# exclude-type = "or"
-# mp3gain = false
+# include-type = "or"        # "or" (any listed flag) or "and" (ALL listed flags), default "or"
+# exclude-type = "or"        # same modes, default "or"
+# mp3gain = false            # only honored in per-preset mp3gain mode ([features.mp3gain])

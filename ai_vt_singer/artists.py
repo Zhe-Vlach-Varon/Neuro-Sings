@@ -128,6 +128,20 @@ class Project:
     E.g. ``{"Chinatown Blues": "2"}``. Used by ``extract_official()`` instead of the
     default ``'1'``."""
 
+    font_file: str = "First Coffee.ttf"
+    """Font filename (inside :attr:`fonts_dir`) used for thumbnail date text.
+
+    Set via ``[project] font-file`` in config.toml."""
+
+    non_karaoke_dirs: dict[str, Path] = field(default_factory=dict)
+    """Mapping of voice version → resolved non-karaoke setlist folder.
+
+    E.g. ``{"v3": "setlists/v3 voice/non-karaoke"}``. Files under any of these directories
+    are treated as non-karaoke setlists by detection and setlist-check; everything else in
+    :attr:`setlists_dir` is karaoke. Set via the ``[project.setlists.non-karaoke]`` table in
+    config.toml (values relative to the setlists dir); an empty mapping means the project has
+    no non-karaoke setlists."""
+
     # --- helpers ---
     def singer_names(self) -> tuple[str, ...]:
         """The canonical singer names in project order (e.g. ``("Neuro", "Evil")``)."""

@@ -45,6 +45,7 @@ def load_project(config_path: Path = Path("config.toml")) -> Project:
 
     Raises:
         ValueError: If the config lacks a ``[project]`` section.
+        TypeError: If ``[project.setlists] non-karaoke`` is a string instead of a table.
     """
     with open(config_path, "rb") as f:
         raw = tomllib.load(f)
@@ -87,6 +88,24 @@ def load_project(config_path: Path = Path("config.toml")) -> Project:
     song_dirs_cfg = p.get("song-dirs", {})
     song_dirs = {**default_song_dirs, **song_dirs_cfg}
 
+    # Font file for thumbnail date text (lives in fonts/)
+    font_file = p.get("font-file", "First Coffee.ttf")
+
+    # Image subdirectories (project-root-relative; defaults match the standard layout)
+    default_images = {"covers": "images/cover", "custom": "images/custom", "bg": "images/bg"}
+    images_cfg = {**default_images, **p.get("images", {})}
+
+    setlists_dir = base / "setlists"
+    # Non-karaoke setlist folders, keyed by voice version (values relative to the setlists dir)
+    non_karaoke_cfg = p.get("setlists", {}).get("non-karaoke", {})
+    if isinstance(non_karaoke_cfg, str):
+        raise TypeError(
+            "[project.setlists] non-karaoke must be a table mapping voice version → folder "
+            f"(e.g. [project.setlists.non-karaoke] with v1/v2/v3 keys), not the string "
+            f"'{non_karaoke_cfg}'. See projects/_template/config.toml."
+        )
+    non_karaoke_dirs = {ver: setlists_dir / rel for ver, rel in non_karaoke_cfg.items()}
+
     # Duet group name: required for multi-artist projects
     duet_group_name = p.get("duet-group-name")
     if duet_group_name is None and len(artists) >= 2:
@@ -106,10 +125,10 @@ def load_project(config_path: Path = Path("config.toml")) -> Project:
         songs_json=base / "data" / "songs_new.json",
         dates_csv=base / "data" / "dates.csv",
         song_root=base / "songs",
-        setlists_dir=base / "setlists",
-        images_covers_dir=base / "images" / "cover",
-        images_custom_dir=base / "images" / "custom",
-        images_bg_dir=base / "images" / "bg",
+        setlists_dir=setlists_dir,
+        images_covers_dir=base / images_cfg["covers"],
+        images_custom_dir=base / images_cfg["custom"],
+        images_bg_dir=base / images_cfg["bg"],
         out_root=out_root,
         out_unofficial=out_root / "unofficial_releases",
         out_official=out_root / "official_releases",
@@ -126,4 +145,6 @@ def load_project(config_path: Path = Path("config.toml")) -> Project:
         song_dirs=song_dirs,
         song_name_tag_overrides=name_tag_overrides,
         song_version_overrides=version_overrides,
+        font_file=font_file,
+        non_karaoke_dirs=non_karaoke_dirs,
     )

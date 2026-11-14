@@ -503,10 +503,23 @@ def song_entry_sort_by_id(e):
 
 
 def get_setlist_files() -> list[Path]:
+    """All setlist files, karaoke first (sorted), then the project's non-karaoke ones.
+
+    Non-karaoke folders are configured per voice version via the
+    ``[project.setlists.non-karaoke]`` table in config.toml; a file under any of them is
+    non-karaoke. Projects without one have all their setlists treated as karaoke.
+    """
     project = get_project()
-    files = list(project.setlists_dir.glob("**/*"))
-    karaoke_setlists = [f for f in files if 'non-karaoke' not in f.parts and not f.is_dir()]
-    non_karaoke_setlists = [f for f in files if 'non-karaoke' in f.parts and not f.is_dir()]
+    files = [f for f in project.setlists_dir.glob("**/*") if not f.is_dir()]
+    nk_dirs = list(project.non_karaoke_dirs.values())
+    if not nk_dirs:
+        return sorted(files)
+
+    def is_non_karaoke(f: Path) -> bool:
+        return any(f.is_relative_to(d) for d in nk_dirs)
+
+    karaoke_setlists = [f for f in files if not is_non_karaoke(f)]
+    non_karaoke_setlists = [f for f in files if is_non_karaoke(f)]
     karaoke_setlists.sort()
     sorted_setlist_files = karaoke_setlists + non_karaoke_setlists
 

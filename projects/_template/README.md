@@ -41,6 +41,11 @@ against its `config.toml` and directory layout if you're unsure about any field.
    └── out/                 # (created automatically by songs-generate)
    ```
 
+   The image subdirs (`images/{cover,custom,bg}`), the thumbnail font file
+   (`[project] font-file` inside `fonts/`), and the non-karaoke setlist folders per voice
+   version (`[project.setlists.non-karaoke]`, paths relative to `setlists/`) are all
+   configurable in `config.toml` — see the commented examples there.
+
 4. **Run the pipeline** from the project root (or use `--project`):
    ```bash
    # Option A: cd into the project

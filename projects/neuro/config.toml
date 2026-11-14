@@ -14,6 +14,8 @@ arg-singers = ["Study-sama"]
 arg-album = "Neuro-sama ARG"
 # Path to the ARG subdirectory within the unofficial archive
 arg-subdir = "Extra Content/DISC 66 - ARG"
+# Font used for thumbnail date text (file inside fonts/)
+font-file = "First Coffee.ttf"
 
 [[project.artists]]
 name = "Neuro"
@@ -36,6 +38,19 @@ album-artist = "Neuro-Sama/Evil Neuro"
 # Song-specific overrides: title → version value (used by extract_official)
 [project.song-overrides.version]
 "Chinatown Blues" = "2"
+
+# Image subdirectories (relative to the project root)
+[project.images]
+covers = "images/cover"   # dated cover art written/read here
+custom = "images/custom"  # custom-song cover images
+bg = "images/bg"          # thumbnail background images
+
+# Non-karaoke setlist folders, keyed by voice version (paths relative to setlists/).
+# Versions whose folder doesn't exist on disk are simply skipped.
+[project.setlists.non-karaoke]
+v1 = "v1 voice/non-karaoke"
+v2 = "v2 voice/non-karaoke"
+v3 = "v3 voice/non-karaoke"
 
 # Thumbnail background images (optional — omit if this project doesn't generate thumbnails)
 # solo: singer_name → {duet_version: filename}  (singers not listed get no solo image)

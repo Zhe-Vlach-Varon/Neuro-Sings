@@ -19,7 +19,7 @@ from .utils import format_logger, time_format
 
 def apply_text(image: Image.Image,
                         text: str,
-                        font_file: str | Path = Path("fonts") / "First Coffee.ttf",
+                        font_file: str | Path | None = None,
                         font_size: int = 64,
                         font_fill_color = (255, 241, 242),
                         font_stroke_width: int = 2,
@@ -28,7 +28,14 @@ def apply_text(image: Image.Image,
 ) -> Image.Image:
     """
     Draw the given text on the image
+
+    Args:
+        font_file: Font to use. Defaults to the project's configured font
+            (``[project] font-file``, inside ``fonts/``).
     """
+    if font_file is None:
+        project = get_project()
+        font_file = project.fonts_dir / project.font_file
     w,h = image.size
     new_image = image.copy()
 
@@ -48,7 +55,7 @@ def apply_text(image: Image.Image,
     try:
         font = ImageFont.truetype(font_file, size=font_size)
     except OSError:
-        logger.error("Font \"First Coffee\" not found, exitting...")
+        logger.error(f"Font \"{Path(font_file).name}\" not found at {font_file}, exitting...")
         sys.exit(1)
 
     text_x = int(w / 2)

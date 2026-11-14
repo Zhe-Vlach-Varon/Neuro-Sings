@@ -45,11 +45,11 @@ I should have put a Google Drive link somewhere with all the files ready to be d
 
 The Google Drive holds the generated files in the `out/` tree (`unofficial_releases/` and `official_releases/`), each containing the presets (`original_sort/*` and `zvv_sort/*`) plus the `albums/` tree.
 
-It also has an `_inputs` directory; its content can be copied into the root directory of this project to obtain the full input data (`setlists/`, `data/`, `images/`, `custom/`, `unofficialV3/`, the official/copyrighted source audio, `fonts/` and the `.vscode/` config).
+It also has an `_inputs` directory; its content can be copied into the root directory of this project to obtain the full input data (`config.toml`, `setlists/`, `data/`, `images/`, `custom/`, `unofficialV3/`, the official/copyrighted source audio, `fonts/` and the `.vscode/` config).
 
 ### For me (for each batch)
 - [x] Get the new song names + order (setlist file in `setlists/`)
-- [x] Pull input files `inputs-pull` (setlists, data, images, custom, unofficialV3, etc.)
+- [x] Pull input files `inputs-pull` (config.toml, setlists, data, images, custom, unofficialV3, etc.)
 - [x] Generate json `update-json`
 - [x] Sanitize json
   - [x] Check artists name, check coherency with database with queries
@@ -97,7 +97,7 @@ All the scripts can be run with `pdm run <script-name>` after you ran `pdm insta
 - `thumbnails-generate`: Generates all thumbnails with dates
 - `thumbnails-old`: Generates the older style of thumbnails
 #### New batch
-- `inputs-pull`: Pulls all input files (setlists, data, images, custom, unofficialV3, etc.) from my drive (using `rclone`)
+- `inputs-pull`: Pulls all input files (config.toml, setlists, data, images, custom, unofficialV3, etc.) from my drive (using `rclone`)
 - `setlists-pull`: Pulls only the setlists
 - `drive-pull`: Pulls the `unofficialV3` audio from the unofficial archive (using `rclone`)
 - `update-json`: Searches through all present files for untreated files, fills in setlist duplicates, then adds them to `data/songs_new.json`

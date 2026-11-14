@@ -321,6 +321,7 @@ def inputs_pull() -> None:
     # public input files
     setlists_pull()
 
+    _rclone(f"{DRIVE_RCLONE_COMMAND} {public_drive}:{REMOTE_INPUT_PREFIX}/config.toml config.toml", "drive pull failed: config")
     _rclone(f"{DRIVE_RCLONE_COMMAND} {public_drive}:{REMOTE_INPUT_PREFIX}/{project.data_dir} {project.data_dir}", "drive pull failed: data")
     _rclone(f"{DRIVE_RCLONE_COMMAND} {public_drive}:{REMOTE_INPUT_PREFIX}/{project.images_covers_dir.parent} {project.images_covers_dir.parent}", "drive pull failed: images")
     _rclone(f"{DRIVE_RCLONE_COMMAND} {public_drive}:{REMOTE_INPUT_PREFIX}/{project.song_root / project.song_dirs['custom']} {project.song_root / project.song_dirs['custom']}", "drive pull failed: custom")
@@ -348,6 +349,8 @@ def drive_push() -> None:
     # public input files
     setlists_push()
 
+    # config.toml lives in the project root (outside data/), so mirror that on the remote too
+    _rclone(f"{DRIVE_RCLONE_COMMAND} config.toml {public_dest}{public_dir}{REMOTE_INPUT_PREFIX}/config.toml", "drive push failed: config")
     _rclone(f"{DRIVE_RCLONE_COMMAND} {project.data_dir} {public_dest}{public_dir}{REMOTE_INPUT_PREFIX}/{project.data_dir}", "drive push failed: data")
     _rclone(f"{DRIVE_RCLONE_COMMAND} {project.images_covers_dir.parent} {public_dest}{public_dir}{REMOTE_INPUT_PREFIX}/{project.images_covers_dir.parent}", "drive push failed: images")
     _rclone(f"{DRIVE_RCLONE_COMMAND} {project.song_root / project.song_dirs['custom']} {public_dest}{public_dir}{REMOTE_INPUT_PREFIX}/{project.song_root / project.song_dirs['custom']}", "drive push failed: custom")

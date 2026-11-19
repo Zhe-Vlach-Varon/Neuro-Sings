@@ -10,3 +10,6 @@ Neuro
 4 | Colorful Array | Neuro | Neuro | Colorful Array | originals;
 2026-09-21
 5 | Pattern Recognition | Neuro Feat. ODDEEO | Neuro Feat. ODDEEO | Pattern Recognition | originals;
+2026-11-15
+Evil
+6 | Neurotoxin | Evil Feat. Camellia, PB | Evil Feat. Camellia, PB | Neurotoxin | originals;

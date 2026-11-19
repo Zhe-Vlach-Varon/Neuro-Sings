@@ -304,6 +304,55 @@ def do_song_titles_match(existing_song_title: str, new_song_title: str) -> bool:
     # Both titles are already lowercased above, so no str.lower() is needed for the comparison.
     return (new_title in existing_title) and (new_is_nightcore == existing_is_nightcore)
 
+
+def title_similarity(title_a: str, title_b: str) -> float:
+    """Ranks how well two titles match under the same rules as `do_song_titles_match`.
+
+    Returns 0.0 when they don't match at all (per `do_song_titles_match`), otherwise
+    ``len(shorter) / len(longer)`` of the normalized titles — 1.0 for an exact match and a
+    lower value for a substring match. Use this to pick the best candidate file for a song
+    title instead of taking the first substring hit (e.g. "MONSTER" must not grab
+    "Watch Your Own Monster.mp3" when its own file is available).
+
+    Args:
+        title_a (str): First title (e.g. a filename stem).
+        title_b (str): Second title (e.g. the song's canonical title).
+
+    Returns:
+        float: 0.0 = no match, otherwise similarity in (0, 1].
+    """
+    if title_a is None or title_b is None:
+        return 0.0
+
+    # The "Numbers" series must match exactly instead of falling through to the substring check
+    # (same rule as do_song_titles_match).
+    if str(title_a).startswith('Numbers') and str(title_b).startswith('Numbers'):
+        a = TITLE_STRIP_RE.sub('', str(remove_accents(title_a)).lower())
+        b = TITLE_STRIP_RE.sub('', str(remove_accents(title_b)).lower())
+        return 1.0 if a == b else 0.0
+
+    a = TITLE_STRIP_RE.sub('', str(remove_accents(title_a)).lower())
+    b = TITLE_STRIP_RE.sub('', str(remove_accents(title_b)).lower())
+
+    # A nightcore/chipmunk version only matches if BOTH titles are (or aren't) one.
+    a_is_nightcore = bool(NIGHTCORE_RE.search(a))
+    b_is_nightcore = bool(NIGHTCORE_RE.search(b))
+    if a_is_nightcore != b_is_nightcore:
+        return 0.0
+    a = NIGHTCORE_RE.sub('', a)
+    b = NIGHTCORE_RE.sub('', b)
+
+    if not a or not b:
+        return 0.0
+    if a in b:
+        shorter, longer = a, b
+    elif b in a:
+        shorter, longer = b, a
+    else:
+        return 0.0
+    return len(shorter) / len(longer)
+
+
 # Compiled once at module level instead of on every call.
 ARTIST_CHAR_STRIP_RE = re.compile(r"[\_\-\(\)\[\]\{\}\<\>\.\*\/\'\\]")
 ARTIST_PRODUCER_P_RE = re.compile(r'p$')  # strips a trailing "p" (producer suffix)
@@ -497,6 +546,22 @@ def is_copyright_issue(title: str | None, artist: str | None) -> bool:
 
     return False
 
+def _is_collab_credit(cover_artist: str, singer_names: tuple[str, ...]) -> bool:
+    """A credit is a collab when it lists multiple artists and at least one of them is
+    exactly one of the project's singers (optionally with a voice-version suffix like [v1]).
+
+    Credits such as 'Neuro Feat. ODDEEO' or 'Evil Feat. Camellia, PB' are NOT collabs:
+    the singer only appears inside a 'Feat.' clause, not as a standalone credit part."""
+    parts = re.split(r'[&,]', cover_artist)
+    if len(parts) < 2:
+        return False
+    for s in singer_names:
+        pattern = rf'^{re.escape(s)}(\s*\[[^\]]+\])?$'
+        if any(re.match(pattern, part.strip()) for part in parts):
+            return True
+    return False
+
+
 def get_flags(song: SongEntry, project: Project | None = None) -> str:
 
     """ Singing voice version: 'v1', 'v2', 'v3', ''
@@ -539,9 +604,7 @@ def get_flags(song: SongEntry, project: Project | None = None) -> str:
             flags += project.flag_for(lead_singer) + ';'
     if cover_artist == project.duet_cover_artist():
         flags += 'duet;'
-    elif any(s in cover_artist for s in project.singer_names()) and (
-        (' & ' in cover_artist or ', ' in cover_artist) and cover_artist != project.duet_cover_artist()
-    ):
+    elif _is_collab_credit(cover_artist, project.singer_names()):
         flags += 'collab;'
 
     return post_process_flags(flags, song['Cover Artist'], project=project)

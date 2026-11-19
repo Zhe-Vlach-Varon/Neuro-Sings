@@ -266,6 +266,36 @@ def _make_song_entry(artist: str, cover_artist: str, title: str, file: Path, dat
     }
 
 
+def _best_file_for_title(title: str, files: list[Path], claimed_files: set[Path], existing_files: set[str]) -> Path | None:
+    """The unclaimed file (not yet in the DB) whose name matches `title` most closely.
+
+    Candidates are ranked by utils.title_similarity — 1.0 for an exact match, lower for a
+    substring match — so a song's own file always wins over an unrelated file that merely
+    contains its title as a word (e.g. "MONSTER" must not grab "Watch Your Own Monster.mp3").
+    """
+    best_file: Path | None = None
+    best_score = 0.0
+    for file in files:
+        if file in claimed_files or str(file) in existing_files:
+            continue
+        score = utils.title_similarity(file.stem, title)
+        if score > best_score:
+            best_file, best_score = file, score
+    return best_file
+
+
+def _song_already_in_db(songs_df: pl.DataFrame, title: str, artist: str, cover_artist: str | None) -> bool:
+    """True when a song with this title+artist (and cover artist, if given) is already registered."""
+    for row in songs_df.to_dicts():
+        titles_match = utils.do_song_titles_match(row['Title'], title) or utils.do_song_titles_match(title, row['Title'])
+        artists_match = (utils.get_song_artists_match_count(row['Artist'], artist) > 0
+                         or utils.get_song_artists_match_count(artist, row['Artist']) > 0)
+        covers_match = cover_artist is None or row['Cover Artist'] == cover_artist
+        if titles_match and artists_match and covers_match:
+            return True
+    return False
+
+
 def extract_official(files: list[Path], out: utils.SongJSON | None = None) -> utils.SongJSON:
     if out is None:
         out = {}
@@ -292,52 +322,53 @@ def extract_official(files: list[Path], out: utils.SongJSON | None = None) -> ut
         return out
 
     songs_db = load_db()
+    existing_files = {str(x) for x in songs_db.get_column('File_IN').to_list()}
 
     id = 1
+    # A file can only back one song entry; track what's been claimed across both loops below.
+    claimed_files: set[Path] = set()
+
+    def add_entry(title: str, artist: str, cover_artist: str, lead_singer: str, date: str, version: str, file: Path) -> None:
+        nonlocal id
+        data = _make_song_entry(artist, cover_artist, title, file, date, id, lead_singer, version)
+        if 'custom' in out:
+            out['custom'].append(data)
+        else:
+            out['custom'] = [data]
+        claimed_files.add(file)
+        id += 1
 
     for song in official_songs_csv:
-        for file in files:
-            if str(file) in songs_db['File_IN']:
-                continue
-            # need to try both orders because for some reason the mp3 file of CFRB is named 'Robot Body.mp3'
-            if utils.do_song_titles_match(file.stem, song['Title']) or utils.do_song_titles_match(song['Title'], file.stem):
-                artist = song['Artist']
-                cover_artist = song['Cover Artist']
-                title = song['Title']
-                date = song['Date']
-                # a lot of the code assumes that one of the project artists is the lead singer
-                lead_singer = None
-                for a in project.artists:
-                    if a.name in cover_artist:
-                        lead_singer = a.name
-                        break
-                if lead_singer is None:
-                    logger.error(f"how did we get here: neuro/detection.py: unexpected Cover Artist '{cover_artist}'")
-                    sys.exit(1)
-                version = project.song_version_overrides.get(title, '1')
-                data = _make_song_entry(artist, cover_artist, title, file, date, id, lead_singer, version)
-                if 'custom' in out:
-                    out['custom'].append(data)
-                else:
-                    out['custom'] = [data]
-                id += 1
-                break  # Fix #7: break after first match
+        title, artist, cover_artist = song['Title'], song['Artist'], song['Cover Artist']
+        if _song_already_in_db(songs_db, title, artist, cover_artist):
+            logger.debug(f"official cover '{artist} - {title}' already in database; skipping")
+            continue
+        file = _best_file_for_title(title, files, claimed_files, existing_files)
+        if file is None:
+            logger.warning(f"no matching file found for official cover '{artist} - {title}'")
+            continue
+        # a lot of the code assumes that one of the project artists is the lead singer
+        lead_singer = None
+        for a in project.artists:
+            if a.name in cover_artist:
+                lead_singer = a.name
+                break
+        if lead_singer is None:
+            logger.error(f"how did we get here: neuro/detection.py: unexpected Cover Artist '{cover_artist}'")
+            sys.exit(1)
+        version = project.song_version_overrides.get(title, '1')
+        add_entry(title, artist, cover_artist, lead_singer, song['Date'], version, file)
 
     for song in original_songs_csv:
-        for file in files:
-            if str(file) in songs_db['File_IN']:
-                continue
-            if utils.do_song_titles_match(file.stem, song['Title']) or utils.do_song_titles_match(song['Title'], file.stem):
-                artist = song['Artist']
-                title = song['Title']
-                date = song['Date']
-                data = _make_song_entry(artist, artist, title, file, date, id, artist, '1')
-                if 'custom' in out:
-                    out['custom'].append(data)
-                else:
-                    out['custom'] = [data]
-                id += 1
-                break  # Fix #7: break after first match
+        title, artist = song['Title'], song['Artist']
+        if _song_already_in_db(songs_db, title, artist, None):
+            logger.debug(f"original song '{artist} - {title}' already in database; skipping")
+            continue
+        file = _best_file_for_title(title, files, claimed_files, existing_files)
+        if file is None:
+            logger.warning(f"no matching file found for original song '{artist} - {title}'")
+            continue
+        add_entry(title, artist, artist, artist, song['Date'], '1', file)
 
     return out
 
@@ -647,6 +678,14 @@ def fill_in_setlists(out: utils.SongJSON | None = None) -> utils.SongJSON:
                 out[album].remove(song)
         if not out[album]:
             del out[album]
+
+    # 'custom' entries that no named album claimed are dropped by export_json. Warn about the
+    # ones that match nothing in the DB, so a forgotten setlist entry doesn't vanish silently.
+    unclaimed = [s for s in out.get('custom', []) if utils.does_matching_song_exist_in_list(s, songs_df.to_dicts()) == 0]
+    if unclaimed:
+        logger.warning(f"{len(unclaimed)} detected song(s) were not claimed by any setlist album and will be dropped from the JSON output:")
+        for s in unclaimed:
+            logger.warning(f"  {s['Artist']} - {s['Title']} (Cover Artist: {s['Cover Artist']}, date {s.get('Date')}) -> {s.get('File_IN')}")
 
     return out
 

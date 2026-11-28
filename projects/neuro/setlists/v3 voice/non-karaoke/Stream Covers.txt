@@ -4,28 +4,29 @@
 1 | I See The Light | Mandy Moore, Zachary Levi | Neuro & Miyune | I see the light | as_custom;
 2023-09-03
 2 | Baka Mitai (taxi driver) | Mitsuharu Fukuyama, Ryosuke Horii | Neuro | aura | as_custom;
+2023-10-04
+3 | Miku (Neuro ver. Abriviated w Filian Yelling) | Anamanaguchi | Neuro | Neuro Filian 2023 Oct Debate Stage | as_custom;
 2024-04-20
-3 | MOGU MOGU YUMMY | Nekomata Okayu | Neuro & Cerber | Mogu Mogu | as_custom;
+4 | MOGU MOGU YUMMY | Nekomata Okayu | Neuro & Cerber | Mogu Mogu | as_custom;
 2024-08-09
-4 | Everything Goes On | Porter Robinson | Neuro & MinikoMew | Everything goes on | as_custom;
+5 | Everything Goes On | Porter Robinson | Neuro & MinikoMew | Everything goes on | as_custom;
 2024-10-04
 Evil
-5 | Rises The Moon | Liana Flores | Evil & MinikoMew | Rises the moon | as_custom;
+6 | Rises The Moon | Liana Flores | Evil & MinikoMew | Rises the moon | as_custom;
 2024-10-27
-6 | Bring Me To Life | Evanescence | Evil & Cerber | Bring me to life | as_custom;
+7 | Bring Me To Life | Evanescence | Evil & Cerber | Bring me to life | as_custom;
 2025-03-25
-7 | Sweater Weather | The Neighbourhood | Evil
-!! 2025-03-26
-!! Neuro
-!! 8 | Stay Alive | Rie Takahashi | Neuro
-!! rip stream version of song, forgor if there was much game audio or comments from Vedal
-!! 2025-12-05
-!! 9 | Stay Alive | Rie Takahashi | Neuro | Minecraft
-!! find better art for the Minecraft Hardcore stream
-!! extract the stream audio as the song cuts off before the end
-!!
-!! should the Partners in Crime from the end of the prison break stream be included 2025-10-26
-!!     maybe not
-!!
-!! found the filian collab stream where Neuro started singing to gain political favor 2023-10-04
-!!     rip stream version from youtube, song cuts off before the end
+8 | Sweater Weather | The Neighbourhood | Evil
+Neuro
+2025-03-26
+9 | Stay Alive | Rie Takahashi | Neuro
+!! I count this as a duplicate and not a new version since the full song played, and there wasn't much significant comments from vedal or game audio
+2025-12-05
+10 | Stay Alive (MC HC ver.) | Rie Takahashi | Neuro | Minecraft Hardcore Marathon | as_custom;
+2026-08-18
+!! Followed a presentation about horses by Neuro
+11 | Stupid Horse | 100 gecs | Neuro
+2026-11-26
+Evil
+!! Thanksgiving Day random song
+12 | Stupid Horse | 100 gecs | Evil

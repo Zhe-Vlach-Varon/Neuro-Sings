@@ -133,8 +133,8 @@ def _remove_broken_shortcuts(out_dir: Path, dest: str, dir_prefix: str) -> dict[
 EXISTING_SHORTCUT_ERROR = "not overwriting shortcut target"
 
 
-def _remote_file_id(remote_path: str) -> str | None:
-    """Return the ID of a single remote file via `rclone lsjson`, or None if it can't be listed."""
+def _remote_entry(remote_path: str) -> dict | None:
+    """Return the first non-directory `rclone lsjson` entry for a single remote path, or None."""
     result = subprocess.run(f'rclone lsjson "{remote_path}"', shell=True, capture_output=True, text=True, check=False)
     if result.returncode != 0:
         return None
@@ -144,8 +144,26 @@ def _remote_file_id(remote_path: str) -> str | None:
         return None
     for entry in entries:
         if not entry.get("IsDir", False):
-            return entry.get("ID")
+            return entry
     return None
+
+
+def _remote_file_id(remote_path: str) -> str | None:
+    """Return the ID of a single remote file via `rclone lsjson`, or None if it can't be listed."""
+    entry = _remote_entry(remote_path)
+    return entry.get("ID") if entry else None
+
+
+def _is_gdrive_shortcut(occupant_id: str | None, dest_remote: str) -> bool:
+    """True if the file at dest_remote is a GDrive shortcut (valid or dangling).
+
+    A valid shortcut's ID is "<shortcut-id>\\t<target-id>"; a dangling one has a bare ID and
+    MimeType "application/vnd.google-apps.shortcut.dangling" — so check both signals.
+    """
+    if occupant_id and "\t" in occupant_id:
+        return True
+    entry = _remote_entry(dest_remote) or {}
+    return str(entry.get("MimeType", "")).startswith("application/vnd.google-apps.shortcut")
 
 
 def _existing_shortcut_points_to_same_target(shortcut_remote: str, source_remote: str) -> bool:
@@ -168,8 +186,11 @@ def _create_drive_shortcuts(out_dir: Path, dest: str, dir_prefix: str, error_lab
 
     A shortcut that already exists at its destination pointing to the same target file is kept
     as-is and counted, so re-runs are idempotent (rclone refuses to overwrite an existing
-    shortcut: "not overwriting shortcut target: existing file"). Any other rclone error still
-    fails fast: the pending ones are cancelled and it exits 1.
+    shortcut: "not overwriting shortcut target: existing file"). If the occupant is instead a
+    stale shortcut pointing to a different target — e.g. the song moved albums and its old Drive
+    file was replaced by a re-upload under a new ID, leaving the old shortcut dangling — it is
+    deleted and recreated (only GDrive shortcuts are ever removed; a regular file still fails
+    fast). Any other rclone error also fails fast: the pending ones are cancelled and it exits 1.
 
     Before creating shortcuts, the target directory structure is created on the remote
     (sequentially, parents before children) to avoid a race condition where multiple
@@ -235,11 +256,32 @@ def _create_drive_shortcuts(out_dir: Path, dest: str, dir_prefix: str, error_lab
                 f"failed to create directory '{d}' on the remote",
             )
 
-    def _run(item: tuple[Path, str]) -> tuple[Path, int, str]:
+    def _run(item: tuple[Path, str]) -> tuple[Path, int, str, bool]:
+        """Run one shortcut creation; self-heals a stale occupant. Returns (file, exit code, stderr, replaced)."""
         file, cmd = item
         # subprocess.run is fork+exec → safe to call from multiple threads (loguru too)
         code, stderr = _rclone_captured(cmd)
-        return file, code, stderr
+        if code == 0:
+            return file, code, stderr, False
+
+        # Self-heal a stale occupant: the destination holds an existing shortcut that points to a
+        # different target — e.g. the song moved albums and its old Drive file was replaced by a
+        # re-upload under a new ID, leaving the old shortcut dangling (rclone refuses to overwrite
+        # it). Delete the stale shortcut and recreate. If we can't confirm the occupant is a
+        # GDrive shortcut, leave it alone and surface the failure for manual handling.
+        replaced = False
+        if EXISTING_SHORTCUT_ERROR in stderr and not _same_target(file):
+            shortcut_rel = file.relative_to(base).as_posix()
+            dest_remote = f"{remote_prefix}{REMOTE_OUT_PREFIX / Path(shortcut_rel)}"
+            occupant_id = (file_ids or {}).get(shortcut_rel)
+            if _is_gdrive_shortcut(occupant_id, dest_remote):
+                logger.warning(f"replacing stale shortcut at {dest_remote} (it points to a different target)")
+                del_code, del_err = _rclone_captured(f'rclone delete "{dest_remote}"')
+                if del_code != 0:
+                    logger.warning(f"failed to remove stale shortcut {dest_remote}: {del_err}")
+                code, stderr = _rclone_captured(cmd)
+                replaced = True
+        return file, code, stderr, replaced
 
     def _same_target(file: Path) -> bool:
         """Check if the existing file at the shortcut path points to the same target.
@@ -261,10 +303,13 @@ def _create_drive_shortcuts(out_dir: Path, dest: str, dir_prefix: str, error_lab
 
     failed_file: Path | None = None
     skipped_existing = 0
+    replaced_stale = 0
     executor = ThreadPoolExecutor(max_workers=max_workers, thread_name_prefix="shortcut")
     try:
-        for file, code, stderr in executor.map(_run, commands):
+        for file, code, stderr, replaced in executor.map(_run, commands):
             if code == 0:
+                if replaced:
+                    replaced_stale += 1
                 continue
             # A previous run may have already created this exact shortcut.
             already_exists = EXISTING_SHORTCUT_ERROR in stderr and _same_target(file)
@@ -285,6 +330,8 @@ def _create_drive_shortcuts(out_dir: Path, dest: str, dir_prefix: str, error_lab
 
     if skipped_existing:
         logger.info(f"kept {skipped_existing} existing shortcut(s) that already pointed to the same target")
+    if replaced_stale:
+        logger.info(f"replaced {replaced_stale} stale shortcut(s) that pointed to a different target")
 
 
 def setlists_pull() -> None:

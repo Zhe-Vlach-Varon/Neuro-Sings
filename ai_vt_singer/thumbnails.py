@@ -11,7 +11,6 @@ from loguru import logger
 from PIL import Image, ImageDraw, ImageFont
 
 from . import get_project
-from .artists import Project
 from .cli import chdir_to_project
 from .polars_utils import load_dates
 from .utils import format_logger, time_format
@@ -155,33 +154,6 @@ def check_stream(stream: dict[str, str], project=None) -> None:
     if valid_versions and stream["Duet Format"] not in valid_versions:
         raise ValueError(f"Wrong duet version {stream['Duet Format']}")
 
-
-def singer_match(singer: str, version: str, project: Project) -> tuple[str | None, str]:
-    """Returns (solo_bg_filename, duet_bg_filename) for the given singer and duet version.
-
-    Lookups are driven by the project's ``bg_solo_images`` and ``bg_duet_images`` config,
-    so different projects can map singers/versions to different background images.
-
-    Args:
-        singer: Singer name (e.g. "Neuro", "Evil") or duet group name (e.g. "Twins").
-        version: Duet version string from the dates CSV (e.g. "v1", "v2v1", "v2").
-        project: The active project.
-
-    Returns:
-        (solo_filename | None, duet_filename): ``solo_filename`` is ``None`` when the singer
-        has no solo image for this version (e.g. the duet group).
-
-    Raises:
-        ValueError: If no duet bg image is configured for this version.
-    """
-    solo = (project.bg_solo_images or {}).get(singer, {}).get(version)
-    duet = (project.bg_duet_images or {}).get(version)
-    if duet is None:
-        raise ValueError(
-            f"No duet bg image configured for version '{version}' in project '{project.name}' "
-            f"([project.thumbnails.duet] in config.toml)"
-        )
-    return solo, duet
 
 def generate_main() -> None:
     """Generates all thumbnails at once. It automatically re-generate all of them."""

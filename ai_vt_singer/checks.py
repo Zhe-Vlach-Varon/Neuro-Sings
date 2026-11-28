@@ -62,7 +62,7 @@ def check_hash(*, max_workers: int = 1) -> None:
         raise AssertionError("hash check failed:\n  " + "\n  ".join(sorted(set(failures))))
 
 
-# Test if there are case inconsitancies at all
+# Test if there are case inconsistencies at all
 def check_case(field: str) -> None:
     """Checks for any inconsistency in the database regarding casing and logs any found.
 
@@ -225,7 +225,8 @@ def check_all_group_coverage() -> None:
 
 
 def all_tests() -> None:
-    """Runs all checks defined in this file"""
+    """Runs all integrity checks defined in this file, plus the setlist/DB\
+    consistency check from :mod:`ai_vt_singer.detection`."""
     chdir_to_project()
     project = get_project()
     format_logger(log_file=project.logs_dir / "checks.log")

@@ -1,10 +1,10 @@
 """Shared CLI helpers for the package entry points (multi-project selection).
 
-Every path in this package resolves relative to the current working directory
-(``ROOT_DIR = Path(".")`` in :mod:`ai_vt_singer`), so *selecting a project is a matter of
-changing into that project's directory*. Each project is a directory containing its own
-``config.toml`` (plus ``data/``, ``songs/``, ``setlists/``, ``images/``, ``out/``, ...);
-the existing Neuro Twins project *is* the repository root.
+Every path in this package resolves relative to the current working directory, so
+*selecting a project is a matter of changing into that project's directory*. Each project
+is a directory containing its own ``config.toml`` (plus ``data/``, ``songs/``,
+``setlists/``, ``images/``, ``out/``, ...); the Neuro Twins project lives in
+``projects/neuro``.
 
 This module provides a single, uniform way for entry points to accept a
 ``--project <name-or-dir>`` option and ``chdir`` into it before any project-relative work

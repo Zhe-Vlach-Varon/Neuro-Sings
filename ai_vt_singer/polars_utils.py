@@ -99,13 +99,12 @@ def stack_or(flag_list: list[str]) -> pl.Expr:
     )
 
 def stack_and(flag_list: list[str]) ->pl.Expr:
-    """matches any songs with all listed flags"""
+    """Matches songs that have all of the listed flags (starts from True and ANDs each flag's presence)."""
     return reduce(
         lambda acc, val: acc & flag_expr(val),
         flag_list,
         pl.lit(True),
     )
-    """start with True and AND with truth of each flag being present"""
 
 
 def load_db(as_db: bool = True, project: Project | None = None) -> pl.DataFrame:

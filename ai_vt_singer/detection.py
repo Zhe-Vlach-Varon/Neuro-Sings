@@ -80,7 +80,9 @@ def extract_custom(files: list[Path], out: utils.SongJSON | None = None) -> util
         filename = file.stem
         fields = filename.split(' - ')
         artist = fields[0]
-        title = fields[1]
+        # Split off a trailing "(identify)" like setlist parsing does, so custom entries carry
+        # Title/Identify consistently (e.g. "Stay Alive" + "MC HC ver.") instead of one combined title.
+        title, identify = utils.split_title_and_identify(fields[1])
         cover_artist = fields[2] if len(fields) > 2 else ""
         album = fields[3] if len(fields) > 3 else ""
 
@@ -90,7 +92,7 @@ def extract_custom(files: list[Path], out: utils.SongJSON | None = None) -> util
             "ArtistOG": "None",
             "Title": title,
             "TitleOG": "None",
-            "Identify": "None",
+            "Identify": identify,
             "Cover Artist": cover_artist,
             "File_IN": str(file),
             "id": 999999,
@@ -108,7 +110,7 @@ def extract_custom(files: list[Path], out: utils.SongJSON | None = None) -> util
 
 
 def extract_unofficialV3(files: list[Path], out: utils.SongJSON | None = None) -> utils.SongJSON:
-    """extract files from the Unofficial Neuro Karaoke Archvie v3
+    """extract files from the Unofficial Neuro Karaoke Archive v3
 
     Args:
         files (list[Path]): List of files.
@@ -587,17 +589,21 @@ def fill_in_setlists(out: utils.SongJSON | None = None) -> utils.SongJSON:
                     out[target_album].append(song)
                     break
 
+    def _full_title(song: dict) -> str:
+        # Title plus identify (when present), the combined form used for title matching.
+        return song['Title'] + ((' ' + song['Identify']) if song.get('Identify') and song['Identify'] != 'None' else '')
+
     def _merge_setlist_data_to_out(album: str, setlist_songs: list, existing_count: int, found_ids: list) -> None:
         for song in out[album]:
+            best_entry = None
+            best_score = 0.0
             for entry in setlist_songs[existing_count:]:
+                if entry['id'] in found_ids:
+                    continue  # already claimed by another file entry
+
                 title_match = (
-                    utils.do_song_titles_match(
-                        song['Title'] + ((' ' + song['Identify']) if song.get('Identify') and song['Identify'] != 'None' else ''),
-                        entry['Title'] + ((' ' + entry['Identify']) if entry.get('Identify') and entry['Identify'] != 'None' else '')
-                    ) or utils.do_song_titles_match(
-                        entry['Title'] + ((' ' + entry['Identify']) if entry.get('Identify') and entry['Identify'] != 'None' else ''),
-                        song['Title'] + ((' ' + song['Identify']) if song.get('Identify') and song['Identify'] != 'None' else '')
-                    )
+                    utils.do_song_titles_match(_full_title(song), _full_title(entry)) or
+                    utils.do_song_titles_match(_full_title(entry), _full_title(song))
                 )
 
                 artist_match = (
@@ -610,14 +616,23 @@ def fill_in_setlists(out: utils.SongJSON | None = None) -> utils.SongJSON:
                 cover_match = song['Cover Artist'].lower() == entry['Cover Artist'].lower() and not entry['encore']
                 date_match = ('Date' in song and 'Date' in entry and song['Date'] == entry['Date']) or ('Date' not in song)
 
-                if artist_match and title_match and cover_match and date_match:
-                    for key in entry:
-                        if key not in song:
-                            song[key] = entry[key]
-                    song['id'] = entry['id']
-                    song['Lead Singer'] = entry['Lead Singer']
-                    found_ids.append(entry["id"])
-                    break
+                if not (artist_match and title_match and cover_match and date_match):
+                    continue
+
+                # Rank candidates by how closely the titles match instead of taking the first one:
+                # a file for "Stay Alive (MC HC ver.)" must claim the identified track, not an earlier
+                # plain "Stay Alive" that only substring-matches it.
+                score = utils.title_similarity(_full_title(song), _full_title(entry))
+                if score > best_score:
+                    best_entry, best_score = entry, score
+
+            if best_entry is not None:
+                for key in best_entry:
+                    if key not in song:
+                        song[key] = best_entry[key]
+                song['id'] = best_entry['id']
+                song['Lead Singer'] = best_entry['Lead Singer']
+                found_ids.append(best_entry["id"])
 
     def _sort_and_insert_songs(album: str, setlist_songs: list, existing_count: int, found_ids: list) -> None:
         out[album].sort(key=song_entry_sort_by_id)
@@ -694,7 +709,7 @@ def extract_all() -> utils.SongJSON:
     """Runs all the extraction functions on all defined patterns.
 
     Returns:
-        SongJSON: Output dictionary containg all files that are not yet in the database.They are grouped by date, or category if no date was provided in filename."""
+        SongJSON: Output dictionary containing all files that are not yet in the database. They are grouped by date, or category if no date was provided in filename."""
     songs_db = load_db()
     files = get_files(songs_db)
 
@@ -762,13 +777,13 @@ def check_missing_setlist_entries() -> list[dict]:
         flag mismatches between the setlist-derived expectation and the database
         keeping in mind that setlists can contain multiple instances of a song with different track numbers :IMPORTANT: this is intended, as sometimes a song will be repeated as an encore and will thus be in the setlist multiple times with different track numbers
 
-        builds a list of found discrepencies containing dicts of with the following fields:
-            'Type': 'Missing'|'Extra'|'Mismatch'|'Flags'|'Album'    where Missing means track missing from DB, 'Extra' means unexpected track in DB, 'Mismatch' means track number mismatch between setlist and DB, 'Flags' means the DB flags differ from the setlist-derived expectation, and 'Album' means that this album exists in the database but not in any setlists
+        builds a list of found discrepencies containing dicts with the following fields:
+            'Type': 'Missing'|'Extra'|'Mismatch'|'Flags'|'Missing Setlist'    where Missing means track missing from DB, 'Extra' means unexpected track in DB, 'Mismatch' means track number mismatch between setlist and DB, 'Flags' means the DB flags differ from the setlist-derived expectation, and 'Missing Setlist' means that this album exists in the database but not in any setlists
 
         logs found errors using the following format:
             if 'Missing', 'Extra', 'Mismatch', or 'Flags':
                 issue-type: song info, setlist_file if not None
-            if 'Album':
+            if 'Missing Setlist':
                 issue-type: album name
     """
     songs_df = load_db()
@@ -848,7 +863,6 @@ def check_missing_setlist_entries() -> list[dict]:
 
             # Check for track number mismatches and flag discrepancies among matched tracks
             is_twin_duet = is_twin_duet_stream(album_name, songs)
-            # 'duplicate'/'encore' are structural markers added to encore entries in
             # 'duplicate'/'encore' are structural markers added to encore entries in
             # update_db; they are not part of the musical content flags, so ignore them
             structural = {'duplicate', 'encore'}
@@ -936,8 +950,6 @@ def check_missing_setlist_entries() -> list[dict]:
                 logger.warning(f"  Extra in DB: {entry['Album']} ({entry['Date']}) - {entry['Track_ID']}. {entry['Artist']} - {entry['Title']}")
             elif entry['Type'] == 'Flags':
                 logger.warning(f"  Flag Mismatch: {entry['Album']} ({entry['Date']}) - {entry['Track_ID']}. {entry['Artist']} - {entry['Title']}. Missing: {entry['Missing_Flags']}, Extra: {entry['Extra_Flags']}")
-            elif entry['Type'] == 'Album':
-                logger.warning(f"  Unexpected Album: {entry['Album']}")
             elif entry['Type'] == 'Missing Setlist':
                 logger.warning(f"  Missing Setlist: {entry['Album']}")
     else:
@@ -950,7 +962,7 @@ def run_setlist_check() -> int:
     chdir_to_project()
     project = get_project()
     utils.format_logger(log_file=project.logs_dir / "setlist-check.log")
-    return len(check_missing_setlist_entries()) == 0
+    return 1 if check_missing_setlist_entries() else 0
 
 
 def export_json(all_songs: utils.SongJSON) -> None:
@@ -967,7 +979,10 @@ def export_json(all_songs: utils.SongJSON) -> None:
     for key, songs in all_songs.items():
         if key != 'custom':
             for song in songs:
+                if 'Date' not in song:
+                    print(song)
                 assert 'Date' in song
+
 
     keys_to_exclude = ['custom']
     dated_songs = {k:v for k,v in all_songs.items() if k not in keys_to_exclude}

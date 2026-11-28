@@ -10,7 +10,7 @@ from pathlib import Path
 import polars as pl
 from loguru import logger
 from mutagen.flac import FLAC, Picture
-from mutagen.id3 import ID3
+from mutagen.id3 import ID3, ID3NoHeaderError
 from mutagen.id3._frames import APIC, COMM, TALB, TBPM, TDRC, TDRL, TIT2, TKEY, TPE1, TPE2, TRCK, TSO2, TYER, TextFrame
 from PIL import Image
 
@@ -48,6 +48,28 @@ def get_album_track_count(album: str) -> int:
     return _album_track_counts.get(album, 0)
 
 
+def load_id3(path: Path | str) -> ID3:
+    """Load the ID3 tag set of ``path``.
+
+    A file with no ID3 header at all (e.g. a raw MP3 that was never tagged) makes
+    ``ID3()`` raise ``ID3NoHeaderError``; in that case return a fresh empty tag set
+    bound to the file, so subsequent ``delete()``/``save()`` calls work as usual.
+
+    Args:
+        path (Path | str): File whose tags should be loaded.
+
+    Returns:
+        ID3: The loaded tag set, or an empty one if the file had no header.
+    """
+    try:
+        return ID3(path)
+    except ID3NoHeaderError:
+        logger.warning(f"No ID3 header in {path}; starting from an empty tag set")
+        id3 = ID3()
+        id3.filename = str(path)
+        return id3
+
+
 class Song:
     """Represents a Song's Metadata. Abstract class, used for common code between drive/custom songs."""
 
@@ -70,7 +92,7 @@ class Song:
         """Songs from the ARG channel"""
         official: bool
         originals: bool
-        """Songs that have been officially released on at least one streaming service (excluding youtube, because appearently chinatown blues mv version is now included in unofficial archive)"""
+        """Songs that have been officially released on at least one streaming service (excluding youtube, because apparently chinatown blues mv version is now included in unofficial archive)"""
         encore: bool
         """Songs that were re-run during the same stream"""
         copyright_issues: bool
@@ -258,7 +280,7 @@ class Song:
         img = APIC(
             encoding=3,  # 3 is for utf-8
             mime="image/jpeg",  # image/jpeg or image/png
-            type=18,  # 3 is for the cover image
+            type=18,  # ID3 picture type: 18 = "icon (other)" (use 3 for "cover (front)")
             desc="Cover",
             data=cover.read_bytes(),  # read_bytes() closes the handle automatically (open().read() leaked it)
         )
@@ -439,10 +461,7 @@ class Song:
             filename = f"{prefix}{self.artist} - {self.title}{identify}{encore} - {self.cover_artist}"
         else:
             filename = f"{prefix}{self.artist} - {self.title}{identify}{encore} [{self.name_tag}] [{self.date}]"
-        # TODO add {self.track_n} to start of file name
-        # TODO get total number of tracks for tag
-        # TODO if entire karaoke stream (only karaoke streams, not the subathon or other setlists from the non-karaoke folder)
-        #       if entire stream is duets, remove the 'neuro;' or 'evil;' flags
+        # TODO add {self.track_n} to start of file name (numberedFiles support exists but no caller enables it yet)
 
         return sanitize_filename(filename)
 
@@ -495,7 +514,7 @@ class DriveSong(Song):
         picture to the file.
         """
         # Text tags
-        id3 = ID3(self.outfile)
+        id3 = load_id3(self.outfile)
 
         common_props = self.get_id3_frames(ascii_tags=ascii_tags)
         for frame in common_props:
@@ -588,7 +607,7 @@ class CustomSong(Song):
 
     def apply_id3(self, ascii_tags: bool = False) -> None:
         """ID3 version of the metadata management. Similar to the one for Drive Songs."""
-        id3 = ID3(self.outfile)
+        id3 = load_id3(self.outfile)
         id3.delete()
 
         for frame in self.get_id3_frames(ascii_tags=ascii_tags):
@@ -656,7 +675,7 @@ class CustomSong(Song):
 
         common = self.get_vorbis_frames(ascii_tags=ascii_tags)
         for k, v in common.items():
-            # Uppercase totaly unneeded I think
+            # Uppercase totally unneeded I think
             file.tags[k.upper()] = v  # type: ignore
 
         # Cover

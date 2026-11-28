@@ -120,26 +120,25 @@ def file_check(file_: Path | str, /) -> None:
 
 
 def time_format(dt: float, precise: bool = False) -> str:
-    """Formats a floating point number of seconds as min/sec, sec, or ms, ...
-    Done automatically once and for all
+    """Formats a floating point number of seconds as h/mn/s, s, ms, μs or ns.
 
     Args:
-        dt (float): Time
-        precise (bool, optional): Display seconds if dt > 3600. Display decimals\
-            if dt>60. Defaults to False.
+        dt (float): Time in seconds.
+        precise (bool, optional): If True, adds trailing seconds for values over an hour and\
+            decimal seconds for values between 1 minute and 1 hour. Defaults to False.
 
     Returns:
         str: Pretty time string
     """
     i = int(dt)
     if dt > 3600:
-        hour = i // 60
-        min, sec = divmod(i, 60)
+        hour = i // 3600
+        min, sec = divmod(i % 3600, 60)
         extra = f"{sec}s" if precise else ""
         return f"{hour}h{min}mn" + extra
     if dt > 60:
         min, sec = divmod(i, 60)
-        extra = f".{dt - i:.2f}" if precise else ""
+        extra = f".{round((dt - i) * 100):02d}" if precise else ""
         return f"{min}mn{sec}s" + extra
     elif dt > 1:
         return f"{dt:.2f}s"

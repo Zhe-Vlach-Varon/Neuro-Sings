@@ -241,10 +241,9 @@ def check_group() -> None:
 
 
 def generate_songs(create_placeholders: bool = False) -> None:
-    """Generates all songs files. For each files it first copies the files into\
-    its destination, then edits the metadata of the destination file. This is\
-    just to avoid tempering the original files.\
-    Generates songs in preset groups.
+    """Generates all song files, grouped by preset group. For each file it first places a copy\
+    (or a symlink, when [output] make-links is true) into its destination, then edits the\
+    metadata of that destination file — this avoids tampering with the original files.
     """
     chdir_to_project()
     config = load_config()[0]
@@ -436,7 +435,7 @@ def mp3gain_standalone() -> None:
                      "[features.mp3gain].type to 'gain' or 'tag'")
         sys.exit(1)
 
-    # Force ON_ALL so the per-preset booleans (currently all false) don't disable everything
+    # Force ON_ALL so the per-preset booleans don't disable this run
     preset_mp3gain = (MP3GainMode.ON_ALL, mp3gain[1])
 
     for preset in config["Presets"]:

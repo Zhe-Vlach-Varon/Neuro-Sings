@@ -33,9 +33,9 @@ def _artist_from_dict(d: dict) -> CoverArtist:
 def load_project(config_path: Path = Path("config.toml")) -> Project:
     """Parse ``config.toml`` and return a :class:`Project` instance.
 
-    Paths are resolved relative to the current working directory (matching the existing
-    ``ROOT_DIR = Path(".")`` design), so a project is selected simply by ``cd``-ing into its
-    directory. The config **must** contain a ``[project]`` section.
+    Paths are resolved relative to the current working directory, so a project is selected
+    simply by ``cd``-ing into its directory (or passing ``--project``). The config **must**
+    contain a ``[project]`` section.
 
     Args:
         config_path: Path to the config file. Defaults to ``config.toml`` in the CWD.
